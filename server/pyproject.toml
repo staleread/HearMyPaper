@@ -1,0 +1,9 @@
+[project]
+name = "hearmypaper-server"
+version = "0.1.0"
+description = "A server part of HearMyPaper project"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.116.1",
+    "ruff>=0.13.0",
+]
