@@ -1,0 +1,31 @@
+from pydantic import BaseModel
+
+from .enums import UserRole
+
+
+class RegisterRequest(BaseModel):
+    username: str
+    role: UserRole
+    public_key: str
+
+
+class RegisterResponse(BaseModel):
+    user_id: int
+
+
+class ChallengeRequest(BaseModel):
+    user_id: int
+
+
+class ChallengeResponse(BaseModel):
+    challenge: str
+
+
+class SignatureRequest(BaseModel):
+    user_id: int
+    challenge: str
+    signature: str
+
+
+class SignatureResponse(BaseModel):
+    is_success: bool
