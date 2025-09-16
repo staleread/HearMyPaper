@@ -1,4 +1,3 @@
 # HearMyPaper
 
-Secure your course projects, unlock them with a token, and only let the
-instructor listen
+Secure your course project, and only let the instructor listen!
