@@ -5,7 +5,7 @@ from .enums import UserRole
 
 class RegisterRequest(BaseModel):
     username: str
-    role: UserRole = UserRole.STUDENT
+    role: UserRole
     public_key: str
 
 

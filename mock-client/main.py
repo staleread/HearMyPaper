@@ -19,7 +19,7 @@ print("Public key below:")
 print(public_key_b64)
 
 print("\n1.2. Registering user")
-payload = {"username": "nicolas442", "public_key": public_key_b64}
+payload = {"username": "nicolas442", "role": "student", "public_key": public_key_b64}
 
 r1 = requests.post("http://localhost:8000/auth/register", json=payload)
 user_id = r1.json()["user_id"]
