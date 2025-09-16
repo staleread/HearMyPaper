@@ -22,7 +22,7 @@ class ChallengeResponse(BaseModel):
 
 
 class SignatureRequest(BaseModel):
-    username: str
+    user_id: int
     challenge: str
     signature: str
 

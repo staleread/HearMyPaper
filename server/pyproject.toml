@@ -1,9 +1,14 @@
 [project]
 name = "hearmypaper-server"
 version = "0.1.0"
-description = "A server part of HearMyPaper project"
+description = "HearMyPaper server"
 requires-python = ">=3.13"
 dependencies = [
+    "asyncpg>=0.30.0",
+    "cryptography>=45.0.7",
     "fastapi[standard]>=0.116.1",
+    "mypy>=1.18.1",
+    "pydantic-settings>=2.10.1",
     "ruff>=0.13.0",
+    "sqlalchemy>=2.0.43",
 ]
