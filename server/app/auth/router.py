@@ -8,6 +8,7 @@ from .models import (
     SignatureRequest,
     SignatureResponse,
 )
+from .service import generate_challenge
 
 router = APIRouter()
 
@@ -19,7 +20,8 @@ async def register(req: RegisterRequest) -> RegisterResponse:
 
 @router.post("/challenge")
 def request_challenge(req: ChallengeRequest) -> ChallengeResponse:
-    return ChallengeResponse(challenge="K3d9jr_Mock_challenge_.wsKsdf")
+    challenge = generate_challenge()
+    return ChallengeResponse(challenge=challenge)
 
 
 @router.post("/signature")
