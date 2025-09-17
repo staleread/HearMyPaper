@@ -1,8 +1,17 @@
 import base64
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from .api_client import register_user, request_challenge, submit_challenge, APIClientError
-from .credentials_repo import save_user_credentials, get_user_credentials, CredentialsRepoError
+from .api_client import (
+    register_user,
+    request_challenge,
+    submit_challenge,
+    APIClientError,
+)
+from .credentials_repo import (
+    save_user_credentials,
+    get_user_credentials,
+    CredentialsRepoError,
+)
 
 
 def register(username, role, token_path, password) -> str | None:
@@ -46,4 +55,3 @@ def login(token_path, password) -> str | None:
         return str(e)
     except Exception as e:
         return f"Unexpected error during login: {e}"
-

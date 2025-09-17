@@ -40,4 +40,3 @@ def submit_challenge(user_id, challenge_b64, signed_challenge_b64) -> bool:
     r = requests.post("http://localhost:8000/auth/signature", json=payload)
 
     return _check_response(r)["is_success"]
-

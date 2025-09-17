@@ -13,7 +13,9 @@ def register_screen(navigator):
     token_label = toga.Label("No file selected")
 
     async def pick_file(widget):
-        dialog = toga.SaveFileDialog(title="Select token path", suggested_filename="hearmypaper_token.bin")
+        dialog = toga.SaveFileDialog(
+            title="Select token path", suggested_filename="hearmypaper_token.bin"
+        )
         file_path = await navigator.main_window.dialog(dialog)
         if file_path:
             token_label.text = file_path
@@ -39,8 +41,9 @@ def register_screen(navigator):
             token_label,
             password,
             toga.Button("Submit", on_press=on_submit),
-            toga.Button("Back to Login", on_press=lambda w: navigator.navigate("login")),
+            toga.Button(
+                "Back to Login", on_press=lambda w: navigator.navigate("login")
+            ),
         ],
         style=Pack(direction=COLUMN, margin=20, gap=10),
     )
-

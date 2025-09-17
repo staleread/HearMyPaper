@@ -11,7 +11,9 @@ class CredentialsRepoError(Exception):
     """Raised when storing or retrieving user credentials fails."""
 
 
-def save_user_credentials(user_id: str, token_path: str, private_key_bytes: bytes, password: str) -> None:
+def save_user_credentials(
+    user_id: str, token_path: str, private_key_bytes: bytes, password: str
+) -> None:
     """
     Encrypt user_id and private_key_bytes with password (PBKDF2 + AES-256-GCM)
     and save to token_path as binary file.
@@ -37,9 +39,7 @@ def save_user_credentials(user_id: str, token_path: str, private_key_bytes: byte
 
         iv = secrets.token_bytes(12)
         encryptor = Cipher(
-            algorithms.AES(key),
-            modes.GCM(iv),
-            backend=default_backend()
+            algorithms.AES(key), modes.GCM(iv), backend=default_backend()
         ).encryptor()
 
         ciphertext = encryptor.update(plaintext) + encryptor.finalize()
@@ -83,9 +83,7 @@ def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
         key = kdf.derive(password.encode("utf-8"))
 
         decryptor = Cipher(
-            algorithms.AES(key),
-            modes.GCM(iv, tag),
-            backend=default_backend()
+            algorithms.AES(key), modes.GCM(iv, tag), backend=default_backend()
         ).decryptor()
 
         plaintext = decryptor.update(ciphertext) + decryptor.finalize()
@@ -100,4 +98,3 @@ def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
 
     except Exception:
         raise CredentialsRepoError(f"Failed to read credentials")
-

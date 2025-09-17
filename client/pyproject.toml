@@ -8,4 +8,5 @@ dependencies = [
     "briefcase>=0.3.25",
     "cryptography>=46.0.1",
     "requests>=2.32.5",
+    "ruff>=0.13.0",
 ]

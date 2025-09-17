@@ -1,5 +1,6 @@
 import toga
 
+
 class Navigator:
     def __init__(self, main_window: toga.MainWindow):
         self.main_window = main_window
@@ -14,4 +15,3 @@ class Navigator:
 
         widget = self.screens[name](self)
         self.main_window.content = widget
-
