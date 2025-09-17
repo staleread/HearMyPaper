@@ -6,7 +6,6 @@ from hearmypaper.services.auth_service import login
 
 
 def login_screen(navigator):
-    username = toga.TextInput(placeholder="Username")
     password = toga.PasswordInput(placeholder="Password")
 
     token_label = toga.Label("No file selected")
@@ -18,15 +17,22 @@ def login_screen(navigator):
             token_label.text = file_path
 
     async def on_submit(widget):
-        login(username.value, password.value, token_label.text)
+        error = login(token_label.text, password.value)
+
+        if not error:
+            dialog = toga.InfoDialog(title="Info", message="Login successful")
+
+            return await navigator.main_window.dialog(dialog)
+
+        dialog = toga.ErrorDialog(title="Oops", message=error)
+        await navigator.main_window.dialog(dialog)
 
     return toga.Box(
         children=[
             toga.Label("Login", style=Pack(padding=(0, 0, 10, 0))),
-            username,
-            password,
             toga.Button("Select token path", on_press=pick_file),
             token_label,
+            password,
             toga.Button("Submit", on_press=on_submit),
             toga.Button("Register", on_press=lambda w: navigator.navigate("register")),
         ],
