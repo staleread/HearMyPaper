@@ -1,5 +1,4 @@
 import toga
-from toga.style.pack import COLUMN, ROW
 
 from .utils.navigator import Navigator
 from .ui.login_screen import login_screen

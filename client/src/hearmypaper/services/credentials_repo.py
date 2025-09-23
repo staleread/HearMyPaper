@@ -50,7 +50,7 @@ def save_user_credentials(
             f.write(encrypted_data)
 
     except Exception:
-        raise CredentialsRepoError(f"Failed to save credentials")
+        raise CredentialsRepoError("Failed to save credentials")
 
 
 def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
@@ -67,10 +67,10 @@ def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
     if len(data) < 16 + 12 + 16:  # salt + iv + tag at minimum
         raise CredentialsRepoError("Corrupted file: too short")
 
-        salt = data[:16]
-        iv = data[16:28]
-        tag = data[-16:]
-        ciphertext = data[28:-16]
+    salt = data[:16]
+    iv = data[16:28]
+    tag = data[-16:]
+    ciphertext = data[28:-16]
 
     try:
         kdf = PBKDF2HMAC(
@@ -88,13 +88,12 @@ def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
 
         plaintext = decryptor.update(ciphertext) + decryptor.finalize()
         decoded = plaintext.decode("utf-8")
-
-        try:
-            user_id, hex_priv = decoded.split(",", 1)
-        except ValueError:
-            raise CredentialsRepoError("Invalid plaintext format inside token")
-
-        return user_id, bytes.fromhex(hex_priv)
-
     except Exception:
-        raise CredentialsRepoError(f"Failed to read credentials")
+        raise CredentialsRepoError("Failed to read credentials")
+
+    try:
+        user_id, hex_priv = decoded.split(",", 1)
+    except ValueError:
+        raise CredentialsRepoError("Invalid plaintext format inside token")
+
+    return user_id, bytes.fromhex(hex_priv)
