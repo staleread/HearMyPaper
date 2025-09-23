@@ -21,7 +21,7 @@ dev = [
 ]
 
 [project.urls]
-homepage = "https://staleread.github.io/HearMyPaper/"
+Homepage = "https://staleread.github.io/HearMyPaper/"
 
 [tool.briefcase]
 project_name = "HearMyPaper"
