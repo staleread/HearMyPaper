@@ -1,53 +1,57 @@
 # HearMyPaper (Client)
 
-Cross-platform client for HearMyPaper built with [BeeWare Toga](https://beeware.org/).
+Cross-platform client for HearMyPaper, built with [BeeWare Toga](https://beeware.org/).
 
 ---
 
 ## 🛠️ Development Setup
 
 ### 1. Prerequisites
-- Python **3.13** (as defined in `pyproject.toml`)
-- [uv](https://github.com/astral-sh/uv) package/dependency manager
 
-Install `uv` if not already:
+* Python `>=3.13` (as defined in `pyproject.toml`)
+* [pip](https://pip.pypa.io/) for dependency management
+* [BeeWare Briefcase](https://briefcase.readthedocs.io/) for building & packaging
 
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+### 2. Create a virtual environment & install dependencies
 
-2. Create a virtual environment & install dependencies
 From the project root:
 
 ```bash
-uv venv .venv
-. .venv/bin/activate
-uv sync
+python -m venv .venv
+source .venv/bin/activate   # On Windows use: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-This will install dependencies listed in `pyproject.toml` into `.venv`.
+If you prefer to install directly from `pyproject.toml`:
 
-3. Run the app in development mode
+```bash
+pip install .
+```
+
+### 3. Run the app in development mode
+
 Inside the venv:
 
 ```bash
 briefcase dev
 ```
 
-This starts the app in development mode — changes under src/hearmypaper/ are picked up immediately without rebuilding.
+This launches the app in development mode — changes under `src/hearmypaper/` are picked up immediately without rebuilding.
 
-4. Run tests
+### 4. Run tests
 
 ```bash
-uv run pytest
+pytest
 ```
 
+---
+
 ## 📦 Building the App
+
 BeeWare can package the app for multiple platforms:
 
-Windows / macOS / Linux desktop
-
-iOS / Android mobile
+* **Windows / macOS / Linux** (desktop)
+* **iOS / Android** (mobile)
 
 ### Build & run a packaged app
 
@@ -57,28 +61,38 @@ briefcase build
 briefcase run
 ```
 
-Make a distributable installer
+### Make a distributable installer
 
 ```bash
 briefcase package
 ```
 
+---
+
 ## 📚 Useful Links
-- BeeWare Toga docs: https://toga.readthedocs.io/
-- BeeWare Briefcase docs: https://briefcase.readthedocs.io/en/latest/
-- Tutorial: https://beeware.org/project/projects/tutorials/
-- uv docs: https://docs.astral.sh/uv/
+
+* [BeeWare Toga docs](https://toga.readthedocs.io/)
+* [BeeWare Briefcase docs](https://briefcase.readthedocs.io/en/latest/)
+* [BeeWare Tutorial](https://beeware.org/project/projects/tutorials/)
+
+---
 
 ## 📂 Project Structure
 
 ```bash
-hearmypaper/
+.
 ├── src/hearmypaper/        # App source code
-│   ├── app.py              # Entry point
-│   ├── ui/                 # UI screens
-│   ├── services/           # Business logic & API calls
-│   └── utils/              # Helpers (navigator, etc.)
+│   ├── app.py              # App entry point
+│   ├── __main__.py         # Allows running as `python -m hearmypaper`
+│   ├── models/             # Data models
+│   ├── resources/          # Assets, static files
+│   ├── services/           # API clients, auth, repositories
+│   ├── ui/                 # UI screens (login, register, etc.)
+│   └── utils/              # Helpers (e.g., navigator)
 ├── tests/                  # Unit tests
 ├── pyproject.toml          # Project metadata & dependencies
+├── LICENSE                 # License info
+├── CHANGELOG               # Version history
 └── README.md               # You are here 🚀
 ```
+
