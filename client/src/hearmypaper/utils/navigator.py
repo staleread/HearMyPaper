@@ -1,10 +1,12 @@
 import toga
 
+from collections.abc import Callable
+
 
 class Navigator:
     def __init__(self, main_window: toga.MainWindow):
         self.main_window = main_window
-        self.screens = {}
+        self.screens: dict[str, Callable[[Navigator], toga.Widget]] = {}
 
     def register_screen(self, name: str, screen_factory):
         self.screens[name] = screen_factory

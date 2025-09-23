@@ -50,7 +50,7 @@ def save_user_credentials(
             f.write(encrypted_data)
 
     except Exception:
-        raise CredentialsRepoError(f"Failed to save credentials")
+        raise CredentialsRepoError("Failed to save credentials")
 
 
 def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
@@ -89,7 +89,7 @@ def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
         plaintext = decryptor.update(ciphertext) + decryptor.finalize()
         decoded = plaintext.decode("utf-8")
     except Exception:
-        raise CredentialsRepoError(f"Failed to read credentials")
+        raise CredentialsRepoError("Failed to read credentials")
 
     try:
         user_id, hex_priv = decoded.split(",", 1)
