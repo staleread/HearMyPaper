@@ -51,7 +51,6 @@ def decode_user_token(token: str) -> UserInfo | None:
         )
         return UserInfo(
             user_id=payload.user_id,
-            role=payload.role,
             access_level=payload.access_level,
             categories=set(payload.categories),
         )

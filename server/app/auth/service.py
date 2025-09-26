@@ -1,25 +1,50 @@
-import os
-import base64
+from sqlalchemy import Connection
+from fastapi.exceptions import HTTPException
 
-from cryptography.hazmat.primitives.asymmetric import ed25519
-from cryptography.exceptions import InvalidSignature
+from app.shared.models import UserInfo
+from app.user import service as user_service
+
+from .models import (
+    RegisterRequest,
+    RegisterResponse,
+    ChallengeResponse,
+    LoginRequest,
+    LoginResponse,
+)
+from .utils import generate_login_challenge, verify_login_challenge, encode_user_token
+
+# TODO: remove this
+public_keys = dict()
 
 
-def generate_challenge() -> str:
-    return base64.b64encode(os.urandom(256)).decode("utf-8")
+def register_user(req: RegisterRequest, *, connection: Connection) -> RegisterResponse:
+    user_id = 1
+    public_keys[user_id] = req.public_key
+
+    return RegisterResponse(user_id=user_id)
 
 
-def verify_signed_challenge(
-    *, signature_b64: str, challenge_b64: str, public_key_b64: str
-) -> bool:
-    try:
-        signature_bytes = base64.b64decode(signature_b64)
-        challenge_bytes = base64.b64decode(challenge_b64)
-        public_key_bytes = base64.b64decode(public_key_b64)
+def create_login_challenge() -> ChallengeResponse:
+    challenge = generate_login_challenge()
+    return ChallengeResponse(challenge=challenge)
 
-        public_key = ed25519.Ed25519PublicKey.from_public_bytes(public_key_bytes)
-        public_key.verify(signature_bytes, challenge_bytes)
 
-        return True
-    except InvalidSignature:
-        return False
+def login_user(req: LoginRequest, *, connection: Connection) -> LoginResponse:
+    public_key_b64 = public_keys[req.user_id]
+    is_success = verify_login_challenge(
+        signature_b64=req.signature,
+        challenge_b64=req.challenge,
+        public_key_b64=public_key_b64,
+    )
+
+    if not is_success:
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+
+    user = user_service.get_user_by_id(req.user_id, connection=connection)
+
+    payload = UserInfo(
+        user_id=user.id, access_level=user.access_level, categories=user.categories
+    )
+    token = encode_user_token(payload)
+
+    return LoginResponse(token=token)

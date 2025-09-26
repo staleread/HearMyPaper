@@ -7,4 +7,4 @@ router = APIRouter()
 
 @router.get("/")
 async def get_user() -> User:
-    return User(id=1, username="Nicolas")
+    return User(id=1, username="Nicolas", access_level=2, categories=set("student"))
