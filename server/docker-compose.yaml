@@ -6,7 +6,17 @@ services:
       - ./nginx:/etc/nginx:ro
     ports:
       - "443:443"
+    depends_on:
+      - api
 
   api:
     build: .
     container_name: hmp-api
+    env_file: .env
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    container_name: hmp-postgres
+    env_file: .env
