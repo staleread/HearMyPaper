@@ -30,6 +30,10 @@ Inside the venv:
 briefcase dev
 ```
 
+> [!NOTE]
+> When running for the first time (or whenever the dependencies change)
+> consider using `briefcase dev -r` to pack the required dependencies
+
 ---
 
 ## 📦 Building the App
