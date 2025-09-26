@@ -32,7 +32,7 @@ def verify_login_challenge(
 
 def encode_user_token(payload: UserInfo) -> str:
     moment = datetime.now(tz=timezone.utc) + timedelta(
-        seconds=env_settings.jwt.lifetime
+        seconds=env_settings.jwt_lifetime_sec
     )
 
     data = {
@@ -40,14 +40,14 @@ def encode_user_token(payload: UserInfo) -> str:
         **payload.model_dump(),
     }
     return jwt.encode(
-        data, env_settings.jwt.secret, algorithm=env_settings.jwt.algorithm
+        data, env_settings.jwt_secret, algorithm=env_settings.jwt_algorithm
     )
 
 
 def decode_user_token(token: str) -> UserInfo | None:
     try:
         payload = jwt.decode(
-            token, env_settings.jwt.secret, algorithms=[env_settings.jwt.algorithm]
+            token, env_settings.jwt_secret, algorithms=[env_settings.jwt_algorithm]
         )
         return UserInfo(
             user_id=payload.user_id,

@@ -10,7 +10,7 @@ class DataSource(Enum):
     POSTGRES = "postgres"
 
 
-postgres_engine = create_engine(env_settings.postgres.url)
+postgres_engine = create_engine(env_settings.postgres_url)
 
 
 def get_db_engine(data_source: DataSource):

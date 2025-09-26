@@ -2,33 +2,23 @@ from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class PostrgresSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_prefix="postgres_")
+class EnvSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env")
 
-    user: str
-    password: str
-    host: str
-    port: str = "5432"
-    database: str
+    jwt_secret: str
+    jwt_algorithm: str
+    jwt_lifetime_sec: int
+
+    postgres_user: str
+    postgres_password: str
+    postgres_host: str
+    postgres_port: str = "5432"
+    postgres_database: str
 
     @computed_field  # type: ignore
     @property
-    def url(self) -> str:
-        return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
-
-
-class JwtSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_prefix="jwt_")
-
-    cookie_name: str
-    secret: str
-    algorithm: str
-    lifetime: int
-
-
-class EnvSettings(BaseSettings):
-    postgres: PostrgresSettings
-    jwt: JwtSettings
+    def postgres_url(self) -> str:
+        return f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_database}"
 
 
 env_settings = EnvSettings()  # type: ignore
