@@ -8,8 +8,11 @@ from app.shared.utils.db import SqlQueryRunner
 
 
 def get_db_connection(data_source: DataSource):
-    with get_db_engine(data_source).begin() as connection:
-        yield connection
+    def get_connection():
+        with get_db_engine(data_source).begin() as connection:
+            yield connection
+
+    return get_connection
 
 
 PostgresConnectionDep = Annotated[
@@ -21,4 +24,4 @@ def get_postgres_query_runner(connection: PostgresConnectionDep) -> SqlQueryRunn
     return SqlQueryRunner(connection=connection)
 
 
-PostgresQueryRunnerDep = Annotated[SqlQueryRunner, Depends(get_postgres_query_runner())]
+PostgresQueryRunnerDep = Annotated[SqlQueryRunner, Depends(get_postgres_query_runner)]
