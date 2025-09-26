@@ -1,21 +1,22 @@
+from datetime import datetime
+
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton,
     QFileDialog, QMessageBox, QComboBox, QHBoxLayout, QFrame,
     QSpacerItem, QSizePolicy, QGraphicsOpacityEffect
 )
 from PyQt5.QtCore import pyqtSignal, Qt, QPropertyAnimation, QEasingCurve
-
+from hearmypaper.ui.dashbord_screen import DashboardScreen
 
 class RegisterScreen(QWidget):
     navigate_to_login = pyqtSignal()
 
-    def __init__(self, auth_service):
+    def __init__(self, auth_service, navigator=None):
         super().__init__()
         self.auth_service = auth_service
+        self.navigator = navigator
         self.token_path = ""
         self.init_ui()
-        self.center_window()
-        self.animate_widgets()
 
     def init_ui(self):
         self.setWindowTitle("Register")
@@ -186,14 +187,8 @@ class RegisterScreen(QWidget):
             self.token_label.setText(file_path)
 
     def on_submit(self):
-        if not self.username_input.text():
-            QMessageBox.warning(self, "Error", "Please enter a username")
-            return
-        if not self.token_path:
-            QMessageBox.warning(self, "Error", "Please select a token file path")
-            return
-        if not self.password_input.text():
-            QMessageBox.warning(self, "Error", "Please enter a password")
+        if not self.username_input.text() or not self.token_path or not self.password_input.text():
+            QMessageBox.warning(self, "Error", "Please fill all fields")
             return
 
         error = self.auth_service.register(
@@ -204,8 +199,16 @@ class RegisterScreen(QWidget):
         )
 
         if not error:
-            QMessageBox.information(self, "Success", "Registration successful")
-            self.navigate_to_login.emit()
+            user_data = {
+                "username": self.username_input.text(),
+                "registered_at": datetime.now().isoformat(),
+                "last_login_at": datetime.now().isoformat()
+            }
+            projects = []  # можна передати порожній список або реальні проекти
+            if self.navigator:  # ⬅️ тепер спрацює
+                dashboard = DashboardScreen(self.navigator, user_data, projects)  # ⬅️ новий код
+                self.navigator.stacked_widget.addWidget(dashboard)  # ⬅️ новий код
+                self.navigator.stacked_widget.setCurrentWidget(dashboard)  # ⬅️ новий код
         else:
             QMessageBox.critical(self, "Error", error)
 

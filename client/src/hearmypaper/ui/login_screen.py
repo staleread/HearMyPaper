@@ -4,6 +4,9 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import pyqtSignal, Qt, QPropertyAnimation, QEasingCurve, QTimer
 from datetime import datetime
+from hearmypaper.ui.dashbord_screen import DashboardScreen
+
+
 
 class LoginScreen(QWidget):
     navigate_to_register = pyqtSignal()
@@ -141,12 +144,14 @@ class LoginScreen(QWidget):
                 "registered_at": "2025-09-26T12:00:00+03:00",
                 "last_login_at": datetime.now().isoformat()
             }
+            projects = [
+                {"title": "Math", "syllabus": "Algebra", "status": "Submitted", "deadline": "2025-09-30"},
+                {"title": "Physics", "syllabus": "Mechanics", "status": "Pending", "deadline": "2025-10-01"}
+            ]
             if self.navigator:
-                self.navigator.navigate_user_profile(user_data)
-            else:
-                from user_profile_screen import UserProfileScreen
-                self.profile_screen = UserProfileScreen(user_data)
-                self.profile_screen.show()
+                dashboard = DashboardScreen(self.navigator, user_data, projects)  # ⬅️ новий код
+                self.navigator.stacked_widget.addWidget(dashboard)  # ⬅️ новий код
+                self.navigator.stacked_widget.setCurrentWidget(dashboard)  # ⬅️ новий код
         else:
             QMessageBox.critical(self, "Error", error)
 

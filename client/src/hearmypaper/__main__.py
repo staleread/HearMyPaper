@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QApplication
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-
 from utils.navigator import Navigator
 from services.auth_service import register, login
 
