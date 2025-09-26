@@ -1,19 +1,52 @@
-import toga
+import sys
+import os
+from PyQt5.QtWidgets import QMainWindow, QStackedWidget
 
-from collections.abc import Callable
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from hearmypaper.ui.login_screen import LoginScreen
+from hearmypaper.ui.register_screen import RegisterScreen
+from hearmypaper.ui.user_profile_screen import UserProfileScreen
 
 
-class Navigator:
-    def __init__(self, main_window: toga.MainWindow):
-        self.main_window = main_window
-        self.screens: dict[str, Callable[[Navigator], toga.Widget]] = {}
 
-    def register_screen(self, name: str, screen_factory):
-        self.screens[name] = screen_factory
 
-    def navigate(self, name: str):
-        if name not in self.screens:
+class Navigator(QMainWindow):
+    def __init__(self, auth_service):
+        super().__init__()
+        self.auth_service = auth_service
+        self.screens = {}
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("HearMyPaper")
+        self.setGeometry(100, 100, 400, 500)
+
+        self.stacked_widget = QStackedWidget()
+        self.setCentralWidget(self.stacked_widget)
+
+
+        self.register_screen("login", lambda: LoginScreen(self.auth_service, navigator=self))
+        self.register_screen("register", lambda: RegisterScreen(self.auth_service))
+
+
+        self.screens["login"].navigate_to_register.connect(lambda: self.navigate("register"))
+        self.screens["register"].navigate_to_login.connect(lambda: self.navigate("login"))
+
+        self.navigate("login")
+
+    def register_screen(self, name, screen_factory):
+        screen = screen_factory()
+        self.screens[name] = screen
+        self.stacked_widget.addWidget(screen)
+
+    def navigate(self, name):
+        if name in self.screens:
+            self.stacked_widget.setCurrentWidget(self.screens[name])
+        else:
             raise ValueError(f"Screen '{name}' not registered")
 
-        widget = self.screens[name](self)
-        self.main_window.content = widget
+    def navigate_user_profile(self, user_data):
+        profile_screen = UserProfileScreen(user_data)
+        self.stacked_widget.addWidget(profile_screen)
+        self.stacked_widget.setCurrentWidget(profile_screen)
