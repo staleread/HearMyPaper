@@ -1,6 +1,13 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QLabel, QTableWidget, QTableWidgetItem,
-    QPushButton, QHBoxLayout, QComboBox, QHeaderView
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QTableWidget,
+    QTableWidgetItem,
+    QPushButton,
+    QHBoxLayout,
+    QComboBox,
+    QHeaderView,
 )
 from PyQt5.QtCore import Qt
 
@@ -41,7 +48,9 @@ class SubmissionsListScreen(QWidget):
 
         self.table = QTableWidget()
         self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["Title", "Syllabus", "Status", "Deadline"])
+        self.table.setHorizontalHeaderLabels(
+            ["Title", "Syllabus", "Status", "Deadline"]
+        )
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         layout.addWidget(self.table)
 
@@ -49,7 +58,9 @@ class SubmissionsListScreen(QWidget):
 
         if self.user_role == "Curator":
             self.add_button = QPushButton("Create New Project")
-            self.add_button.setStyleSheet("background:#3F51B5; color:white; border-radius:8px; padding:8px;")
+            self.add_button.setStyleSheet(
+                "background:#3F51B5; color:white; border-radius:8px; padding:8px;"
+            )
             layout.addWidget(self.add_button)
 
         self.setLayout(layout)

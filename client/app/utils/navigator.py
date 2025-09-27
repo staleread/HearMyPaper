@@ -1,15 +1,9 @@
-import sys
-import os
 from PyQt5.QtWidgets import QMainWindow, QStackedWidget
 
-
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from hearmypaper.ui.login_screen import LoginScreen
-from hearmypaper.ui.register_screen import RegisterScreen
-from hearmypaper.ui.user_profile_screen import UserProfileScreen
-from hearmypaper.ui.submition_screen import SubmissionsListScreen
+from app.ui.login_screen import LoginScreen
+from app.ui.register_screen import RegisterScreen
+from app.ui.user_profile_screen import UserProfileScreen
+from app.ui.submition_screen import SubmissionsListScreen
 
 
 class Navigator(QMainWindow):
@@ -26,11 +20,19 @@ class Navigator(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
 
-        self.register_screen("login", lambda: LoginScreen(self.auth_service, navigator=self))
-        self.register_screen("register", lambda: RegisterScreen(self.auth_service, navigator=self))
+        self.register_screen(
+            "login", lambda: LoginScreen(self.auth_service, navigator=self)
+        )
+        self.register_screen(
+            "register", lambda: RegisterScreen(self.auth_service, navigator=self)
+        )
 
-        self.screens["login"].navigate_to_register.connect(lambda: self.navigate("register"))
-        self.screens["register"].navigate_to_login.connect(lambda: self.navigate("login"))
+        self.screens["login"].navigate_to_register.connect(
+            lambda: self.navigate("register")
+        )
+        self.screens["register"].navigate_to_login.connect(
+            lambda: self.navigate("login")
+        )
 
         self.navigate("login")
 
@@ -46,7 +48,9 @@ class Navigator(QMainWindow):
             raise ValueError(f"Screen '{name}' not registered")
 
     def navigate_user_profile(self, user_data):
-        profile_screen = UserProfileScreen(user_data, navigator=self)  # <- передаємо navigator
+        profile_screen = UserProfileScreen(
+            user_data, navigator=self
+        )  # <- передаємо navigator
         self.stacked_widget.addWidget(profile_screen)
         self.stacked_widget.setCurrentWidget(profile_screen)
 
@@ -54,6 +58,3 @@ class Navigator(QMainWindow):
         submissions_screen = SubmissionsListScreen(user_role, projects)
         self.stacked_widget.addWidget(submissions_screen)
         self.stacked_widget.setCurrentWidget(submissions_screen)
-
-
-

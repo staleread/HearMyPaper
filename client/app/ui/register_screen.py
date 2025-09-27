@@ -1,15 +1,27 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton,
-    QFileDialog, QMessageBox, QHBoxLayout, QFrame, QSpacerItem, QSizePolicy, QGraphicsOpacityEffect
-)
-from PyQt5.QtCore import pyqtSignal, Qt, QPropertyAnimation, QEasingCurve, QTimer
 from datetime import datetime
-from hearmypaper.ui.dashbord_screen import DashboardScreen
+
+from PyQt5.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QFileDialog,
+    QMessageBox,
+    QComboBox,
+    QHBoxLayout,
+    QFrame,
+    QSpacerItem,
+    QSizePolicy,
+    QGraphicsOpacityEffect,
+)
+from PyQt5.QtCore import pyqtSignal, Qt, QPropertyAnimation, QEasingCurve
+
+from app.ui.dashboard_screen import DashboardScreen
 
 
-
-class LoginScreen(QWidget):
-    navigate_to_register = pyqtSignal()
+class RegisterScreen(QWidget):
+    navigate_to_login = pyqtSignal()
 
     def __init__(self, auth_service, navigator=None):
         super().__init__()
@@ -19,36 +31,61 @@ class LoginScreen(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle("Login")
-        self.setMinimumSize(420, 500)
+        self.setWindowTitle("Register")
+        self.setMinimumSize(420, 520)
 
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(0)
         main_layout.setContentsMargins(40, 40, 40, 40)
+        main_layout.setSpacing(0)
 
         content_container = QFrame()
-        content_container.setFixedWidth(340)
-        content_container.setMaximumWidth(340)
-        content_container.setMaximumHeight(600)
+        content_container.setMaximumWidth(440)
+        content_container.setMaximumHeight(660)
         content_layout = QVBoxLayout(content_container)
         content_layout.setSpacing(15)
         content_layout.setContentsMargins(0, 0, 0, 0)
 
-        content_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        content_layout.addSpacerItem(
+            QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        )
 
-        self.title_label = QLabel("Welcome Back")
+        # Title
+        self.title_label = QLabel("Create Account")
         self.title_label.setAlignment(Qt.AlignCenter)
         self.title_label.setStyleSheet("""
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: #3F51B5;
         """)
         content_layout.addWidget(self.title_label)
 
-        self.token_button = QPushButton("Select Token File")
-        self.token_button.clicked.connect(self.pick_file)
+        self.username_input = QLineEdit()
+        self.username_input.setPlaceholderText("Username")
+        self.username_input.setStyleSheet(self.input_style())
+        content_layout.addWidget(QLabel("Username:"))
+        content_layout.addWidget(self.username_input)
+
+        content_layout.addWidget(QLabel("Role:"))
+        self.role_combo = QComboBox()
+        self.role_combo.addItems(["Student", "Instructor"])
+        self.role_combo.setStyleSheet("""
+            QComboBox {
+                border-radius: 8px;
+                padding: 8px;
+                border: 2px solid #BDBDBD;
+                background-color: #FFFFFF;
+                font-size: 14px;
+            }
+            QComboBox:focus {
+                border: 2px solid #3F51B5;
+            }
+        """)
+        content_layout.addWidget(self.role_combo)
+
+        self.token_button = QPushButton("Select token file")
         self.token_button.setCursor(Qt.PointingHandCursor)
+        self.token_button.clicked.connect(self.pick_file)
         self.token_button.setStyleSheet(self.button_style("#3F51B5"))
         content_layout.addWidget(self.token_button)
 
@@ -73,25 +110,21 @@ class LoginScreen(QWidget):
                 border: none;
                 background: transparent;
                 font-size: 16px;
-                color: #9E9E9E;
-            }
-            QPushButton:checked {
-                color: #3F51B5;
             }
         """)
         pw_layout.addWidget(self.eye_button)
         content_layout.addLayout(pw_layout)
 
-        self.submit_button = QPushButton("Login")
-        self.submit_button.clicked.connect(self.on_submit)
+        self.submit_button = QPushButton("Register")
         self.submit_button.setCursor(Qt.PointingHandCursor)
+        self.submit_button.clicked.connect(self.on_submit)
         self.submit_button.setStyleSheet(self.gradient_button_style())
         content_layout.addWidget(self.submit_button)
 
-        self.register_button = QPushButton("Create an account")
-        self.register_button.clicked.connect(self.navigate_to_register.emit)
-        self.register_button.setCursor(Qt.PointingHandCursor)
-        self.register_button.setStyleSheet("""
+        self.login_button = QPushButton("Back to Login")
+        self.login_button.setCursor(Qt.PointingHandCursor)
+        self.login_button.clicked.connect(self.navigate_to_login.emit)
+        self.login_button.setStyleSheet("""
             QPushButton {
                 background: transparent;
                 color: #3F51B5;
@@ -103,9 +136,12 @@ class LoginScreen(QWidget):
                 color: #303F9F;
             }
         """)
-        content_layout.addWidget(self.register_button, alignment=Qt.AlignCenter)
+        content_layout.addWidget(self.login_button, alignment=Qt.AlignCenter)
 
-        content_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        content_layout.addSpacerItem(
+            QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        )
+
         main_layout.addWidget(content_container)
         self.setLayout(main_layout)
 
@@ -119,37 +155,81 @@ class LoginScreen(QWidget):
         """)
 
     def toggle_password_visibility(self):
-        if self.eye_button.isChecked():
-            self.password_input.setEchoMode(QLineEdit.Normal)
-            self.eye_button.setText("👁‍🗨")
-        else:
-            self.password_input.setEchoMode(QLineEdit.Password)
-            self.eye_button.setText("👁")
+        self.password_input.setEchoMode(
+            QLineEdit.Normal if self.eye_button.isChecked() else QLineEdit.Password
+        )
+
+    def center_window(self):
+        screen_geometry = self.screen().availableGeometry()
+        window_size = self.size()
+        x = (screen_geometry.width() - window_size.width()) // 2
+        y = (screen_geometry.height() - window_size.height()) // 2
+        self.move(x, y)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.layout().setAlignment(Qt.AlignCenter)
+
+    def animate_widgets(self):
+        for widget in [
+            self.title_label,
+            self.username_input,
+            self.role_combo,
+            self.token_button,
+            self.token_label,
+            self.password_input,
+            self.submit_button,
+            self.login_button,
+            self.eye_button,
+        ]:
+            effect = QGraphicsOpacityEffect()
+            widget.setGraphicsEffect(effect)
+            anim = QPropertyAnimation(effect, b"opacity")
+            anim.setDuration(800)
+            anim.setStartValue(0)
+            anim.setEndValue(1)
+            anim.setEasingCurve(QEasingCurve.InOutQuad)
+            anim.start()
+            widget.anim = anim
 
     def pick_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Select token path", "", "All Files (*)")
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Select token path",
+            "hearmypaper_token.bin",
+            "Binary Files (*.bin);;All Files (*)",
+        )
         if file_path:
             self.token_path = file_path
             self.token_label.setText(file_path)
 
     def on_submit(self):
-        if not self.token_path or not self.password_input.text():
-            QMessageBox.warning(self, "Error", "Token and password required")
+        if (
+            not self.username_input.text()
+            or not self.token_path
+            or not self.password_input.text()
+        ):
+            QMessageBox.warning(self, "Error", "Please fill all fields")
             return
 
-        error = self.auth_service.login(self.token_path, self.password_input.text())
+        error = self.auth_service.register(
+            self.username_input.text(),
+            self.role_combo.currentText(),
+            self.token_path,
+            self.password_input.text(),
+        )
+
         if not error:
             user_data = {
-                "username": "TestUser",
-                "registered_at": "2025-09-26T12:00:00+03:00",
-                "last_login_at": datetime.now().isoformat()
+                "username": self.username_input.text(),
+                "registered_at": datetime.now().isoformat(),
+                "last_login_at": datetime.now().isoformat(),
             }
-            projects = [
-                {"title": "Math", "syllabus": "Algebra", "status": "Submitted", "deadline": "2025-09-30"},
-                {"title": "Physics", "syllabus": "Mechanics", "status": "Pending", "deadline": "2025-10-01"}
-            ]
-            if self.navigator:
-                dashboard = DashboardScreen(self.navigator, user_data, projects)  # ⬅️ новий код
+            projects = []  # можна передати порожній список або реальні проекти
+            if self.navigator:  # ⬅️ тепер спрацює
+                dashboard = DashboardScreen(
+                    self.navigator, user_data, projects
+                )  # ⬅️ новий код
                 self.navigator.stacked_widget.addWidget(dashboard)  # ⬅️ новий код
                 self.navigator.stacked_widget.setCurrentWidget(dashboard)  # ⬅️ новий код
         else:

@@ -1,6 +1,6 @@
 # HearMyPaper (Client)
 
-Cross-platform client for HearMyPaper, built with [BeeWare Toga](https://beeware.org/).
+Cross-platform client for HearMyPaper, built with [PyQt5](https://pypi.org/project/PyQt5/).
 
 ---
 
@@ -9,17 +9,20 @@ Cross-platform client for HearMyPaper, built with [BeeWare Toga](https://beeware
 ### 1. Prerequisites
 
 * Python `>=3.13` (as defined in `pyproject.toml`)
-* [pip](https://pip.pypa.io/) for dependency management
-* [BeeWare Briefcase](https://briefcase.readthedocs.io/) for building & packaging
+* [uv](https://docs.astral.sh/uv/) for dependency management and running tasks
 
-### 2. Create a virtual environment & install dependencies
+### 2. Create and sync the environment
 
 From the project root:
 
 ```bash
-python -m venv .venv
+uv sync --extra dev
+```
+
+To enter the environment:
+
+```bash
 source .venv/bin/activate   # On Windows use: .venv\Scripts\activate
-pip install .[dev]
 ```
 
 ### 3. Run the app in development mode
@@ -27,32 +30,5 @@ pip install .[dev]
 Inside the venv:
 
 ```bash
-briefcase dev
-```
-
-> [!NOTE]
-> When running for the first time (or whenever the dependencies change)
-> consider using `briefcase dev -r` to pack the required dependencies
-
----
-
-## 📦 Building the App
-
-BeeWare can package the app for multiple platforms:
-
-* **Windows / macOS / Linux** (desktop)
-* **iOS / Android** (mobile)
-
-### Build & run a packaged app
-
-```bash
-briefcase create
-briefcase build
-briefcase run
-```
-
-### Make a distributable installer
-
-```bash
-briefcase package
+python -m app
 ```

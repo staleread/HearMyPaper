@@ -1,6 +1,15 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame, QSpacerItem, QSizePolicy, QPushButton
+from PyQt5.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QFrame,
+    QSpacerItem,
+    QSizePolicy,
+    QPushButton,
+)
 from PyQt5.QtCore import Qt
 from dateutil import parser
+
 
 class UserProfileScreen(QWidget):
     def __init__(self, user_data: dict, navigator=None):
@@ -27,7 +36,9 @@ class UserProfileScreen(QWidget):
         container_layout.setSpacing(15)
         container_layout.setContentsMargins(0, 0, 0, 0)
 
-        container_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        container_layout.addSpacerItem(
+            QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        )
 
         # Заголовок
         title_label = QLabel(f"Welcome, {self.user_data.get('username', 'User')}")
@@ -37,17 +48,23 @@ class UserProfileScreen(QWidget):
 
         # Дата реєстрації
         registered_at = parser.isoparse(self.user_data.get("registered_at"))
-        reg_label = QLabel(f"Registered at: {registered_at.strftime('%Y-%m-%d %H:%M:%S %z')}")
+        reg_label = QLabel(
+            f"Registered at: {registered_at.strftime('%Y-%m-%d %H:%M:%S %z')}"
+        )
         reg_label.setAlignment(Qt.AlignCenter)
         container_layout.addWidget(reg_label)
 
         # Дата останнього логіну
         last_login_at = parser.isoparse(self.user_data.get("last_login_at"))
-        login_label = QLabel(f"Last login: {last_login_at.strftime('%Y-%m-%d %H:%M:%S %z')}")
+        login_label = QLabel(
+            f"Last login: {last_login_at.strftime('%Y-%m-%d %H:%M:%S %z')}"
+        )
         login_label.setAlignment(Qt.AlignCenter)
         container_layout.addWidget(login_label)
 
-        container_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        container_layout.addSpacerItem(
+            QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        )
 
         # Кнопка назад
         back_button = QPushButton("Back")
