@@ -5,6 +5,14 @@ class APIClientError(Exception):
     """Raised when the API returns an error response."""
 
 
+s = requests.Session()
+
+# TODO: replace with relative path
+s.verify = (
+    "/home/mykola/edu/chnu/python-web/HearMyPaper/server/nginx/hearmypaper.edu.crt"
+)
+
+
 def _check_response(r: requests.Response) -> dict:
     try:
         r.raise_for_status()
@@ -19,24 +27,25 @@ def _check_response(r: requests.Response) -> dict:
 
 def register_user(username, role, public_key_b64) -> str:
     payload = {"username": username, "role": role.lower(), "public_key": public_key_b64}
-    r = requests.post("http://localhost:8000/auth/register", json=payload)
+    r = s.post("https://localhost/auth/register", json=payload)
 
     return _check_response(r)["user_id"]
 
 
 def request_challenge(user_id) -> str:
     payload = {"user_id": user_id}
-    r = requests.post("http://localhost:8000/auth/challenge", json=payload)
+    r = s.post("https://localhost/auth/challenge", json=payload)
 
     return _check_response(r)["challenge"]
 
 
-def submit_challenge(user_id, challenge_b64, signed_challenge_b64) -> bool:
+def submit_challenge(user_id, challenge_b64, signed_challenge_b64):
     payload = {
         "user_id": user_id,
         "challenge": challenge_b64,
         "signature": signed_challenge_b64,
     }
-    r = requests.post("http://localhost:8000/auth/signature", json=payload)
+    r = s.post("https://localhost/auth/login", json=payload)
 
-    return _check_response(r)["is_success"]
+    token = _check_response(r)["token"]
+    s.headers.update({"Authorization": f"Bearer {token}"})

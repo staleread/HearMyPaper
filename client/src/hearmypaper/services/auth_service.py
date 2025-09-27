@@ -45,10 +45,7 @@ def login(token_path, password) -> str | None:
         signed_challenge_bytes = private_key.sign(challenge_bytes)
         signed_challenge_b64 = base64.b64encode(signed_challenge_bytes).decode("utf-8")
 
-        success = submit_challenge(user_id, challenge_b64, signed_challenge_b64)
-
-        if not success:
-            return "Authentication failed: invalid signature"
+        submit_challenge(user_id, challenge_b64, signed_challenge_b64)
 
         return None
     except (APIClientError, CredentialsRepoError) as e:

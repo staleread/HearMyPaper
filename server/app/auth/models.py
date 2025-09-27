@@ -1,6 +1,11 @@
 from pydantic import BaseModel
+from enum import StrEnum
 
-from .enums import UserRole
+
+class UserRole(StrEnum):
+    STUDENT = "student"
+    CURATOR = "curator"
+    INSTRUCTOR = "instructor"
 
 
 class RegisterRequest(BaseModel):
@@ -21,11 +26,11 @@ class ChallengeResponse(BaseModel):
     challenge: str
 
 
-class SignatureRequest(BaseModel):
+class LoginRequest(BaseModel):
     user_id: int
     challenge: str
     signature: str
 
 
-class SignatureResponse(BaseModel):
-    is_success: bool
+class LoginResponse(BaseModel):
+    token: str
