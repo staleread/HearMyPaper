@@ -15,12 +15,11 @@ def generate_login_challenge() -> str:
 
 
 def verify_login_challenge(
-    *, signature_b64: str, challenge_b64: str, public_key_b64: str
+    *, signature_b64: str, challenge_b64: str, public_key_bytes: bytes
 ) -> bool:
     try:
         signature_bytes = base64.b64decode(signature_b64)
         challenge_bytes = base64.b64decode(challenge_b64)
-        public_key_bytes = base64.b64decode(public_key_b64)
 
         public_key = ed25519.Ed25519PublicKey.from_public_bytes(public_key_bytes)
         public_key.verify(signature_bytes, challenge_bytes)
@@ -30,14 +29,16 @@ def verify_login_challenge(
         return False
 
 
-def encode_user_token(payload: UserInfo) -> str:
+def encode_user_token(user: UserInfo) -> str:
     moment = datetime.now(tz=timezone.utc) + timedelta(
         seconds=env_settings.jwt_lifetime_sec
     )
 
     data = {
         "exp": int(moment.timestamp()),
-        **payload.model_dump(),
+        "user_id": user.user_id,
+        "access_level": user.access_level,
+        "categories": list(user.categories),
     }
     return jwt.encode(
         data, env_settings.jwt_secret, algorithm=env_settings.jwt_algorithm

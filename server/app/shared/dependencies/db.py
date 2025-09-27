@@ -1,14 +1,17 @@
 from typing import Annotated
 from fastapi import Depends
 from sqlalchemy import Connection
+from collections.abc import Callable, Generator
 
 from app.shared.config.db import get_db_engine, DataSource
 
-from app.shared.utils.db import SqlQueryRunner
+from app.shared.utils.db import SqlRunner
 
 
-def get_db_connection(data_source: DataSource):
-    def get_connection():
+def get_db_connection(
+    data_source: DataSource,
+) -> Callable[[], Generator[Connection, None, None]]:
+    def get_connection() -> Generator[Connection, None, None]:
         with get_db_engine(data_source).begin() as connection:
             yield connection
 
@@ -20,8 +23,8 @@ PostgresConnectionDep = Annotated[
 ]
 
 
-def get_postgres_query_runner(connection: PostgresConnectionDep) -> SqlQueryRunner:
-    return SqlQueryRunner(connection=connection)
+def get_postgres_runner(connection: PostgresConnectionDep) -> SqlRunner:
+    return SqlRunner(connection=connection)
 
 
-PostgresQueryRunnerDep = Annotated[SqlQueryRunner, Depends(get_postgres_query_runner)]
+PostgresRunnerDep = Annotated[SqlRunner, Depends(get_postgres_runner)]

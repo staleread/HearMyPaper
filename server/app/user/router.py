@@ -1,10 +1,16 @@
-from fastapi import APIRouter
+from typing import Annotated
+from fastapi import APIRouter, Path
 
-from .models import User
+from app.shared.dependencies.db import PostgresRunnerDep
+
+from .models import UserDto
+from . import service as user_service
 
 router = APIRouter()
 
 
-@router.get("/")
-async def get_user() -> User:
-    return User(id=1, username="Nicolas", access_level=2, categories=set("student"))
+@router.get("/{user_id}")
+async def get_user_by_id(
+    user_id: Annotated[int, Path()], db: PostgresRunnerDep
+) -> UserDto:
+    return user_service.get_user_by_id(user_id, db=db)

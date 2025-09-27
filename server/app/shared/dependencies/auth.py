@@ -1,24 +1,27 @@
-from fastapi import HTTPException, Header
+from fastapi import Header
 from typing import Annotated
+from collections.abc import Callable
 
 from app.shared.models import UserInfo
-from app.auth.utils import decode_user_token
+from app.auth import service as auth_service
+from app.auth.enums import ConfidentialityLevel, SubjectAction
 
 
-def get_authorized_user(*, access_level=int, categories: set[str]):
+def authorize_subject(
+    *,
+    subject_action: SubjectAction = SubjectAction.READ,
+    confidentiality_level: ConfidentialityLevel = ConfidentialityLevel.UNCLASSIFIED,
+    object_categories: set[str] = set(),
+) -> Callable[[Annotated[str | None, Header()]], UserInfo]:
+    if object_categories is None:
+        object_categories = set()
+
     def get_user(authorization: Annotated[str | None, Header()] = None) -> UserInfo:
-        if not authorization:
-            raise HTTPException(status_code=401, detail="Unauthorized")
-
-        token = authorization.split(" ")[1]
-        user = decode_user_token(token=token)
-
-        if not user:
-            raise HTTPException(status_code=401, detail="Unauthorized")
-
-        if user.access_level < access_level or not user.categories & categories:
-            raise HTTPException(status_code=403, detail="Forbidden")
-
-        return user
+        return auth_service.authorize_subject(
+            auth_header=authorization,
+            subject_action=subject_action,
+            confidentiality_level=confidentiality_level,
+            object_categories=object_categories,
+        )
 
     return get_user

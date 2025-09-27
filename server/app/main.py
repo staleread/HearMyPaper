@@ -11,5 +11,5 @@ app.include_router(user_router, prefix="/user")
 
 
 @app.get("/health")
-async def check_health():
+async def check_health() -> str:
     return "I'm good"
