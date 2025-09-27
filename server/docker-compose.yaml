@@ -14,9 +14,29 @@ services:
     container_name: hmp-api
     env_file: .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+        restart: true
 
   postgres:
     image: postgres:latest
     container_name: hmp-postgres
     env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: hmp-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
