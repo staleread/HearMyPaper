@@ -1,27 +1,42 @@
-from fastapi import Header
+from fastapi import Header, HTTPException
 from typing import Annotated
-from collections.abc import Callable
 
-from app.shared.models import UserInfo
-from app.auth import service as auth_service
-from app.auth.enums import ConfidentialityLevel, SubjectAction
+from app.auth.models import Subject
+from app.auth.utils import decode_subject_token
 
 
-def authorize_subject(
-    *,
-    subject_action: SubjectAction = SubjectAction.READ,
-    confidentiality_level: ConfidentialityLevel = ConfidentialityLevel.UNCLASSIFIED,
-    object_categories: set[str] = set(),
-) -> Callable[[Annotated[str | None, Header()]], UserInfo]:
-    if object_categories is None:
-        object_categories = set()
+def get_current_subject(
+    authorization: Annotated[str | None, Header()] = None,
+) -> Subject:
+    """
+    Extract and validate the current subject from the Authorization header.
 
-    def get_user(authorization: Annotated[str | None, Header()] = None) -> UserInfo:
-        return auth_service.authorize_subject(
-            auth_header=authorization,
-            subject_action=subject_action,
-            confidentiality_level=confidentiality_level,
-            object_categories=object_categories,
+    Expected format: "Bearer <token>"
+    """
+
+    if not authorization:
+        raise HTTPException(
+            status_code=401,
+            detail="Missing Authorization header",
         )
 
-    return get_user
+    parts = authorization.split(" ")
+    if len(parts) != 2 or parts[0] != "Bearer":
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid Authorization header format",
+        )
+
+    token = parts[1]
+    subject = decode_subject_token(token)
+
+    if not subject:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token",
+        )
+
+    return subject
+
+
+CurrentSubjectDep = Annotated[Subject, get_current_subject]

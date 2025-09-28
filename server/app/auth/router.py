@@ -2,9 +2,7 @@ from fastapi import APIRouter
 
 from app.shared.dependencies.db import PostgresRunnerDep
 
-from .models import (
-    RegisterRequest,
-    RegisterResponse,
+from .dto import (
     ChallengeRequest,
     ChallengeResponse,
     LoginRequest,
@@ -14,13 +12,6 @@ from . import service as auth_service
 
 
 router = APIRouter()
-
-
-@router.post("/register")
-async def register_user(
-    req: RegisterRequest, db: PostgresRunnerDep
-) -> RegisterResponse:
-    return auth_service.register_user(req, db=db)
 
 
 @router.post("/challenge")

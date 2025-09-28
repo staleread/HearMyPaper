@@ -1,15 +1,9 @@
-import base64
 from fastapi.exceptions import HTTPException
 
-from app.shared.models import UserInfo
 from app.user import repository as user_repo
-from app.user.models import UserCreateDto
 from app.shared.utils.db import SqlRunner
-from app.auth.models import UserRole
 
-from .models import (
-    RegisterRequest,
-    RegisterResponse,
+from .dto import (
     ChallengeResponse,
     LoginRequest,
     LoginResponse,
@@ -17,22 +11,10 @@ from .models import (
 from .utils import (
     generate_login_challenge,
     verify_login_challenge,
-    encode_user_token,
-    decode_user_token,
+    encode_subject_token,
 )
-from .enums import ConfidentialityLevel, SubjectAction
-
-
-def register_user(req: RegisterRequest, *, db: SqlRunner) -> RegisterResponse:
-    dto = UserCreateDto(
-        username=req.username,
-        access_level=_resolve_access_level(req.role),
-        categories=_resolve_subject_categories(req.role),
-        public_key=base64.b64decode(req.public_key),
-    )
-    user_id = user_repo.create_user(dto, db=db)
-
-    return RegisterResponse(user_id=user_id)
+from .models import Subject, ObjectId
+from .enums import AccessLevel, AccessType
 
 
 def create_login_challenge() -> ChallengeResponse:
@@ -52,67 +34,43 @@ def login_user(req: LoginRequest, *, db: SqlRunner) -> LoginResponse:
     if not is_success:
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
-    payload = UserInfo(
-        user_id=user.id, access_level=user.access_level, categories=user.categories
+    subject = Subject(
+        id=user.id, access_level=user.access_level, access_rules=user.access_rules
     )
-    token = encode_user_token(payload)
+    token = encode_subject_token(subject)
 
     return LoginResponse(token=token)
 
 
 def authorize_subject(
     *,
-    auth_header: str | None,
-    subject_action: SubjectAction,
-    confidentiality_level: ConfidentialityLevel,
-    object_categories: set[str],
-) -> UserInfo:
-    if not auth_header:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+    subject: Subject,
+    access_type: AccessType,
+    object_id: ObjectId,
+    object_access_level: AccessLevel,
+) -> Subject:
+    """Authorize subject to access an object using Bell–LaPadula rules + explicit access rules."""
 
-    token = auth_header.split(" ")[1]
-    user = decode_user_token(token=token)
+    matching_rule = next(
+        (rule for rule in subject.access_rules if rule.object_id == object_id),
+        None,
+    )
+    if not matching_rule:
+        raise HTTPException(status_code=403, detail="No access rule for this object")
 
-    if not user:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+    # Ensure the requested access_type is allowed by the rule
+    if not (matching_rule.access & access_type):
+        raise HTTPException(status_code=403, detail="Access type not permitted")
 
-    if not user.categories & object_categories:
-        raise HTTPException(status_code=403, detail="No matching category")
+    # Enforce Bell–LaPadula rules
+    if AccessType.READ in access_type and subject.access_level < object_access_level:
+        raise HTTPException(
+            status_code=403, detail="Read access forbidden (no read up)"
+        )
 
-    if (
-        subject_action == SubjectAction.READ
-        and user.access_level < confidentiality_level.value
-    ):
-        raise HTTPException(status_code=403, detail="Read access forbidden")
+    if AccessType.WRITE in access_type and subject.access_level > object_access_level:
+        raise HTTPException(
+            status_code=403, detail="Write access forbidden (no write down)"
+        )
 
-    if (
-        subject_action == SubjectAction.WRITE
-        and user.access_level > confidentiality_level.value
-    ):
-        raise HTTPException(status_code=403, detail="Write access forbidden")
-
-    return user
-
-
-def _resolve_access_level(role: UserRole) -> int:
-    match role:
-        case UserRole.STUDENT:
-            return 2
-        case UserRole.CURATOR:
-            return 2
-        case UserRole.INSTRUCTOR:
-            return 3
-        case _:
-            raise ValueError("Unknown user role")
-
-
-def _resolve_subject_categories(role: UserRole) -> set[str]:
-    match role:
-        case UserRole.STUDENT:
-            return {"submission"}
-        case UserRole.CURATOR:
-            return {"preparation"}
-        case UserRole.INSTRUCTOR:
-            return {"review"}
-        case _:
-            raise ValueError("Unknown user role")
+    return subject

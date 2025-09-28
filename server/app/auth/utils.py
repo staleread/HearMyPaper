@@ -7,7 +7,9 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.exceptions import InvalidSignature
 
 from app.shared.config.env import env_settings
-from app.shared.models import UserInfo
+
+from .models import Subject, AccessRule
+from .enums import AccessLevel, UserRole
 
 
 def generate_login_challenge() -> str:
@@ -29,31 +31,43 @@ def verify_login_challenge(
         return False
 
 
-def encode_user_token(user: UserInfo) -> str:
+def encode_subject_token(subject: Subject) -> str:
     moment = datetime.now(tz=timezone.utc) + timedelta(
         seconds=env_settings.jwt_lifetime_sec
     )
 
     data = {
         "exp": int(moment.timestamp()),
-        "user_id": user.user_id,
-        "access_level": user.access_level,
-        "categories": list(user.categories),
+        "subject_id": subject.id,
+        "access_level": subject.access_level.value,
+        "access_rules": [str(rule) for rule in subject.access_rules],
     }
     return jwt.encode(
         data, env_settings.jwt_secret, algorithm=env_settings.jwt_algorithm
     )
 
 
-def decode_user_token(token: str) -> UserInfo | None:
+def decode_subject_token(token: str) -> Subject | None:
     try:
         payload = jwt.decode(
             token, env_settings.jwt_secret, algorithms=[env_settings.jwt_algorithm]
         )
-        return UserInfo(
-            user_id=payload.user_id,
-            access_level=payload.access_level,
-            categories=set(payload.categories),
+        return Subject(
+            id=payload.subject_id,
+            access_level=AccessLevel(payload.access_level),
+            access_rules=[AccessRule.parse(rule) for rule in payload.access_rules],
         )
     except jwt.ExpiredSignatureError:
         return None
+
+
+def get_access_level_by_role(role: UserRole) -> AccessLevel:
+    match role:
+        case UserRole.STUDENT:
+            return AccessLevel.CONTROLLED
+        case UserRole.CURATOR:
+            return AccessLevel.CONTROLLED
+        case UserRole.INSTRUCTOR:
+            return AccessLevel.RESTRICTED
+        case _:
+            raise ValueError("Unknown user role")
