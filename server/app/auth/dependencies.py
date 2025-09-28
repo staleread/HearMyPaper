@@ -1,4 +1,4 @@
-from fastapi import Header, HTTPException
+from fastapi import Header, HTTPException, Depends
 from typing import Annotated
 
 from app.auth.models import Subject
@@ -23,7 +23,7 @@ def get_current_subject(
     parts = authorization.split(" ")
     if len(parts) != 2 or parts[0] != "Bearer":
         raise HTTPException(
-            status_code=401,
+            status_code=400,
             detail="Invalid Authorization header format",
         )
 
@@ -39,4 +39,4 @@ def get_current_subject(
     return subject
 
 
-CurrentSubjectDep = Annotated[Subject, get_current_subject]
+CurrentSubjectDep = Annotated[Subject, Depends(get_current_subject)]

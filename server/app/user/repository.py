@@ -63,7 +63,7 @@ def create_user(user: User, *, db: SqlRunner) -> int:
         .bind(
             username=user.username,
             access_level=user.access_level.value,
-            access_rules=user.access_rules,
+            access_rules=[str(rule) for rule in user.access_rules],
             public_key=user.public_key,
         )
         .scalar(lambda x: int(x))

@@ -43,12 +43,12 @@ def login_user(req: LoginRequest, *, db: SqlRunner) -> LoginResponse:
 
 
 def authorize_subject(
-    *,
     subject: Subject,
+    *,
     access_type: AccessType,
     object_id: ObjectId,
     object_access_level: AccessLevel,
-) -> Subject:
+) -> None:
     """Authorize subject to access an object using Bell–LaPadula rules + explicit access rules."""
 
     matching_rule = next(
@@ -56,7 +56,10 @@ def authorize_subject(
         None,
     )
     if not matching_rule:
-        raise HTTPException(status_code=403, detail="No access rule for this object")
+        raise HTTPException(
+            status_code=403,
+            detail=f"No access rule for '{object_id.resource_type}' object",
+        )
 
     # Ensure the requested access_type is allowed by the rule
     if not (matching_rule.access & access_type):
@@ -64,13 +67,9 @@ def authorize_subject(
 
     # Enforce Bell–LaPadula rules
     if AccessType.READ in access_type and subject.access_level < object_access_level:
-        raise HTTPException(
-            status_code=403, detail="Read access forbidden (no read up)"
-        )
+        raise HTTPException(status_code=403, detail="Read access forbidden")
 
     if AccessType.WRITE in access_type and subject.access_level > object_access_level:
         raise HTTPException(
             status_code=403, detail="Write access forbidden (no write down)"
         )
-
-    return subject

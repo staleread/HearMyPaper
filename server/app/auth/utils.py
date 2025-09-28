@@ -53,21 +53,30 @@ def decode_subject_token(token: str) -> Subject | None:
             token, env_settings.jwt_secret, algorithms=[env_settings.jwt_algorithm]
         )
         return Subject(
-            id=payload.subject_id,
-            access_level=AccessLevel(payload.access_level),
-            access_rules=[AccessRule.parse(rule) for rule in payload.access_rules],
+            id=payload["subject_id"],
+            access_level=AccessLevel(payload["access_level"]),
+            access_rules=[AccessRule.parse(rule) for rule in payload["access_rules"]],
         )
     except jwt.ExpiredSignatureError:
         return None
 
 
-def get_access_level_by_role(role: UserRole) -> AccessLevel:
+def get_access_by_role(role: UserRole) -> tuple[AccessLevel, list[AccessRule]]:
     match role:
         case UserRole.STUDENT:
-            return AccessLevel.CONTROLLED
+            return (
+                AccessLevel.CONTROLLED,
+                [AccessRule.parse(rule) for rule in ["my_user:*:r-"]],
+            )
         case UserRole.CURATOR:
-            return AccessLevel.CONTROLLED
+            return (
+                AccessLevel.CONTROLLED,
+                [AccessRule.parse(rule) for rule in ["my_user:*:r-", "user:*:rw"]],
+            )
         case UserRole.INSTRUCTOR:
-            return AccessLevel.RESTRICTED
+            return (
+                AccessLevel.RESTRICTED,
+                [AccessRule.parse(rule) for rule in ["my_user:*:r-"]],
+            )
         case _:
             raise ValueError("Unknown user role")

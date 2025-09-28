@@ -2,7 +2,7 @@ import base64
 from fastapi.exceptions import HTTPException
 
 from app.shared.utils.db import SqlRunner
-from app.auth.utils import get_access_level_by_role
+from app.auth.utils import get_access_by_role
 
 from . import repository as user_repo
 from .models import User
@@ -29,9 +29,12 @@ def register_user(req: UserCreateRequest, *, db: SqlRunner) -> UserCreateRespons
             status_code=400, detail=f"Username '{req.username}' is already taken"
         )
 
+    access_level, access_rules = get_access_by_role(req.role)
+
     user = User(
         username=req.username,
-        access_level=get_access_level_by_role(req.role),
+        access_level=access_level,
+        access_rules=access_rules,
         public_key=base64.b64decode(req.public_key),
     )
 

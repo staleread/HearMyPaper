@@ -14,7 +14,7 @@ class AccessLevel(Enum):
     CONFIDENTIAL = 4
 
     def __lt__(self, other):  # type: ignore
-        if other is AccessLevel:
+        if isinstance(other, AccessLevel):
             return self.value < other.value
         return NotImplemented
 
