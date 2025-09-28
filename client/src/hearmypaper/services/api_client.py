@@ -14,22 +14,19 @@ s.verify = (
 
 
 def _check_response(r: requests.Response) -> dict:
-    try:
-        r.raise_for_status()
-        data = r.json()
-    except requests.RequestException as e:
-        raise APIClientError(f"Network error: {e}") from e
-    except ValueError as e:
-        raise APIClientError(f"Invalid JSON response: {r.text}") from e
+    data = r.json()
 
-    return data
+    if r.status_code == 200:
+        return data
+
+    raise APIClientError(f"{r.status_code}: {data['detail'] or 'Something went wrong'}")
 
 
 def register_user(username, role, public_key_b64) -> str:
     payload = {"username": username, "role": role.lower(), "public_key": public_key_b64}
-    r = s.post("https://localhost/auth/register", json=payload)
+    r = s.post("https://localhost/user/register", json=payload)
 
-    return _check_response(r)["user_id"]
+    return _check_response(r)["id"]
 
 
 def request_challenge(user_id) -> str:
@@ -48,4 +45,8 @@ def submit_challenge(user_id, challenge_b64, signed_challenge_b64):
     r = s.post("https://localhost/auth/login", json=payload)
 
     token = _check_response(r)["token"]
+
+    # TODO: remove this
+    print(f'Token: "{token}"')
+
     s.headers.update({"Authorization": f"Bearer {token}"})

@@ -7,7 +7,7 @@ from hearmypaper.services.auth_service import register
 
 def register_screen(navigator):
     username = toga.TextInput(placeholder="Username")
-    role = toga.Selection(items=["Student", "Instructor"])
+    role = toga.Selection(items=["Student", "Instructor", "Curator"])
     password = toga.PasswordInput(placeholder="Password")
 
     token_label = toga.Label("No file selected")
