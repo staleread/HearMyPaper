@@ -1,12 +1,11 @@
 from pydantic import BaseModel
 
-from app.auth.models import AccessRule
 from app.auth.enums import AccessLevel
 
 
 class User(BaseModel):
     id: int = 0
     username: str
-    access_level: AccessLevel
-    access_rules: list[AccessRule] = list()
+    confidentiality_level: AccessLevel
+    integrity_levels: list[AccessLevel]
     public_key: bytes

@@ -2,7 +2,7 @@ from functools import wraps
 from typing import Callable, Awaitable, TypeVar, ParamSpec
 from fastapi import HTTPException
 
-from .models import ObjectId, Subject
+from .models import Subject
 from .enums import AccessType, AccessLevel
 from .service import authorize_subject
 
@@ -15,9 +15,7 @@ def authorize(
 ) -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
     """
     Decorator for FastAPI route handlers that enforces authorization.
-    - Infers access_type from the CRU* function name.
-    - Infers resource_type from the function name after the verb.
-    - Extracts `id` (if present in path params) to build ObjectId.
+    - Infers access_type from the verb part of the function name.
     - Reads `subject`, which should be injected (e.g. as a FastAPI dependency)
     """
 
@@ -51,14 +49,9 @@ def authorize(
             if not isinstance(subject, Subject):
                 raise HTTPException(status_code=401, detail="Unauthorized")
 
-            id_arg = kwargs.get("id")
-            obj_id_val: int | None = id_arg if isinstance(id_arg, int) else None
-            object_id = ObjectId(resource_type=resource_type, id=obj_id_val)
-
             authorize_subject(
                 subject=subject,
                 access_type=access_type,
-                object_id=object_id,
                 object_access_level=access_level,
             )
 

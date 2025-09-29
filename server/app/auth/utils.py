@@ -8,8 +8,8 @@ from cryptography.exceptions import InvalidSignature
 
 from app.shared.config.env import env_settings
 
-from .models import Subject, AccessRule
-from .enums import AccessLevel, UserRole
+from .models import Subject
+from .enums import AccessLevel
 
 
 def generate_login_challenge() -> str:
@@ -39,8 +39,8 @@ def encode_subject_token(subject: Subject) -> str:
     data = {
         "exp": int(moment.timestamp()),
         "subject_id": subject.id,
-        "access_level": subject.access_level.value,
-        "access_rules": [str(rule) for rule in subject.access_rules],
+        "confidentiality_level": subject.confidentiality_level.value,
+        "integrity_levels": [level.value for level in subject.integrity_levels],
     }
     return jwt.encode(
         data, env_settings.jwt_secret, algorithm=env_settings.jwt_algorithm
@@ -54,29 +54,10 @@ def decode_subject_token(token: str) -> Subject | None:
         )
         return Subject(
             id=payload["subject_id"],
-            access_level=AccessLevel(payload["access_level"]),
-            access_rules=[AccessRule.parse(rule) for rule in payload["access_rules"]],
+            confidentiality_level=AccessLevel(payload["confidentiality_level"]),
+            integrity_levels=[
+                AccessLevel(level) for level in payload["integrity_levels"]
+            ],
         )
     except jwt.ExpiredSignatureError:
         return None
-
-
-def get_access_by_role(role: UserRole) -> tuple[AccessLevel, list[AccessRule]]:
-    match role:
-        case UserRole.STUDENT:
-            return (
-                AccessLevel.CONTROLLED,
-                [AccessRule.parse(rule) for rule in ["my_user:*:r-"]],
-            )
-        case UserRole.CURATOR:
-            return (
-                AccessLevel.CONTROLLED,
-                [AccessRule.parse(rule) for rule in ["my_user:*:r-", "user:*:rw"]],
-            )
-        case UserRole.INSTRUCTOR:
-            return (
-                AccessLevel.RESTRICTED,
-                [AccessRule.parse(rule) for rule in ["my_user:*:r-"]],
-            )
-        case _:
-            raise ValueError("Unknown user role")

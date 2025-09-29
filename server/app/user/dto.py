@@ -6,8 +6,8 @@ from app.auth.enums import UserRole
 class UserResponse(BaseModel):
     id: int
     username: str
-    access_level: int
-    access_rules: list[str]
+    confidentiality_level: int
+    integrity_levels: list[int]
     public_key: str
 
 

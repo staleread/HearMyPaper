@@ -13,8 +13,36 @@ from .utils import (
     verify_login_challenge,
     encode_subject_token,
 )
-from .models import Subject, ObjectId
-from .enums import AccessLevel, AccessType
+from .models import Subject
+from .enums import AccessLevel, AccessType, UserRole
+
+
+def get_access_by_role(role: UserRole) -> tuple[AccessLevel, list[AccessLevel]]:
+    """
+    Define security policy: confidentiality level and integrity levels for each role.
+    Business logic that determines what each role can read and write.
+    """
+    match role:
+        case UserRole.STUDENT:
+            # Students can read up to CONTROLLED and can write submissions at RESTRICTED level
+            return (
+                AccessLevel.CONTROLLED,
+                [AccessLevel.RESTRICTED],
+            )
+        case UserRole.CURATOR:
+            # Curators can read up to CONTROLLED and can write course-project info at CONTROLLED level
+            return (
+                AccessLevel.CONTROLLED,
+                [AccessLevel.CONTROLLED],
+            )
+        case UserRole.INSTRUCTOR:
+            # Instructors can read up to RESTRICTED but cannot write anything (read-only)
+            return (
+                AccessLevel.RESTRICTED,
+                [],
+            )
+        case _:
+            raise ValueError("Unknown user role")
 
 
 def create_login_challenge() -> ChallengeResponse:
@@ -35,7 +63,9 @@ def login_user(req: LoginRequest, *, db: SqlRunner) -> LoginResponse:
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
     subject = Subject(
-        id=user.id, access_level=user.access_level, access_rules=user.access_rules
+        id=user.id,
+        confidentiality_level=user.confidentiality_level,
+        integrity_levels=user.integrity_levels,
     )
     token = encode_subject_token(subject)
 
@@ -46,30 +76,36 @@ def authorize_subject(
     subject: Subject,
     *,
     access_type: AccessType,
-    object_id: ObjectId,
     object_access_level: AccessLevel,
 ) -> None:
-    """Authorize subject to access an object using Bell–LaPadula rules + explicit access rules."""
+    """Authorize subject using Bell–LaPadula rules with confidentiality and integrity levels."""
 
-    matching_rule = next(
-        (rule for rule in subject.access_rules if rule.object_id == object_id),
-        None,
-    )
-    if not matching_rule:
+    # Bell-LaPadula No Read Up rule
+    if (
+        AccessType.READ in access_type
+        and subject.confidentiality_level < object_access_level
+    ):
         raise HTTPException(
             status_code=403,
-            detail=f"No access rule for '{object_id.resource_type}' object",
+            detail=f"Read access forbidden: subject confidentiality level {subject.confidentiality_level.name} < object level {object_access_level.name}",
         )
 
-    # Ensure the requested access_type is allowed by the rule
-    if not (matching_rule.access & access_type):
-        raise HTTPException(status_code=403, detail="Access type not permitted")
-
-    # Enforce Bell–LaPadula rules
-    if AccessType.READ in access_type and subject.access_level < object_access_level:
-        raise HTTPException(status_code=403, detail="Read access forbidden")
-
-    if AccessType.WRITE in access_type and subject.access_level > object_access_level:
+    # Bell-LaPadula No Write Down rule
+    if (
+        AccessType.WRITE in access_type
+        and subject.confidentiality_level > object_access_level
+    ):
         raise HTTPException(
-            status_code=403, detail="Write access forbidden (no write down)"
+            status_code=403,
+            detail=f"Write access forbidden (no write down): subject confidentiality level {subject.confidentiality_level.name} > object level {object_access_level.name}",
+        )
+
+    # Integrity level check - subject can only write to levels they are authorized for
+    if (
+        AccessType.WRITE in access_type
+        and object_access_level not in subject.integrity_levels
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail=f"Write access forbidden: subject not authorized to write at {object_access_level.name} level",
         )
