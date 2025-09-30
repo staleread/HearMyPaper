@@ -1,31 +1,26 @@
 import toga
 from datetime import datetime, timedelta
-from typing import Any, cast
 
-from ..service import create_project_with_dto
+from ..service import create_project
 from ..dto import ProjectCreateDto
 
 
 def project_create_form_screen(navigator):
-    """Project creation form screen with instructor dropdown using user service"""
-
     children = [
         toga.Label(
             "Create New Project",
             style=toga.style.Pack(
-                font_size=18, font_weight="bold", padding=(0, 0, 10, 0)
+                font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
             ),
         )
     ]
 
-    # Form inputs
     title_input = toga.TextInput(placeholder="Project Title")
     syllabus_input = toga.MultilineTextInput(placeholder="Brief syllabus summary")
     description_input = toga.MultilineTextInput(
         placeholder="Detailed project description"
     )
 
-    # Use email input instead of dropdown (Curator can't see user list)
     instructor_email_input = toga.TextInput(
         placeholder="Instructor Email (e.g., john.doe@university.edu)"
     )
@@ -34,8 +29,7 @@ def project_create_form_screen(navigator):
         placeholder="Deadline (ISO format, e.g. 2025-12-15T23:59:59Z)"
     )
 
-    async def on_submit(widget: toga.Widget) -> None:
-        # Validate inputs
+    async def on_submit(widget):
         if not all(
             [
                 title_input.value,
@@ -50,7 +44,6 @@ def project_create_form_screen(navigator):
             await navigator.main_window.dialog(dialog)
             return
 
-        # Basic email validation
         instructor_email = instructor_email_input.value.strip()
         if "@" not in instructor_email or "." not in instructor_email:
             dialog = toga.ErrorDialog(
@@ -59,14 +52,12 @@ def project_create_form_screen(navigator):
             await navigator.main_window.dialog(dialog)
             return
 
-        # Use provided deadline or fallback to 30 days from now
         deadline = deadline_input.value
         if not deadline:
             deadline = (
                 datetime.now().replace(microsecond=0) + timedelta(days=30)
             ).isoformat() + "Z"
 
-        # Create DTO from form data
         project_dto = ProjectCreateDto(
             title=title_input.value,
             syllabus_summary=syllabus_input.value,
@@ -76,7 +67,7 @@ def project_create_form_screen(navigator):
         )
 
         try:
-            result = create_project_with_dto(navigator.session, project_dto)
+            result = create_project(navigator.session, project_dto)
 
             if result.is_ok():
                 response = result.unwrap()
@@ -96,10 +87,9 @@ def project_create_form_screen(navigator):
             dialog = toga.ErrorDialog(title="Error", message=f"Invalid input: {e}")
             await navigator.main_window.dialog(dialog)
 
-    def on_cancel(widget: toga.Widget) -> None:
+    def on_cancel(widget):
         navigator.navigate("projects_catalog")
 
-    # Build form manually
     children.extend(
         [
             toga.Label("Title:"),
@@ -118,17 +108,19 @@ def project_create_form_screen(navigator):
             deadline_input,
             toga.Box(
                 children=[
-                    toga.Button("Create Project", on_press=cast(Any, on_submit)),
-                    toga.Button("Cancel", on_press=cast(Any, on_cancel)),
+                    toga.Button("Create Project", on_press=on_submit),
+                    toga.Button("Cancel", on_press=on_cancel),
                 ],
                 style=toga.style.Pack(
-                    direction=toga.style.pack.ROW, padding=(10, 0, 0, 0)
+                    direction=toga.style.pack.ROW, margin=(10, 0, 0, 0)
                 ),
             ),
         ]
     )
 
-    return toga.Box(
-        children=children,
-        style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
+    return toga.ScrollContainer(
+        content=toga.Box(
+            children=children,
+            style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
+        )
     )

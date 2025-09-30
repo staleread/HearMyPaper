@@ -1,5 +1,5 @@
 from hearmypaper.shared.ui.catalog_screen import catalog_screen
-from ..service import get_projects_list
+from ..service import get_projects
 
 
 def projects_catalog_screen(navigator):
@@ -7,7 +7,7 @@ def projects_catalog_screen(navigator):
         navigator.navigate("project_info", row.id)
 
     data = (
-        get_projects_list(navigator.session)
+        get_projects(navigator.session)
         .map(lambda projects: [project.model_dump() for project in projects])
         .map_err(lambda err: f"Error loading projects: {err}")
     )

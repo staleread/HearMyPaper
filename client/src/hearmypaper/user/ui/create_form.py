@@ -1,18 +1,15 @@
 import toga
 from datetime import datetime, timedelta
+
 from ...auth.service import create_user_with_credentials
 from ...auth.enums import AccessLevel
 from ...user.dto import UserCreateDto
 
 
 def user_create_form_screen(navigator):
-    """User creation form screen with key generation and credential storage"""
-
-    # State variables
     credentials_path = None
 
     async def select_credentials_file():
-        """Select file for saving user credentials"""
         dialog = toga.SaveFileDialog(
             title="Select credentials file location",
             suggested_filename="user_credentials.bin",
@@ -24,32 +21,26 @@ def user_create_form_screen(navigator):
         toga.Label(
             "Create New User",
             style=toga.style.Pack(
-                font_size=18, font_weight="bold", padding=(0, 0, 10, 0)
+                font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
             ),
         )
     ]
 
-    # Form inputs
     name_input = toga.TextInput(placeholder="First Name")
     surname_input = toga.TextInput(placeholder="Last Name")
     email_input = toga.TextInput(placeholder="Email")
 
-    # Access level dropdowns with descriptive text
     access_level_options = AccessLevel.get_display_options()
     confidentiality_input = toga.Selection(items=access_level_options)
-    confidentiality_input.value = (
-        AccessLevel.CONFIDENTIAL.to_display_string()
-    )  # Default to CONFIDENTIAL
+    confidentiality_input.value = AccessLevel.CONFIDENTIAL.to_display_string()
 
-    # Integrity levels as checkboxes
     integrity_checkboxes = {}
     integrity_box = toga.Box(
-        style=toga.style.Pack(direction=toga.style.pack.COLUMN, padding=(10, 0))
+        style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=(10, 0))
     )
 
     for level in AccessLevel:
         checkbox = toga.Switch(f"{level.value} - {level.name.title()}")
-        # Default to RESTRICTED and CONFIDENTIAL for admin users
         if level in [AccessLevel.RESTRICTED, AccessLevel.CONFIDENTIAL]:
             checkbox.value = True
         integrity_checkboxes[level.value] = checkbox
@@ -69,8 +60,7 @@ def user_create_form_screen(navigator):
             credentials_path = file_path
             credentials_label.text = f"Selected: {file_path}"
 
-    def get_selected_integrity_levels() -> list[AccessLevel]:
-        """Get list of selected integrity levels"""
+    def get_selected_integrity_levels():
         return [
             AccessLevel(level)
             for level, checkbox in integrity_checkboxes.items()
@@ -78,7 +68,6 @@ def user_create_form_screen(navigator):
         ]
 
     async def on_submit(widget):
-        # Validate inputs
         if not all([name_input.value, surname_input.value, email_input.value]):
             dialog = toga.ErrorDialog(
                 title="Error", message="Please fill in all required fields"
@@ -101,22 +90,18 @@ def user_create_form_screen(navigator):
             await navigator.main_window.dialog(dialog)
             return
 
-        # Check integrity levels (empty selection is allowed)
         integrity_levels = get_selected_integrity_levels()
 
         try:
-            # Parse confidentiality level
             confidentiality_level = AccessLevel.from_display_string(
                 confidentiality_input.value
             )
 
-            # Set default expiry if not provided
             expires_at = expires_input.value
             if not expires_at:
                 default_expiry = (datetime.now() + timedelta(days=365)).isoformat()
                 expires_at = default_expiry
 
-            # Create DTO
             user_dto = UserCreateDto(
                 name=name_input.value,
                 surname=surname_input.value,
@@ -128,7 +113,6 @@ def user_create_form_screen(navigator):
                 credentials_password=password_input.value,
             )
 
-            # Create user with generated credentials
             result = create_user_with_credentials(navigator.session, user_dto)
 
             if result.is_err():
@@ -138,7 +122,7 @@ def user_create_form_screen(navigator):
                 )
                 await navigator.main_window.dialog(dialog)
             else:
-                result.unwrap()  # Ensure result is consumed
+                result.unwrap()
                 dialog = toga.InfoDialog(
                     title="Success", message="User created successfully!"
                 )
@@ -152,7 +136,6 @@ def user_create_form_screen(navigator):
     def on_cancel(widget):
         navigator.navigate("users_catalog")
 
-    # Build form manually for custom file selection
     children.extend(
         [
             toga.Label("First Name:"),
@@ -186,13 +169,15 @@ def user_create_form_screen(navigator):
                     toga.Button("Cancel", on_press=on_cancel),
                 ],
                 style=toga.style.Pack(
-                    direction=toga.style.pack.ROW, padding=(10, 0, 0, 0)
+                    direction=toga.style.pack.ROW, margin=(10, 0, 0, 0)
                 ),
             ),
         ]
     )
 
-    return toga.Box(
-        children=children,
-        style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
+    return toga.ScrollContainer(
+        content=toga.Box(
+            children=children,
+            style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
+        )
     )

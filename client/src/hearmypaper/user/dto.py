@@ -69,8 +69,6 @@ class UserListResponse(BaseModel):
 
 
 class UserView(BaseModel):
-    """DTO for user data as displayed in UI views"""
-
     id: int
     name: str
     surname: str
@@ -81,7 +79,6 @@ class UserView(BaseModel):
 
     @classmethod
     def from_response(cls, response: UserResponse) -> "UserView":
-        """Convert server response to view DTO"""
         return cls(
             id=response.id,
             name=response.name,
@@ -96,8 +93,6 @@ class UserView(BaseModel):
 
 
 class UserCreateDto(BaseModel):
-    """DTO for user creation form data"""
-
     name: str
     surname: str
     email: str
@@ -121,8 +116,6 @@ class UserCreateDto(BaseModel):
 
 
 class UserUpdateDto(BaseModel):
-    """DTO for user update form data"""
-
     name: str
     surname: str
     email: str
@@ -131,7 +124,6 @@ class UserUpdateDto(BaseModel):
     expires_at: str
 
     def to_request(self) -> UserUpdateRequest:
-        """Convert to API request format"""
         return UserUpdateRequest(
             name=self.name,
             surname=self.surname,

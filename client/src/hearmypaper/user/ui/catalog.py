@@ -1,6 +1,6 @@
 from hearmypaper.shared.ui.catalog_screen import catalog_screen
 
-from ..service import get_users_list
+from ..service import get_users
 
 
 def users_catalog_screen(navigator):
@@ -8,7 +8,7 @@ def users_catalog_screen(navigator):
         navigator.navigate("user_info", row.id)
 
     data = (
-        get_users_list(navigator.session)
+        get_users(navigator.session)
         .map(lambda users: [user.model_dump() for user in users])
         .map_err(lambda err: f"Error loading users: {err}")
     )

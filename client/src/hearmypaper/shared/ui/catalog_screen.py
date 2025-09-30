@@ -11,8 +11,8 @@ def catalog_screen(
     title,
     headings: list[str],
     data: Result,
-    on_back,
-    actions,
+    actions=None,
+    on_back=None,
     on_activate=None,
 ):
     back_button = toga.Button(
@@ -26,12 +26,9 @@ def catalog_screen(
         title, style=Pack(font_size=14, font_weight="bold", flex=1, margin_left=10)
     )
 
-    action_buttons = []
-    if actions:
-        for label, handler in actions:
-            btn = toga.Button(label, on_press=handler)
-            action_buttons.append(btn)
-
+    action_buttons = [
+        toga.Button(label, on_press=handler) for label, handler in actions or []
+    ]
     actions_box = toga.Box(children=action_buttons, style=Pack(direction=ROW))
 
     header_box = toga.Box(
@@ -40,22 +37,27 @@ def catalog_screen(
     )
 
     if is_err(data):
-        contents = toga.Label(data.err_value, style=Pack(font_size=14, margin=(10, 0)))
-    else:
-        table = toga.Table(
-            headings=headings,
-            data=data.unwrap(),
-            style=Pack(flex=1),
+        error_label = toga.Label(
+            data.err_value, style=Pack(color="red", font_size=14, margin=(10, 0))
         )
 
-        contents = table
+        return toga.Box(
+            children=[header_box, error_label],
+            style=Pack(direction=COLUMN, margin=20, gap=10),
+        )
 
-        def on_row_activate(widget: toga.Table, row: Any, **kwargs: Any):
-            on_activate(row)
+    table = toga.Table(
+        headings=headings,
+        data=data.unwrap(),
+        style=Pack(flex=1),
+    )
 
-        if on_activate:
-            table.on_activate = on_row_activate
+    def on_row_activate(widget: toga.Table, row: Any, **kwargs: Any):
+        on_activate(row)
+
+    if on_activate:
+        table.on_activate = on_row_activate
 
     return toga.Box(
-        children=[header_box, contents], style=Pack(direction=COLUMN, margin=20, gap=10)
+        children=[header_box, table], style=Pack(direction=COLUMN, margin=20, gap=10)
     )

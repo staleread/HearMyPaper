@@ -6,8 +6,16 @@ from ..service import login
 
 
 def login_screen(navigator):
-    password = toga.PasswordInput(placeholder="Password")
+    title_label = toga.Label(
+        "Login", style=Pack(font_size=14, font_weight="bold", flex=1)
+    )
 
+    header_box = toga.Box(
+        children=[title_label],
+        style=Pack(margin=(0, 0, 10, 0)),
+    )
+
+    password = toga.PasswordInput(placeholder="Password")
     token_label = toga.Label("No file selected")
 
     async def pick_file(widget):
@@ -28,7 +36,7 @@ def login_screen(navigator):
 
     return toga.Box(
         children=[
-            toga.Label("Login", style=Pack(padding=(0, 0, 10, 0))),
+            header_box,
             toga.Button("Select token path", on_press=pick_file),
             token_label,
             password,
