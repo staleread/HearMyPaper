@@ -2,7 +2,7 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
 
-from hearmypaper.services.auth_service import login
+from ..service import login
 
 
 def login_screen(navigator):
@@ -17,14 +17,13 @@ def login_screen(navigator):
             token_label.text = file_path
 
     async def on_submit(widget):
-        error = login(token_label.text, password.value)
+        result = login(navigator.session, token_label.text, password.value)
 
-        if not error:
-            dialog = toga.InfoDialog(title="Info", message="Login successful")
+        if result.is_ok():
+            navigator.navigate("resource_catalog")
+            return
 
-            return await navigator.main_window.dialog(dialog)
-
-        dialog = toga.ErrorDialog(title="Oops", message=error)
+        dialog = toga.ErrorDialog(title="Oops", message=result.unwrap_err())
         await navigator.main_window.dialog(dialog)
 
     return toga.Box(
@@ -34,7 +33,6 @@ def login_screen(navigator):
             token_label,
             password,
             toga.Button("Submit", on_press=on_submit),
-            toga.Button("Register", on_press=lambda w: navigator.navigate("register")),
         ],
         style=Pack(direction=COLUMN, margin=20, gap=10),
     )
