@@ -1,19 +1,44 @@
 services:
+  nginx:
+    image: nginx:latest
+    container_name: hmp-nginx
+    volumes:
+      - ./nginx:/etc/nginx:ro
+    ports:
+      - "443:443"
+    depends_on:
+      - api
+
+  api:
+    build: .
+    container_name: hmp-api
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+
   postgres:
     image: postgres:latest
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=postgres
-    ports:
-      - "5432:5432"
+    container_name: hmp-postgres
+    env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
+    container_name: hmp-pgadmin
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=1234
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:5050"
+      - "8080:80"
     depends_on:
       - postgres
+    restart: unless-stopped
+    logging:
+      driver: none

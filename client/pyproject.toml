@@ -11,6 +11,8 @@ dependencies = [
     "briefcase>=0.3.25",
     "cryptography>=46.0.1",
     "requests>=2.32.5",
+    "result>=0.17.0",
+    "pydantic>=2.11.9",
 ]
 
 [project.optional-dependencies]

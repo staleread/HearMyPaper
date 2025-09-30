@@ -1,41 +1,83 @@
-from fastapi import APIRouter
+from typing import Annotated
+from fastapi import APIRouter, Path
 
-from .models import (
-    RegisterRequest,
-    RegisterResponse,
+from app.shared.dependencies.db import PostgresRunnerDep
+from app.auth.dependencies import CurrentSubjectDep
+from app.auth.enums import AccessLevel
+from app.auth.decorators import authorize
+
+from .dto import (
     ChallengeRequest,
     ChallengeResponse,
-    SignatureRequest,
-    SignatureResponse,
+    LoginRequest,
+    LoginResponse,
+    UserCreateRequest,
+    UserCreateResponse,
+    UserResponse,
+    UserListResponse,
+    UserUpdateRequest,
 )
-from .service import generate_challenge, verify_signed_challenge
+from . import service as auth_service
+
 
 router = APIRouter()
 
-public_keys = dict()
-
-
-@router.post("/register")
-async def register(req: RegisterRequest) -> RegisterResponse:
-    user_id = 1
-    public_keys[user_id] = req.public_key
-
-    return RegisterResponse(user_id=user_id)
-
 
 @router.post("/challenge")
-async def request_challenge(req: ChallengeRequest) -> ChallengeResponse:
-    challenge = generate_challenge()
-    return ChallengeResponse(challenge=challenge)
+async def get_login_challenge(
+    req: ChallengeRequest, db: PostgresRunnerDep
+) -> ChallengeResponse:
+    return auth_service.create_login_challenge(req, db=db)
 
 
-@router.post("/signature")
-async def verify_challenge(req: SignatureRequest) -> SignatureResponse:
-    public_key_b64 = public_keys[req.user_id]
-    is_success = verify_signed_challenge(
-        signature_b64=req.signature,
-        challenge_b64=req.challenge,
-        public_key_b64=public_key_b64,
-    )
+@router.post("/login")
+async def login_user(req: LoginRequest, db: PostgresRunnerDep) -> LoginResponse:
+    return auth_service.login_user(req, db=db)
 
-    return SignatureResponse(is_success=is_success)
+
+@router.post("/users")
+@authorize(AccessLevel.CONFIDENTIAL)
+async def create_user(
+    req: UserCreateRequest, db: PostgresRunnerDep, subject: CurrentSubjectDep
+) -> UserCreateResponse:
+    return auth_service.create_user(req, db=db)
+
+
+@router.get("/users")
+@authorize(AccessLevel.CONFIDENTIAL)
+async def read_users(
+    db: PostgresRunnerDep, subject: CurrentSubjectDep
+) -> list[UserListResponse]:
+    """Get simplified list of all users with only id and full name for admin purposes"""
+    rows = db.query("""
+        SELECT id, CONCAT(name, ' ', surname) as full_name
+        FROM users
+        ORDER BY surname, name, id
+    """).many_rows()
+
+    return [
+        UserListResponse(
+            id=row["id"],
+            full_name=row["full_name"],
+        )
+        for row in rows
+    ]
+
+
+@router.get("/users/{id}")
+@authorize(AccessLevel.CONFIDENTIAL)
+async def read_user(
+    id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep
+) -> UserResponse:
+    return auth_service.get_user_by_id(id, db=db)
+
+
+@router.put("/users/{id}")
+@authorize(AccessLevel.CONFIDENTIAL)
+async def update_user(
+    id: Annotated[int, Path()],
+    req: UserUpdateRequest,
+    db: PostgresRunnerDep,
+    subject: CurrentSubjectDep,
+) -> UserResponse:
+    return auth_service.update_user(id, req, db=db)

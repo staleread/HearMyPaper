@@ -10,5 +10,6 @@ repos:
     rev: v1.18.2
     hooks:
       - id: mypy
+        args: ["--strict"]
         additional_dependencies: ["types-requests>=2.32.4.20250913"]
 
