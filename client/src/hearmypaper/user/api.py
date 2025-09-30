@@ -1,7 +1,7 @@
 import requests
 from result import Result, Err
 
-from ..auth.dto import (
+from .dto import (
     UserCreateRequest,
     UserCreateResponse,
     UserUpdateRequest,

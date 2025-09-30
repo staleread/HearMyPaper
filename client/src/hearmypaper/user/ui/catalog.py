@@ -1,11 +1,11 @@
 import toga
-from ..api import get_users
+from ..service import get_users_list
 from ...shared.ui.catalog_screen import catalog_screen
 
 
 def users_catalog_screen(navigator):
     """Users catalog screen"""
-    result = get_users(navigator.session)
+    result = get_users_list(navigator.session)
 
     if result.is_err():
         return toga.Box(

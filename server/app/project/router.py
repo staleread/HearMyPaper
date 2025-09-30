@@ -27,7 +27,7 @@ async def read_projects(
 ) -> list[ProjectListResponse]:
     """Get simplified list of all projects with only essential fields"""
     rows = db.query("""
-        SELECT p.id, p.title, CONCAT(u.name, ' ', u.surname) as instructor_username, p.deadline
+        SELECT p.id, p.title, CONCAT(u.name, ' ', u.surname) as instructor_full_name, p.deadline
         FROM projects p
         JOIN users u ON p.instructor_id = u.id
         ORDER BY p.deadline DESC, p.id
@@ -37,7 +37,7 @@ async def read_projects(
         ProjectListResponse(
             id=row["id"],
             title=row["title"],
-            instructor_username=row["instructor_username"],
+            instructor_full_name=row["instructor_full_name"],
             deadline=row["deadline"],
         )
         for row in rows

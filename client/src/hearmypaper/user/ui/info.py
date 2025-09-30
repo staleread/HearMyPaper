@@ -1,12 +1,12 @@
 import toga
 from typing import cast, Any
-from ..api import get_user
+from ..service import get_user_as_response
 from ...shared.ui.item_info_screen import item_info_screen
 
 
 def user_info_screen(navigator, user_id: int):
     """User info screen"""
-    result = get_user(navigator.session, user_id)
+    result = get_user_as_response(navigator.session, user_id)
 
     if result.is_err():
 

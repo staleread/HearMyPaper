@@ -12,9 +12,10 @@ from .dto import (
 
 
 def get_project_by_id(id: int, *, db: SqlRunner) -> ProjectResponse:
-    project, instructor_username = project_repo.get_project_with_instructor_username(
+    project, instructor_full_name = project_repo.get_project_with_instructor_username(
         id, db=db
     )
+    instructor_email = project_repo.get_user_email_by_id(project.instructor_id, db=db)
     student_count = project_repo.get_project_student_count(id, db=db)
 
     return ProjectResponse(
@@ -22,7 +23,9 @@ def get_project_by_id(id: int, *, db: SqlRunner) -> ProjectResponse:
         title=project.title,
         syllabus_summary=project.syllabus_summary,
         description=project.description,
-        instructor_username=instructor_username,
+        instructor_id=project.instructor_id,
+        instructor_full_name=instructor_full_name,
+        instructor_email=instructor_email,
         student_count=student_count,
         deadline=project.deadline,
     )
@@ -31,11 +34,14 @@ def get_project_by_id(id: int, *, db: SqlRunner) -> ProjectResponse:
 def create_project(
     req: ProjectCreateRequest, *, db: SqlRunner
 ) -> ProjectCreateResponse:
+    # Resolve instructor email to ID
+    instructor_id = project_repo.get_user_id_by_email(req.instructor_email, db=db)
+
     project = Project(
         title=req.title,
         syllabus_summary=req.syllabus_summary,
         description=req.description,
-        instructor_id=req.instructor_id,
+        instructor_id=instructor_id,
         deadline=req.deadline,
     )
 
@@ -47,13 +53,16 @@ def create_project(
 def update_project(
     id: int, req: ProjectUpdateRequest, *, db: SqlRunner
 ) -> ProjectResponse:
+    # Resolve instructor email to ID
+    instructor_id = project_repo.get_user_id_by_email(req.instructor_email, db=db)
+
     # Create updated project with all fields from request
     updated_project = Project(
         id=id,
         title=req.title,
         syllabus_summary=req.syllabus_summary,
         description=req.description,
-        instructor_id=req.instructor_id,
+        instructor_id=instructor_id,
         deadline=req.deadline,
     )
 

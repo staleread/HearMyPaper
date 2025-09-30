@@ -127,3 +127,41 @@ def assign_students_to_project(
                 INSERT INTO project_students (project_id, student_id)
                 VALUES (:project_id, :student_id)
             """).bind(project_id=project_id, student_id=student_id).execute()
+
+
+def get_user_id_by_email(email: str, *, db: SqlRunner) -> int:
+    """Get user ID by email address"""
+    row = (
+        db.query("""
+        SELECT id
+        FROM users
+        WHERE email = :email
+    """)
+        .bind(email=email)
+        .first_row()
+    )
+
+    if not row:
+        raise HTTPException(
+            status_code=400, detail=f"User with email {email} not found"
+        )
+
+    return row["id"]
+
+
+def get_user_email_by_id(user_id: int, *, db: SqlRunner) -> str:
+    """Get user email by ID"""
+    row = (
+        db.query("""
+        SELECT email
+        FROM users
+        WHERE id = :user_id
+    """)
+        .bind(user_id=user_id)
+        .first_row()
+    )
+
+    if not row:
+        raise HTTPException(status_code=404, detail=f"User with ID {user_id} not found")
+
+    return row["email"]

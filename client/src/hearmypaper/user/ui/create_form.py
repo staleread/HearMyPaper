@@ -2,7 +2,7 @@ import toga
 from datetime import datetime, timedelta
 from ...auth.service import create_user_with_credentials
 from ...auth.enums import AccessLevel
-from ...auth.dto import UserCreateDto
+from ...user.dto import UserCreateDto
 
 
 def user_create_form_screen(navigator):
@@ -101,14 +101,8 @@ def user_create_form_screen(navigator):
             await navigator.main_window.dialog(dialog)
             return
 
-        # Check if at least one integrity level is selected
+        # Check integrity levels (empty selection is allowed)
         integrity_levels = get_selected_integrity_levels()
-        if not integrity_levels:
-            dialog = toga.ErrorDialog(
-                title="Error", message="Please select at least one integrity level"
-            )
-            await navigator.main_window.dialog(dialog)
-            return
 
         try:
             # Parse confidentiality level
@@ -173,9 +167,9 @@ def user_create_form_screen(navigator):
                 style=toga.style.Pack(font_size=10, color="#666666"),
             ),
             confidentiality_input,
-            toga.Label("Integrity Levels:"),
+            toga.Label("Integrity Levels (optional):"),
             toga.Label(
-                "(Levels user can write to)",
+                "(Levels user can write to - none selected means no write access)",
                 style=toga.style.Pack(font_size=10, color="#666666"),
             ),
             integrity_box,

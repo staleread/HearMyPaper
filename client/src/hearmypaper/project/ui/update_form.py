@@ -1,81 +1,129 @@
 import toga
-from ..api import update_project
-from ...shared.ui.form_screen import form_screen
+from typing import Any, cast
+from ..service import update_project_with_dto
+from ..dto import ProjectUpdateDto
 
 
 def project_edit_form_screen(navigator, project_data: dict):
-    """Project edit form screen"""
-    fields = [
-        {
-            "name": "title",
-            "label": "Title",
-            "type": "text",
-            "value": project_data.get("title", ""),
-        },
-        {
-            "name": "syllabus_summary",
-            "label": "Syllabus Summary",
-            "type": "multiline",
-            "value": project_data.get("syllabus_summary", ""),
-        },
-        {
-            "name": "description",
-            "label": "Description",
-            "type": "multiline",
-            "value": project_data.get("description", ""),
-        },
-        {
-            "name": "instructor_id",
-            "label": "Instructor ID",
-            "type": "number",
-            "value": str(project_data.get("instructor_id", "")),
-        },
-        {
-            "name": "deadline",
-            "label": "Deadline (ISO format)",
-            "type": "text",
-            "value": project_data.get("deadline", ""),
-        },
+    """Project edit form screen with instructor email input"""
+
+    children = [
+        toga.Label(
+            f"Edit Project: {project_data.get('title', '')}",
+            style=toga.style.Pack(
+                font_size=18, font_weight="bold", padding=(0, 0, 10, 0)
+            ),
+        )
     ]
 
-    async def on_submit(form_data, nav):
-        try:
-            # Process form data
-            update_data = {
-                "title": form_data["title"],
-                "syllabus_summary": form_data["syllabus_summary"],
-                "description": form_data["description"],
-                "instructor_id": int(form_data["instructor_id"]),
-                "deadline": form_data["deadline"],
-            }
+    # Form inputs
+    title_input = toga.TextInput(value=project_data.get("title", ""))
+    syllabus_input = toga.MultilineTextInput(
+        value=project_data.get("syllabus_summary", ""),
+        style=toga.style.Pack(height=100),
+    )
+    description_input = toga.MultilineTextInput(
+        value=project_data.get("description", ""), style=toga.style.Pack(height=100)
+    )
 
-            result = update_project(navigator.session, project_data["id"], update_data)
+    # Use email input - pre-populated with current instructor email
+    instructor_email_input = toga.TextInput(
+        value=project_data.get("instructor_email", ""),
+        placeholder="Instructor Email (e.g., john.doe@university.edu)",
+    )
+
+    deadline_input = toga.TextInput(value=project_data.get("deadline", ""))
+
+    async def on_submit(widget: toga.Widget) -> None:
+        # Validate inputs
+        if not all(
+            [
+                title_input.value,
+                syllabus_input.value,
+                description_input.value,
+                instructor_email_input.value,
+            ]
+        ):
+            dialog = toga.ErrorDialog(
+                title="Error", message="Please fill in all required fields"
+            )
+            await navigator.main_window.dialog(dialog)
+            return
+
+        # Basic email validation
+        instructor_email = instructor_email_input.value.strip()
+        if "@" not in instructor_email or "." not in instructor_email:
+            dialog = toga.ErrorDialog(
+                title="Error", message="Please enter a valid email address"
+            )
+            await navigator.main_window.dialog(dialog)
+            return
+
+        try:
+            # Create DTO from form data
+            project_dto = ProjectUpdateDto(
+                title=title_input.value,
+                syllabus_summary=syllabus_input.value,
+                description=description_input.value,
+                instructor_email=instructor_email,
+                deadline=deadline_input.value,
+            )
+
+            result = update_project_with_dto(
+                navigator.session, project_data["id"], project_dto
+            )
 
             if result.is_ok():
-                dialog = toga.InfoDialog(
+                success_dialog = toga.InfoDialog(
                     title="Success", message="Project updated successfully"
                 )
-                await nav.main_window.dialog(dialog)
-                nav.navigate_with_data("project_info", project_data["id"])
+                await navigator.main_window.dialog(success_dialog)
+                navigator.navigate_with_data("project_info", project_data["id"])
             else:
-                dialog = toga.ErrorDialog(
+                error_dialog = toga.ErrorDialog(
                     title="Error",
                     message=f"Failed to update project: {result.unwrap_err()}",
                 )
-                await nav.main_window.dialog(dialog)
+                await navigator.main_window.dialog(error_dialog)
         except Exception as e:
-            dialog = toga.ErrorDialog(title="Error", message=f"Invalid input: {e}")
-            await nav.main_window.dialog(dialog)
+            exception_dialog = toga.ErrorDialog(
+                title="Error", message=f"Invalid input: {e}"
+            )
+            await navigator.main_window.dialog(exception_dialog)
 
-    def on_cancel(nav):
-        nav.navigate_with_data("project_info", project_data["id"])
+    def on_cancel(widget: toga.Widget) -> None:
+        navigator.navigate_with_data("project_info", project_data["id"])
 
-    return form_screen(
-        title=f"Edit Project: {project_data.get('title', '')}",
-        fields=fields,
-        navigator=navigator,
-        on_submit=lambda form_data, nav: navigator.main_window.app.add_background_task(
-            lambda: on_submit(form_data, nav)
-        ),
-        on_cancel=on_cancel,
+    # Build form manually
+    children.extend(
+        [
+            toga.Label("Title:"),
+            title_input,
+            toga.Label("Syllabus Summary:"),
+            syllabus_input,
+            toga.Label("Description:"),
+            description_input,
+            toga.Label("Instructor Email:"),
+            toga.Label(
+                "(Enter the email address of the instructor)",
+                style=toga.style.Pack(font_size=10, color="#666666"),
+            ),
+            instructor_email_input,
+            toga.Label("Deadline (ISO format):"),
+            deadline_input,
+            toga.Box(
+                children=[
+                    toga.Button("Update Project", on_press=cast(Any, on_submit)),
+                    toga.Button("Cancel", on_press=cast(Any, on_cancel)),
+                ],
+                style=toga.style.Pack(
+                    direction=toga.style.pack.ROW, padding=(10, 0, 0, 0)
+                ),
+            ),
+        ]
+    )
+
+    return toga.Box(
+        children=children,
+        style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
     )

@@ -1,11 +1,11 @@
 import toga
-from ..api import get_projects
+from ..service import get_projects_list
 from ...shared.ui.catalog_screen import catalog_screen
 
 
 def projects_catalog_screen(navigator):
     """Projects catalog screen"""
-    result = get_projects(navigator.session)
+    result = get_projects_list(navigator.session)
 
     if result.is_err():
         return toga.Box(

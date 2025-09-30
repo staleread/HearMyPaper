@@ -1,12 +1,12 @@
 import toga
 from typing import cast, Any
-from ..api import get_project
+from ..service import get_project_as_view
 from ...shared.ui.item_info_screen import item_info_screen
 
 
 def project_info_screen(navigator, project_id: int):
     """Project info screen"""
-    result = get_project(navigator.session, project_id)
+    result = get_project_as_view(navigator.session, project_id)
 
     if result.is_err():
 
@@ -21,9 +21,9 @@ def project_info_screen(navigator, project_id: int):
             style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
         )
 
-    project_data = result.unwrap()
+    project_view = result.unwrap()
     # Convert to dict for compatibility with item_info_screen
-    project_dict = project_data.model_dump()
+    project_dict = project_view.model_dump()
 
     def on_edit_project(item_data, nav):
         nav.navigate_with_data("project_edit_form", item_data)
@@ -38,7 +38,7 @@ def project_info_screen(navigator, project_id: int):
     ]
 
     return item_info_screen(
-        title=f"Project: {project_data.title}",
+        title=f"Project: {project_view.title}",
         item_data=project_dict,
         navigator=navigator,
         actions=actions,

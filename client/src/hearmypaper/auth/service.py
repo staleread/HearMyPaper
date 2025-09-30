@@ -3,17 +3,19 @@ import requests
 from result import Result, Ok, Err
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+
 from .api import (
     request_challenge,
     submit_challenge,
-    create_user,
 )
+from ..user.api import create_user
 from .utils import (
     save_user_credentials,
     get_user_credentials,
     CredentialsRepoError,
 )
-from .dto import ChallengeRequest, LoginRequest, UserCreateDto, UserCreateResponse
+from .dto import ChallengeRequest, LoginRequest
+from ..user.dto import UserCreateDto, UserCreateResponse
 
 
 def create_user_with_credentials(

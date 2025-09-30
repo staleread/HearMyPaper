@@ -1,10 +1,13 @@
 import toga
 from datetime import datetime, timedelta
-from ..api import create_project
+from typing import Any, cast
+
+from ..service import create_project_with_dto
+from ..dto import ProjectCreateDto
 
 
 def project_create_form_screen(navigator):
-    """Project creation form screen with manual inputs (similar to user_create_form_screen)"""
+    """Project creation form screen with instructor dropdown using user service"""
 
     children = [
         toga.Label(
@@ -21,19 +24,24 @@ def project_create_form_screen(navigator):
     description_input = toga.MultilineTextInput(
         placeholder="Detailed project description"
     )
-    instructor_input = toga.TextInput(placeholder="Instructor ID (number)")
+
+    # Use email input instead of dropdown (Curator can't see user list)
+    instructor_email_input = toga.TextInput(
+        placeholder="Instructor Email (e.g., john.doe@university.edu)"
+    )
+
     deadline_input = toga.TextInput(
         placeholder="Deadline (ISO format, e.g. 2025-12-15T23:59:59Z)"
     )
 
-    async def on_submit(widget):
+    async def on_submit(widget: toga.Widget) -> None:
         # Validate inputs
         if not all(
             [
                 title_input.value,
                 syllabus_input.value,
                 description_input.value,
-                instructor_input.value,
+                instructor_email_input.value,
             ]
         ):
             dialog = toga.ErrorDialog(
@@ -42,11 +50,11 @@ def project_create_form_screen(navigator):
             await navigator.main_window.dialog(dialog)
             return
 
-        try:
-            instructor_id = int(instructor_input.value)
-        except ValueError:
+        # Basic email validation
+        instructor_email = instructor_email_input.value.strip()
+        if "@" not in instructor_email or "." not in instructor_email:
             dialog = toga.ErrorDialog(
-                title="Error", message="Instructor ID must be a number"
+                title="Error", message="Please enter a valid email address"
             )
             await navigator.main_window.dialog(dialog)
             return
@@ -58,36 +66,37 @@ def project_create_form_screen(navigator):
                 datetime.now().replace(microsecond=0) + timedelta(days=30)
             ).isoformat() + "Z"
 
-        project_data = {
-            "title": title_input.value,
-            "syllabus_summary": syllabus_input.value,
-            "description": description_input.value,
-            "instructor_id": instructor_id,
-            "deadline": deadline,
-        }
+        # Create DTO from form data
+        project_dto = ProjectCreateDto(
+            title=title_input.value,
+            syllabus_summary=syllabus_input.value,
+            description=description_input.value,
+            instructor_email=instructor_email,
+            deadline=deadline,
+        )
 
         try:
-            result = create_project(navigator.session, project_data)
+            result = create_project_with_dto(navigator.session, project_dto)
 
             if result.is_ok():
                 response = result.unwrap()
-                dialog = toga.InfoDialog(
+                success_dialog = toga.InfoDialog(
                     title="Success",
                     message=f"Project created successfully!\nProject ID: {response.id}",
                 )
-                await navigator.main_window.dialog(dialog)
+                await navigator.main_window.dialog(success_dialog)
                 navigator.navigate("projects_catalog")
             else:
-                dialog = toga.ErrorDialog(
+                error_dialog = toga.ErrorDialog(
                     title="Error",
                     message=f"Failed to create project: {result.unwrap_err()}",
                 )
-                await navigator.main_window.dialog(dialog)
+                await navigator.main_window.dialog(error_dialog)
         except Exception as e:
             dialog = toga.ErrorDialog(title="Error", message=f"Invalid input: {e}")
             await navigator.main_window.dialog(dialog)
 
-    def on_cancel(widget):
+    def on_cancel(widget: toga.Widget) -> None:
         navigator.navigate("projects_catalog")
 
     # Build form manually
@@ -99,14 +108,18 @@ def project_create_form_screen(navigator):
             syllabus_input,
             toga.Label("Description:"),
             description_input,
-            toga.Label("Instructor ID:"),
-            instructor_input,
+            toga.Label("Instructor Email:"),
+            toga.Label(
+                "(Enter the email address of the instructor)",
+                style=toga.style.Pack(font_size=10, color="#666666"),
+            ),
+            instructor_email_input,
             toga.Label("Deadline (optional, ISO):"),
             deadline_input,
             toga.Box(
                 children=[
-                    toga.Button("Create Project", on_press=on_submit),
-                    toga.Button("Cancel", on_press=on_cancel),
+                    toga.Button("Create Project", on_press=cast(Any, on_submit)),
+                    toga.Button("Cancel", on_press=cast(Any, on_cancel)),
                 ],
                 style=toga.style.Pack(
                     direction=toga.style.pack.ROW, padding=(10, 0, 0, 0)

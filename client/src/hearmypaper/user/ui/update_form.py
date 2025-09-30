@@ -1,8 +1,8 @@
 import toga
 from typing import Any, cast
-from ..api import update_user
+from ..service import update_user_with_dto
 from ...auth.enums import AccessLevel
-from ...auth.dto import UserUpdateDto
+from ..dto import UserUpdateDto
 
 
 def user_edit_form_screen(navigator, user_data: dict):
@@ -66,14 +66,8 @@ def user_edit_form_screen(navigator, user_data: dict):
             await navigator.main_window.dialog(dialog)
             return
 
-        # Check if at least one integrity level is selected
+        # Get integrity levels (empty selection is allowed)
         integrity_levels = get_selected_integrity_levels()
-        if not integrity_levels:
-            dialog = toga.ErrorDialog(
-                title="Error", message="Please select at least one integrity level"
-            )
-            await navigator.main_window.dialog(dialog)
-            return
 
         try:
             # Parse confidentiality level
@@ -81,7 +75,6 @@ def user_edit_form_screen(navigator, user_data: dict):
                 str(confidentiality_input.value)
             )
 
-            integrity_levels = get_selected_integrity_levels()
             integrity_access_levels = [AccessLevel(level) for level in integrity_levels]
 
             dto = UserUpdateDto(
@@ -93,7 +86,7 @@ def user_edit_form_screen(navigator, user_data: dict):
                 expires_at=expires_input.value,
             )
 
-            result = update_user(navigator.session, user_data["id"], dto.to_request())
+            result = update_user_with_dto(navigator.session, user_data["id"], dto)
 
             if result.is_err():
                 dialog = toga.ErrorDialog(
@@ -131,9 +124,9 @@ def user_edit_form_screen(navigator, user_data: dict):
                 style=toga.style.Pack(font_size=10, color="#666666"),
             ),
             confidentiality_input,
-            toga.Label("Integrity Levels:"),
+            toga.Label("Integrity Levels (optional):"),
             toga.Label(
-                "(Levels user can write to)",
+                "(Levels user can write to - none selected means no write access)",
                 style=toga.style.Pack(font_size=10, color="#666666"),
             ),
             integrity_box,
