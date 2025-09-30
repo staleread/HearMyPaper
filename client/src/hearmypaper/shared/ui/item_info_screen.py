@@ -1,3 +1,4 @@
+import textwrap
 import toga
 from result import Result, is_err
 from toga.style import Pack
@@ -38,10 +39,12 @@ def item_info_screen(
     )
 
     if is_err(data):
-        print("ERROR HERE")
+        display_error = "\n".join(textwrap.wrap(data.err_value, width=50))
+
         error_label = toga.Label(
-            data.err_value, style=Pack(color="red", font_size=14, margin=(10, 0))
+            display_error, style=Pack(color="red", text_align="center", margin=(10, 0))
         )
+
         return toga.Box(
             children=[header_box, error_label],
             style=Pack(direction=COLUMN, margin=20, gap=10),
