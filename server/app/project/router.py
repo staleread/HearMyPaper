@@ -27,7 +27,7 @@ async def read_projects(
 ) -> list[ProjectListResponse]:
     """Get simplified list of all projects with only essential fields"""
     rows = db.query("""
-        SELECT p.id, p.title, u.username as instructor_username, p.deadline
+        SELECT p.id, p.title, CONCAT(u.name, ' ', u.surname) as instructor_username, p.deadline
         FROM projects p
         JOIN users u ON p.instructor_id = u.id
         ORDER BY p.deadline DESC, p.id
@@ -87,14 +87,14 @@ async def update_project_students(
 async def read_project_students(
     id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> list[ProjectStudentResponse]:
-    """Get students assigned to a project with their id and username for dropdown/list purposes"""
+    """Get students assigned to a project with their id and full name for dropdown/list purposes"""
     rows = (
         db.query("""
-        SELECT u.id, u.username
+        SELECT u.id, CONCAT(u.name, ' ', u.surname) as username
         FROM project_students ps
         JOIN users u ON ps.student_id = u.id
         WHERE ps.project_id = :project_id
-        ORDER BY u.username
+        ORDER BY u.surname, u.name
     """)
         .bind(project_id=id)
         .many_rows()

@@ -1,10 +1,4 @@
-from enum import Enum, StrEnum, Flag, auto
-
-
-class UserRole(StrEnum):
-    STUDENT = "student"
-    CURATOR = "curator"
-    INSTRUCTOR = "instructor"
+from enum import Enum, Flag, auto
 
 
 class AccessLevel(Enum):

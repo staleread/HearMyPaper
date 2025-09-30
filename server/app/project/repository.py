@@ -34,7 +34,7 @@ def get_project_with_instructor_username(
 ) -> tuple[Project, str]:
     row = (
         db.query("""
-        SELECT p.id, p.title, p.syllabus_summary, p.description, p.instructor_id, p.deadline, u.username
+        SELECT p.id, p.title, p.syllabus_summary, p.description, p.instructor_id, p.deadline, CONCAT(u.name, ' ', u.surname) as username
         FROM projects p
         JOIN users u ON p.instructor_id = u.id
         WHERE p.id = :id
