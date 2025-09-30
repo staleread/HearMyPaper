@@ -1,7 +1,9 @@
 import toga
+from datetime import datetime
 
 from ..service import update_project
 from ..dto import ProjectUpdateDto
+from ...shared.ui.components.datetime_picker import DateTimePicker
 
 
 def project_edit_form_screen(navigator, project_data):
@@ -28,7 +30,17 @@ def project_edit_form_screen(navigator, project_data):
         placeholder="Instructor Email (e.g., john.doe@university.edu)",
     )
 
-    deadline_input = toga.TextInput(value=project_data.get("deadline", ""))
+    current_deadline = project_data.get("deadline", "")
+    initial_deadline = None
+    if current_deadline:
+        try:
+            initial_deadline = datetime.fromisoformat(
+                current_deadline.replace("Z", "+00:00")
+            )
+        except ValueError:
+            initial_deadline = None
+
+    deadline_picker = DateTimePicker(initial_value=initial_deadline)
 
     async def on_submit(widget):
         if not all(
@@ -54,12 +66,14 @@ def project_edit_form_screen(navigator, project_data):
             return
 
         try:
+            deadline = deadline_picker.value.isoformat()
+
             project_dto = ProjectUpdateDto(
                 title=title_input.value,
                 syllabus_summary=syllabus_input.value,
                 description=description_input.value,
                 instructor_email=instructor_email,
-                deadline=deadline_input.value,
+                deadline=deadline,
             )
 
             result = update_project(navigator.session, project_data["id"], project_dto)
@@ -99,8 +113,8 @@ def project_edit_form_screen(navigator, project_data):
                 style=toga.style.Pack(font_size=10, color="#666666"),
             ),
             instructor_email_input,
-            toga.Label("Deadline (ISO format):"),
-            deadline_input,
+            toga.Label("Deadline:"),
+            deadline_picker.widget,
             toga.Box(
                 children=[
                     toga.Button("Update Project", on_press=on_submit),

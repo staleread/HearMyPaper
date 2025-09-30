@@ -1,8 +1,10 @@
 import toga
+from datetime import datetime
 
 from ..service import update_user
 from ...auth.enums import AccessLevel
 from ..dto import UserUpdateDto
+from ...shared.ui.components.datetime_picker import DateTimePicker
 
 
 def user_edit_form_screen(navigator, user_data):
@@ -40,9 +42,17 @@ def user_edit_form_screen(navigator, user_data):
         integrity_checkboxes[level.value] = checkbox
         integrity_box.add(checkbox)
 
-    expires_input = toga.TextInput(
-        value=user_data.get("expires_at", ""), placeholder="Expires At (ISO format)"
-    )
+    current_expires = user_data.get("expires_at", "")
+    initial_expires = None
+    if current_expires:
+        try:
+            initial_expires = datetime.fromisoformat(
+                current_expires.replace("Z", "+00:00")
+            )
+        except ValueError:
+            initial_expires = None
+
+    expires_picker = DateTimePicker(initial_value=initial_expires)
 
     def get_selected_integrity_levels():
         return [
@@ -66,13 +76,15 @@ def user_edit_form_screen(navigator, user_data):
 
             integrity_access_levels = [AccessLevel(level) for level in integrity_levels]
 
+            expires_at = expires_picker.value.isoformat()
+
             dto = UserUpdateDto(
                 name=name_input.value,
                 surname=surname_input.value,
                 email=email_input.value,
                 confidentiality_level=confidentiality_level,
                 integrity_levels=integrity_access_levels,
-                expires_at=expires_input.value,
+                expires_at=expires_at,
             )
 
             result = update_user(navigator.session, user_data["id"], dto)
@@ -119,7 +131,7 @@ def user_edit_form_screen(navigator, user_data):
             ),
             integrity_box,
             toga.Label("Expires At:"),
-            expires_input,
+            expires_picker.widget,
             toga.Box(
                 children=[
                     toga.Button("Update User", on_press=on_submit),

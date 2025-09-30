@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from ..service import create_project
 from ..dto import ProjectCreateDto
+from ...shared.ui.components.datetime_picker import DateTimePicker
 
 
 def project_create_form_screen(navigator):
@@ -25,9 +26,8 @@ def project_create_form_screen(navigator):
         placeholder="Instructor Email (e.g., john.doe@university.edu)"
     )
 
-    deadline_input = toga.TextInput(
-        placeholder="Deadline (ISO format, e.g. 2025-12-15T23:59:59Z)"
-    )
+    default_deadline = datetime.now() + timedelta(days=30)
+    deadline_picker = DateTimePicker(initial_value=default_deadline)
 
     async def on_submit(widget):
         if not all(
@@ -52,11 +52,7 @@ def project_create_form_screen(navigator):
             await navigator.main_window.dialog(dialog)
             return
 
-        deadline = deadline_input.value
-        if not deadline:
-            deadline = (
-                datetime.now().replace(microsecond=0) + timedelta(days=30)
-            ).isoformat() + "Z"
+        deadline = deadline_picker.value.isoformat() + "Z"
 
         project_dto = ProjectCreateDto(
             title=title_input.value,
@@ -104,8 +100,8 @@ def project_create_form_screen(navigator):
                 style=toga.style.Pack(font_size=10, color="#666666"),
             ),
             instructor_email_input,
-            toga.Label("Deadline (optional, ISO):"),
-            deadline_input,
+            toga.Label("Deadline:"),
+            deadline_picker.widget,
             toga.Box(
                 children=[
                     toga.Button("Create Project", on_press=on_submit),

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from ...auth.service import create_user_with_credentials
 from ...auth.enums import AccessLevel
 from ...user.dto import UserCreateDto
+from ...shared.ui.components.datetime_picker import DateTimePicker
 
 
 def user_create_form_screen(navigator):
@@ -46,9 +47,8 @@ def user_create_form_screen(navigator):
         integrity_checkboxes[level.value] = checkbox
         integrity_box.add(checkbox)
 
-    expires_input = toga.TextInput(
-        placeholder="Expires At (ISO format, leave empty for 1 year)"
-    )
+    default_expiry = datetime.now() + timedelta(days=365)
+    expires_picker = DateTimePicker(initial_value=default_expiry)
 
     credentials_label = toga.Label("No credentials file selected")
     password_input = toga.PasswordInput(placeholder="Password for credentials file")
@@ -97,10 +97,7 @@ def user_create_form_screen(navigator):
                 confidentiality_input.value
             )
 
-            expires_at = expires_input.value
-            if not expires_at:
-                default_expiry = (datetime.now() + timedelta(days=365)).isoformat()
-                expires_at = default_expiry
+            expires_at = expires_picker.value.isoformat()
 
             user_dto = UserCreateDto(
                 name=name_input.value,
@@ -156,8 +153,8 @@ def user_create_form_screen(navigator):
                 style=toga.style.Pack(font_size=10, color="#666666"),
             ),
             integrity_box,
-            toga.Label("Expires At (optional):"),
-            expires_input,
+            toga.Label("Expires At:"),
+            expires_picker.widget,
             toga.Label("Credentials File:"),
             toga.Button("Select Credentials File", on_press=pick_credentials_file),
             credentials_label,
