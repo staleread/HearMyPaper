@@ -9,7 +9,7 @@ from ...shared.ui.components.datetime_picker import DateTimePicker
 def project_edit_form_screen(navigator, project_data):
     children = [
         toga.Label(
-            f"Edit Project: {project_data.get('title', '')}",
+            "Edit Project",
             style=toga.style.Pack(
                 font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
             ),
@@ -128,8 +128,9 @@ def project_edit_form_screen(navigator, project_data):
     )
 
     return toga.ScrollContainer(
+        horizontal=False,
         content=toga.Box(
             children=children,
             style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
-        )
+        ),
     )

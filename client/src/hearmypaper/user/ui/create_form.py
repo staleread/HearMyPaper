@@ -173,8 +173,9 @@ def user_create_form_screen(navigator):
     )
 
     return toga.ScrollContainer(
+        horizontal=False,
         content=toga.Box(
             children=children,
             style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
-        )
+        ),
     )

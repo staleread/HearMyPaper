@@ -10,7 +10,7 @@ from ...shared.ui.components.datetime_picker import DateTimePicker
 def user_edit_form_screen(navigator, user_data):
     children = [
         toga.Label(
-            f"Edit User: {user_data.get('name', '')} {user_data.get('surname', '')}",
+            "Edit User",
             style=toga.style.Pack(
                 font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
             ),
@@ -145,8 +145,9 @@ def user_edit_form_screen(navigator, user_data):
     )
 
     return toga.ScrollContainer(
+        horizontal=False,
         content=toga.Box(
             children=children,
             style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
-        )
+        ),
     )
