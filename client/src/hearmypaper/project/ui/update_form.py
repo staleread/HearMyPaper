@@ -78,7 +78,7 @@ def project_edit_form_screen(navigator, project_data: dict):
                     title="Success", message="Project updated successfully"
                 )
                 await navigator.main_window.dialog(success_dialog)
-                navigator.navigate_with_data("project_info", project_data["id"])
+                navigator.navigate("project_info", project_data["id"])
             else:
                 error_dialog = toga.ErrorDialog(
                     title="Error",
@@ -92,7 +92,7 @@ def project_edit_form_screen(navigator, project_data: dict):
             await navigator.main_window.dialog(exception_dialog)
 
     def on_cancel(widget: toga.Widget) -> None:
-        navigator.navigate_with_data("project_info", project_data["id"])
+        navigator.navigate("project_info", project_data["id"])
 
     # Build form manually
     children.extend(

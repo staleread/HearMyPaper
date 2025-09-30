@@ -18,7 +18,6 @@ class HearMyPaper(toga.App):
         self.main_window = toga.MainWindow(title="HearMyPaper")
         self.navigator = Navigator(self.main_window, self.paths)
 
-        # Register screens without data
         self.navigator.register_screen("login", login_screen)
         self.navigator.register_screen("resource_catalog", resource_catalog_screen)
         self.navigator.register_screen("users_catalog", users_catalog_screen)
@@ -28,13 +27,10 @@ class HearMyPaper(toga.App):
             "project_create_form", project_create_form_screen
         )
 
-        # Register screens that need data
-        self.navigator.register_data_screen("user_info", user_info_screen)
-        self.navigator.register_data_screen("user_edit_form", user_edit_form_screen)
-        self.navigator.register_data_screen("project_info", project_info_screen)
-        self.navigator.register_data_screen(
-            "project_edit_form", project_edit_form_screen
-        )
+        self.navigator.register_screen("user_info", user_info_screen)
+        self.navigator.register_screen("user_edit_form", user_edit_form_screen)
+        self.navigator.register_screen("project_info", project_info_screen)
+        self.navigator.register_screen("project_edit_form", project_edit_form_screen)
 
         self.navigator.navigate("login")
         self.main_window.show()

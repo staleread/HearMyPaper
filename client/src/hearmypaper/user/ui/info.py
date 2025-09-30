@@ -26,7 +26,7 @@ def user_info_screen(navigator, user_id: int):
     user_dict = user_data.model_dump()
 
     def on_edit_user(item_data, nav):
-        nav.navigate_with_data("user_edit_form", item_data)
+        nav.navigate("user_edit_form", item_data)
 
     def on_delete_user(item_data, nav):
         # This should never be called since delete is marked as unsupported

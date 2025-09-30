@@ -26,7 +26,7 @@ def project_info_screen(navigator, project_id: int):
     project_dict = project_view.model_dump()
 
     def on_edit_project(item_data, nav):
-        nav.navigate_with_data("project_edit_form", item_data)
+        nav.navigate("project_edit_form", item_data)
 
     def on_delete_project(item_data, nav):
         # This should never be called since delete is marked as unsupported

@@ -100,14 +100,14 @@ def user_edit_form_screen(navigator, user_data: dict):
                     title="Success", message="User updated successfully!"
                 )
                 await navigator.main_window.dialog(success_dialog)
-                navigator.navigate_with_data("user_info", user_data["id"])
+                navigator.navigate("user_info", user_data["id"])
 
         except Exception as e:
             dialog = toga.ErrorDialog(title="Error", message=f"Invalid input: {e}")
             await navigator.main_window.dialog(dialog)
 
     def on_cancel(widget: toga.Widget) -> None:
-        navigator.navigate_with_data("user_info", user_data["id"])
+        navigator.navigate("user_info", user_data["id"])
 
     # Build form
     children.extend(
