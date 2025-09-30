@@ -16,7 +16,7 @@ from .project.ui.update_form import project_edit_form_screen
 class HearMyPaper(toga.App):
     def startup(self):
         self.main_window = toga.MainWindow(title="HearMyPaper")
-        self.navigator = Navigator(self.main_window)
+        self.navigator = Navigator(self.main_window, self.paths)
 
         # Register screens without data
         self.navigator.register_screen("login", login_screen)
