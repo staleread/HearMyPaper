@@ -1,0 +1,83 @@
+direction: down
+
+client: Клієнтська частина (Desktop App) {
+  app: HearMyPaper App {
+    shape: oval
+  }
+
+  ui_layer: Рівень UI {
+    auth_ui: Авторизація UI
+    auth_ui.shape: rectangle
+
+    user_ui: Користувачі UI
+    user_ui.shape: rectangle
+
+    project_ui: Проекти UI
+    project_ui.shape: rectangle
+  }
+
+  service_layer: Рівень сервісів {
+    auth_service: Auth Service
+    user_service: User Service
+    project_service: Project Service
+  }
+
+  shared_components: Спільні компоненти {
+    navigator: Navigator
+    navigator.shape: rectangle
+
+    api_client: API Client
+    api_client.shape: rectangle
+  }
+}
+
+server: Серверна частина (FastAPI) {
+  fastapi_app: FastAPI Application {
+    shape: oval
+  }
+
+  routers: Маршрутизатори {
+    auth_router: Auth Router
+    project_router: Project Router
+  }
+
+  services: Бізнес-логіка {
+    auth_service_server: Auth Service
+    project_service_server: Project Service
+  }
+
+  data_layer: Рівень даних {
+    auth_repository: Auth Repository
+    project_repository: Project Repository
+    database: База даних {
+      shape: cylinder
+    }
+  }
+}
+
+client.app -> client.ui_layer.auth_ui
+client.app -> client.ui_layer.user_ui
+client.app -> client.ui_layer.project_ui
+
+client.ui_layer.auth_ui -> client.service_layer.auth_service
+client.ui_layer.user_ui -> client.service_layer.user_service
+client.ui_layer.project_ui -> client.service_layer.project_service
+
+client.service_layer.auth_service -> client.shared_components.api_client
+client.service_layer.user_service -> client.shared_components.api_client
+client.service_layer.project_service -> client.shared_components.api_client
+
+client.shared_components.api_client -> server.fastapi_app: "HTTPS"
+
+server.fastapi_app -> server.routers.auth_router
+server.fastapi_app -> server.routers.project_router
+
+server.routers.auth_router -> server.services.auth_service_server
+server.routers.project_router -> server.services.project_service_server
+
+server.services.auth_service_server -> server.data_layer.auth_repository
+server.services.project_service_server -> server.data_layer.project_repository
+
+server.data_layer.auth_repository -> server.data_layer.database
+server.data_layer.project_repository -> server.data_layer.database
+
