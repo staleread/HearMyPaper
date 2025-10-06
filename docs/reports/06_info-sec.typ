@@ -1,113 +1,12 @@
-#set page(
-  paper: "a4",
-  margin: (
-    top: 20mm,
-    bottom: 20mm,
-    left: 25mm,
-    right: 15mm,
-  ),
+#import "conf.typ": lab_report
+#show: lab_report.with(
+  num: 6,
+  subject: "Безпека програм та даних",
+  title: "Аутентифікація користувачів на основі токенів безпеки",
+  authors: ("Неголюк О.О.", "Ратушняк М.А."),
+  reviewer: "Остапов С.Е.",
+  year: 2025,
 )
-
-#set par(
-  first-line-indent: (
-    amount: 1.25cm,
-    all: true,
-  ),
-  justify: true,
-  leading: 1.5em,
-)
-
-#let fontSize = 14pt;
-
-#set text(
-  font: "Times New Roman",
-  size: fontSize,
-)
-
-#set figure(
-  supplement: [Рисунок],
-  numbering: _ => {
-    let headingCnt = str(counter(heading).get().at(0));
-    let figureCnt = str(counter(figure).get().at(0));
-
-    headingCnt + "." + figureCnt
-  }
-)
-
-#set figure.caption(
-  separator: [ -- ],
-)
-
-#set heading(numbering: (..nums) => {
-   let numbers = nums.pos()
-
-   if numbers.len() == 2 {
-      numbering("1.1.", ..numbers)
-   }
-})
-
-#show heading.where(level: 1): it => {
-  // reset figure timer inside top-level heading body
-  counter(figure).update(0)
-
-  align(center)[
-    #set text(size: fontSize)
-    #block(
-      above: 3.5em,
-      below: 2.5em,
-      it,
-    )
-  ]
-}
-
-#show heading.where(level: 2): it => {
-  set text(size: fontSize);
-
-  block(
-    above: 3.5em,
-    below: 2.5em,
-    it,
-  )
-}
-
-#show outline: it => {
-  show heading: set align(center)
-  it
-}
-
-#align(center)[
-  #set par(leading: 1em)
-  *Міністерство освіти і науки України* \
-  *Чернівецький національний університет імені Юрія Федьковича* \
-  \
-  Інститут фізико-технічних та комп’ютерних наук \
-  Кафедра програмного забезпечення комп’ютерних систем
-]
-
-#align(center + horizon)[
-  #upper[ *Звіт* ] \
-
-  #set par(leading: 1em)
-  про виконання лабораторної роботи №6 \
-  з курсу "Безпека програм та даних" \
-  \
-  Тема: Аутентифікація користувачів на основі токенів безпеки \
-  \
-  Виконали: Неголюк О.О., Ратушняк М.А. \
-  Перевірив: Остапов С.Е. \
-]
-
-#align(center + bottom)[
-  Чернівці -- 2025
-]
-#pagebreak()
-
-#set par(
-  leading: 1.5em,
-)
-
-#outline(title: upper[Зміст])
-#pagebreak()
 
 = СКЛАД ІНФОРМАЦІЇ У ФАЙЛІ НА ТОКЕНІ БЕЗПЕКИ
 
@@ -166,12 +65,12 @@ $ "salt" + "iv" + "ciphertext" + "tag" $
 _діаграму прецедентів_ для відображення ролей і сценаріїв використання.
 
 #figure(
-  image("usecase.svg", width: 80%),
+  image("../diagrams/svg/06_usecase.svg", width: 80%),
   caption: [Діаграма прецедентів системи аутентифікації]
 )
 
 #figure(
-  image("sequence.svg", width: 80%),
+  image("../diagrams/svg/06_sequence.svg", width: 80%),
   caption: [Sequence diagram процесу аутентифікації]
 )
 
