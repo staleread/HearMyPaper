@@ -1,113 +1,12 @@
-#set page(
-  paper: "a4",
-  margin: (
-    top: 20mm,
-    bottom: 20mm,
-    left: 25mm,
-    right: 15mm,
-  ),
+#import "conf.typ": lab_report
+#show: lab_report.with(
+  num: 7,
+  subject: "Безпека програм та даних",
+  title: "Підсистема керування доступом",
+  authors: ("Неголюк О.О.", "Ратушняк М.А."),
+  reviewer: "Остапов С.Е.",
+  year: 2025,
 )
-
-#set par(
-  first-line-indent: (
-    amount: 1.25cm,
-    all: true,
-  ),
-  justify: true,
-  leading: 1.5em,
-)
-
-#let fontSize = 14pt;
-
-#set text(
-  font: "Times New Roman",
-  size: fontSize,
-)
-
-#set figure(
-  supplement: [Рисунок],
-  numbering: _ => {
-    let headingCnt = str(counter(heading).get().at(0));
-    let figureCnt = str(counter(figure).get().at(0));
-
-    headingCnt + "." + figureCnt
-  }
-)
-
-#set figure.caption(
-  separator: [ -- ],
-)
-
-#set heading(numbering: (..nums) => {
-   let numbers = nums.pos()
-
-   if numbers.len() == 2 {
-      numbering("1.1.", ..numbers)
-   }
-})
-
-#show heading.where(level: 1): it => {
-  // reset figure timer inside top-level heading body
-  counter(figure).update(0)
-
-  align(center)[
-    #set text(size: fontSize)
-    #block(
-      above: 3.5em,
-      below: 2.5em,
-      it,
-    )
-  ]
-}
-
-#show heading.where(level: 2): it => {
-  set text(size: fontSize);
-
-  block(
-    above: 3.5em,
-    below: 2.5em,
-    it,
-  )
-}
-
-#show outline: it => {
-  show heading: set align(center)
-  it
-}
-
-#align(center)[
-  #set par(leading: 1em)
-  *Міністерство освіти і науки України* \
-  *Чернівецький національний університет імені Юрія Федьковича* \
-  \
-  Інститут фізико-технічних та комп’ютерних наук \
-  Кафедра програмного забезпечення комп’ютерних систем
-]
-
-#align(center + horizon)[
-  #upper[ *Звіт* ] \
-
-  #set par(leading: 1em)
-  про виконання лабораторної роботи №7 \
-  з курсу "Безпека програм та даних" \
-  \
-  Тема: Підсистема керування доступом \
-  \
-  Виконали: Неголюк О.О., Ратушняк М.А. \
-  Перевірив: Остапов С.Е. \
-]
-
-#align(center + bottom)[
-  Чернівці -- 2025
-]
-#pagebreak()
-
-#set par(
-  leading: 1.5em,
-)
-
-#outline(title: upper[Зміст])
-#pagebreak()
 
 = МЕТА РОБОТИ
 
@@ -165,7 +64,7 @@ up" (заборона читання об'єктів вищого рівня к�
 down" (заборона запису об'єктів нижчого рівня конфіденційності).
 
 #figure(
-  image("use-case.svg"),
+  image("../diagrams/svg/07_use-case.svg"),
   caption: [Діаграма прецедентів системи HearMyPaper]
 ) <fig-use-case>
 
@@ -219,7 +118,7 @@ login_user, які обробляють процес автентифікаці�
 підпис та генерує токен з інформацією про рівні доступу користувача.
 
 #figure(
-  image("data-flow.svg"),
+  image("../diagrams/svg/07_data-flow.svg"),
   caption: [Data Flow діаграма системи HearMyPaper]
 ) <fig-data-flow>
 
@@ -248,7 +147,7 @@ integrity_levels для зберігання масиву рівнів цілі�
 над тим, які об'єкти може створювати або модифікувати користувач.
 
 #figure(
-  image("read-access.svg"),
+  image("../diagrams/svg/07_read-access.svg"),
   caption: [Діаграма політики доступу для "читання" об'єктів]
 ) <fig-read-access>
 
@@ -259,7 +158,7 @@ integrity_levels для зберігання масиву рівнів цілі�
 UNCLASSIFIED, але не може читати CONFIDENTIAL.
 
 #figure(
-  image("write-access.svg"),
+  image("../diagrams/svg/07_write-access.svg"),
   caption: [Діаграма політики доступу для "створення" об'єктів]
 ) <fig-write-access>
 
