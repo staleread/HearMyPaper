@@ -8,12 +8,15 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 )
 
 
-def load_server_private_key(key_path: str, password: str) -> Ed25519PrivateKey:
+def load_server_private_key(password: str) -> Ed25519PrivateKey:
     """
     Load and decrypt the server's private key from encrypted file.
+    Uses hardcoded path: secrets/private_key.bin
 
     Format: [salt(16B) | iv(12B) | ciphertext(N) | tag(16B)]
     """
+    key_path = "secrets/private_key.bin"
+
     with open(key_path, "rb") as f:
         data = f.read()
 

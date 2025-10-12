@@ -1,5 +1,4 @@
 import base64
-from typing import Optional
 from fastapi import APIRouter, HTTPException
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
@@ -24,10 +23,10 @@ from . import service as pdf_service
 router = APIRouter()
 
 # Load server private key on module initialization
-SERVER_PRIVATE_KEY: Optional[Ed25519PrivateKey] = None
+SERVER_PRIVATE_KEY: Ed25519PrivateKey | None = None
 try:
     SERVER_PRIVATE_KEY = load_server_private_key(
-        "secrets/server_private_key.enc", env_settings.server_private_key_password
+        env_settings.server_private_key_password
     )
 except Exception as e:
     print(f"Warning: Could not load server private key: {e}")
