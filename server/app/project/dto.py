@@ -41,7 +41,7 @@ class ProjectCreateResponse(BaseModel):
 
 
 class StudentAssignmentRequest(BaseModel):
-    student_ids: list[int]
+    student_emails: list[str]
 
 
 class ProjectStudentResponse(BaseModel):

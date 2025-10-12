@@ -12,7 +12,10 @@ def project_info_screen(navigator, project_id):
         if is_ok(data):
             navigator.navigate("project_edit_form", data.unwrap())
 
-    actions = [("Edit", on_edit_project)]
+    def on_manage_students():
+        navigator.navigate("manage_students_form", project_id)
+
+    actions = [("Edit", on_edit_project), ("Manage Students", on_manage_students)]
 
     return item_info_screen(
         title="Project Details",

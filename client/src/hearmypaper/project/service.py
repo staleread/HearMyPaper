@@ -9,6 +9,7 @@ from .dto import (
     ProjectCreateResponse,
     ProjectListResponse,
     ProjectView,
+    StudentAssignmentDto,
 )
 
 
@@ -32,3 +33,10 @@ def get_project(session: requests.Session, project_id: int) -> Result[ProjectVie
 
 def get_projects(session: requests.Session) -> Result[list[ProjectListResponse], str]:
     return api.get_projects(session)
+
+
+def assign_students(
+    session: requests.Session, project_id: int, assignment_dto: StudentAssignmentDto
+) -> Result[ProjectResponse, str]:
+    assignment_request = assignment_dto.to_request()
+    return api.assign_students(session, project_id, assignment_request)

@@ -11,6 +11,7 @@ from .project.ui.catalog import projects_catalog_screen
 from .project.ui.info import project_info_screen
 from .project.ui.create_form import project_create_form_screen
 from .project.ui.update_form import project_edit_form_screen
+from .project.ui.manage_students_form import manage_students_form_screen
 
 
 class HearMyPaper(toga.App):
@@ -31,6 +32,9 @@ class HearMyPaper(toga.App):
         self.navigator.register_screen("user_edit_form", user_edit_form_screen)
         self.navigator.register_screen("project_info", project_info_screen)
         self.navigator.register_screen("project_edit_form", project_edit_form_screen)
+        self.navigator.register_screen(
+            "manage_students_form", manage_students_form_screen
+        )
 
         self.navigator.navigate("login")
         self.main_window.show()

@@ -85,3 +85,17 @@ class ProjectUpdateDto(BaseModel):
     def to_request(self) -> ProjectUpdateRequest:
         """Convert to API request format"""
         return ProjectUpdateRequest(**self.model_dump())
+
+
+class StudentAssignmentRequest(BaseModel):
+    student_emails: list[str]
+
+
+class StudentAssignmentDto(BaseModel):
+    """DTO for student assignment form data"""
+
+    student_emails: list[str]
+
+    def to_request(self) -> StudentAssignmentRequest:
+        """Convert to API request format"""
+        return StudentAssignmentRequest(**self.model_dump())
