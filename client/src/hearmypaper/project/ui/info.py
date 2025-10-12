@@ -15,7 +15,15 @@ def project_info_screen(navigator, project_id):
     def on_manage_students():
         navigator.navigate("manage_students_form", project_id)
 
-    actions = [("Edit", on_edit_project), ("Manage Students", on_manage_students)]
+    # TODO: move to future submission overview
+    def on_pdf_to_audio():
+        navigator.navigate("pdf_to_audio_form")
+
+    actions = [
+        ("Edit", on_edit_project),
+        ("Manage Students", on_manage_students),
+        ("PDF to audio", on_pdf_to_audio),
+    ]
 
     return item_info_screen(
         title="Project Details",
