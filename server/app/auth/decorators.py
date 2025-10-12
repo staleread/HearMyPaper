@@ -23,6 +23,7 @@ def authorize(
         "create": AccessType.WRITE,
         "read": AccessType.READ,
         "update": AccessType.READ | AccessType.WRITE,
+        "execute": AccessType.READ | AccessType.WRITE,
     }
 
     def decorator(func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:

@@ -35,7 +35,7 @@ except Exception as e:
 @router.get("/upload-key")
 @authorize(AccessLevel.RESTRICTED)
 @audit()
-async def get_upload_key(
+async def read_upload_key(
     db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> UploadKeyResponse:
     """
