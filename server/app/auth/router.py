@@ -5,6 +5,7 @@ from app.shared.dependencies.db import PostgresRunnerDep
 from app.auth.dependencies import CurrentSubjectDep
 from app.auth.enums import AccessLevel
 from app.auth.decorators import authorize
+from app.audit.decorators import audit
 
 from .dto import (
     ChallengeRequest,
@@ -24,6 +25,7 @@ router = APIRouter()
 
 
 @router.post("/challenge")
+@audit()
 async def get_login_challenge(
     req: ChallengeRequest, db: PostgresRunnerDep
 ) -> ChallengeResponse:
@@ -31,12 +33,14 @@ async def get_login_challenge(
 
 
 @router.post("/login")
+@audit()
 async def login_user(req: LoginRequest, db: PostgresRunnerDep) -> LoginResponse:
     return auth_service.login_user(req, db=db)
 
 
 @router.post("/users")
 @authorize(AccessLevel.CONFIDENTIAL)
+@audit()
 async def create_user(
     req: UserCreateRequest, db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> UserCreateResponse:
@@ -45,6 +49,7 @@ async def create_user(
 
 @router.get("/users")
 @authorize(AccessLevel.CONFIDENTIAL)
+@audit()
 async def read_users(
     db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> list[UserListResponse]:
@@ -66,6 +71,7 @@ async def read_users(
 
 @router.get("/users/{id}")
 @authorize(AccessLevel.CONFIDENTIAL)
+@audit()
 async def read_user(
     id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> UserResponse:
@@ -74,6 +80,7 @@ async def read_user(
 
 @router.put("/users/{id}")
 @authorize(AccessLevel.CONFIDENTIAL)
+@audit()
 async def update_user(
     id: Annotated[int, Path()],
     req: UserUpdateRequest,
