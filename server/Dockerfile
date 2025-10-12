@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir --upgrade .
 
 COPY ./app /code/app
 COPY ./db /code/db
+COPY ./secrets /code/secrets
 
 EXPOSE 8000
 

@@ -1,3 +1,4 @@
+from pathlib import Path
 import secrets
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
@@ -15,7 +16,10 @@ def load_server_private_key(password: str) -> Ed25519PrivateKey:
 
     Format: [salt(16B) | iv(12B) | ciphertext(N) | tag(16B)]
     """
-    key_path = "secrets/private_key.bin"
+    current_dir = Path(__file__).parent
+    root_dir = current_dir.parent.parent.parent
+
+    key_path = root_dir / "secrets/private_key.bin"
 
     with open(key_path, "rb") as f:
         data = f.read()
