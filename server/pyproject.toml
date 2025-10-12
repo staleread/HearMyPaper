@@ -10,6 +10,8 @@ dependencies = [
     "psycopg2-binary>=2.9.10",
     "pydantic-settings>=2.10.1",
     "pyjwt>=2.10.1",
+    "pymupdf>=1.25.2",
+    "pyttsx3>=2.90",
     "sqlalchemy>=2.0.43",
 ]
 
