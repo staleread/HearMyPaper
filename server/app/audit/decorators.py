@@ -2,6 +2,7 @@ from functools import wraps
 from typing import Callable, Awaitable, TypeVar, ParamSpec
 
 from app.shared.utils.db import SqlRunner
+from app.auth.models import Subject
 from . import service as audit_service
 
 P = ParamSpec("P")
@@ -20,11 +21,16 @@ def audit() -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             action = func.__name__
             db = kwargs.get("db")
+            subject = kwargs.get("subject")
 
             if not isinstance(db, SqlRunner):
                 raise RuntimeError(
                     f"Function {func.__name__} must have 'db' parameter of type SqlRunner for audit"
                 )
+
+            user_id: int | None = None
+            if isinstance(subject, Subject):
+                user_id = subject.id
 
             success = True
             reason: str | None = None
@@ -38,7 +44,11 @@ def audit() -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
                 raise
             finally:
                 audit_service.add_action_log(
-                    action=action, is_success=success, reason=reason, db=db
+                    action=action,
+                    is_success=success,
+                    reason=reason,
+                    user_id=user_id,
+                    db=db,
                 )
 
         return wrapper
