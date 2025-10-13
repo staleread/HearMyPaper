@@ -33,8 +33,8 @@ except Exception as e:
 
 
 @router.get("/upload-key")
-@authorize(AccessLevel.RESTRICTED)
 @audit()
+@authorize(AccessLevel.RESTRICTED)
 async def read_upload_key(
     db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> UploadKeyResponse:
@@ -75,8 +75,8 @@ async def read_upload_key(
 
 
 @router.post("/execute")
-@authorize(AccessLevel.RESTRICTED)
 @audit()
+@authorize(AccessLevel.RESTRICTED)
 async def execute_pdf_to_audio(
     req: PdfToAudioRequest, db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> PdfToAudioResponse:

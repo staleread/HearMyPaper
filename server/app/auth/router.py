@@ -39,8 +39,8 @@ async def login_user(req: LoginRequest, db: PostgresRunnerDep) -> LoginResponse:
 
 
 @router.post("/users")
-@authorize(AccessLevel.CONFIDENTIAL)
 @audit()
+@authorize(AccessLevel.CONFIDENTIAL)
 async def create_user(
     req: UserCreateRequest, db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> UserCreateResponse:
@@ -48,8 +48,8 @@ async def create_user(
 
 
 @router.get("/users")
-@authorize(AccessLevel.CONFIDENTIAL)
 @audit()
+@authorize(AccessLevel.CONFIDENTIAL)
 async def read_users(
     db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> list[UserListResponse]:
@@ -70,8 +70,8 @@ async def read_users(
 
 
 @router.get("/users/{id}")
-@authorize(AccessLevel.CONFIDENTIAL)
 @audit()
+@authorize(AccessLevel.CONFIDENTIAL)
 async def read_user(
     id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> UserResponse:
@@ -79,8 +79,8 @@ async def read_user(
 
 
 @router.put("/users/{id}")
-@authorize(AccessLevel.CONFIDENTIAL)
 @audit()
+@authorize(AccessLevel.CONFIDENTIAL)
 async def update_user(
     id: Annotated[int, Path()],
     req: UserUpdateRequest,

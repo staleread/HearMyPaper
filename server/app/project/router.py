@@ -22,8 +22,8 @@ router = APIRouter()
 
 
 @router.get("/")
-@authorize(AccessLevel.CONTROLLED)
 @audit()
+@authorize(AccessLevel.CONTROLLED)
 async def read_projects(
     db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> list[ProjectListResponse]:
@@ -47,8 +47,8 @@ async def read_projects(
 
 
 @router.get("/{id}")
-@authorize(AccessLevel.CONTROLLED)
 @audit()
+@authorize(AccessLevel.CONTROLLED)
 async def read_project(
     id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> ProjectResponse:
@@ -56,8 +56,8 @@ async def read_project(
 
 
 @router.post("/")
-@authorize(AccessLevel.CONTROLLED)
 @audit()
+@authorize(AccessLevel.CONTROLLED)
 async def create_project(
     req: ProjectCreateRequest, db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> ProjectCreateResponse:
@@ -65,8 +65,8 @@ async def create_project(
 
 
 @router.put("/{id}")
-@authorize(AccessLevel.CONTROLLED)
 @audit()
+@authorize(AccessLevel.CONTROLLED)
 async def update_project(
     id: Annotated[int, Path()],
     req: ProjectUpdateRequest,
@@ -77,8 +77,8 @@ async def update_project(
 
 
 @router.put("/{id}/students")
-@authorize(AccessLevel.CONTROLLED)
 @audit()
+@authorize(AccessLevel.CONTROLLED)
 async def update_project_students(
     id: Annotated[int, Path()],
     req: StudentAssignmentRequest,
@@ -89,8 +89,8 @@ async def update_project_students(
 
 
 @router.get("/{id}/students")
-@authorize(AccessLevel.CONTROLLED)
 @audit()
+@authorize(AccessLevel.CONTROLLED)
 async def read_project_students(
     id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep
 ) -> list[ProjectStudentResponse]:

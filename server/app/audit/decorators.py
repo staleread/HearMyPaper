@@ -1,6 +1,5 @@
 from functools import wraps
 from typing import Callable, Awaitable, TypeVar, ParamSpec
-from fastapi import HTTPException
 
 from app.shared.utils.db import SqlRunner
 from . import service as audit_service
@@ -27,22 +26,20 @@ def audit() -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
                     f"Function {func.__name__} must have 'db' parameter of type SqlRunner for audit"
                 )
 
+            success = True
+            reason: str | None = None
+
             try:
                 result = await func(*args, **kwargs)
-                audit_service.add_action_log(
-                    action=action, is_success=True, reason=None, db=db
-                )
                 return result
-            except HTTPException as e:
-                audit_service.add_action_log(
-                    action=action, is_success=False, reason=e.detail, db=db
-                )
-                raise
             except Exception as e:
-                audit_service.add_action_log(
-                    action=action, is_success=False, reason=str(e), db=db
-                )
+                success = False
+                reason = getattr(e, "detail", str(e))
                 raise
+            finally:
+                audit_service.add_action_log(
+                    action=action, is_success=success, reason=reason, db=db
+                )
 
         return wrapper
 

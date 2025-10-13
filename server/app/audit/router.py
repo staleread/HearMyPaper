@@ -14,8 +14,8 @@ router = APIRouter()
 
 
 @router.get("/")
-@authorize(AccessLevel.CONFIDENTIAL)
 @audit()
+@authorize(AccessLevel.CONFIDENTIAL)
 async def read_audit_logs(
     start: Annotated[str, Query()],
     end: Annotated[str, Query()],
