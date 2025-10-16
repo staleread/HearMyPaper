@@ -7,6 +7,7 @@ from .dto import (
     ProjectUpdateRequest,
     ProjectResponse,
     ProjectListResponse,
+    StudentAssignmentRequest,
 )
 from ..shared.utils.api import check_response
 
@@ -53,6 +54,20 @@ def update_project(
     try:
         r = session.put(
             f"https://localhost/project/{project_id}", json=req.model_dump()
+        )
+        result = check_response(r)
+        return result.map(lambda data: ProjectResponse(**data))
+    except Exception as e:
+        return Err(f"Network error: {e}")
+
+
+def assign_students(
+    session: requests.Session, project_id: int, req: StudentAssignmentRequest
+) -> Result[ProjectResponse, str]:
+    """Assign students to a project by their emails"""
+    try:
+        r = session.put(
+            f"https://localhost/project/{project_id}/students", json=req.model_dump()
         )
         result = check_response(r)
         return result.map(lambda data: ProjectResponse(**data))

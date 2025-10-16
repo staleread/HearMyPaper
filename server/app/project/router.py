@@ -5,6 +5,7 @@ from app.shared.dependencies.db import PostgresRunnerDep
 from app.auth.dependencies import CurrentSubjectDep
 from app.auth.enums import AccessLevel
 from app.auth.decorators import authorize
+from app.audit.decorators import audit
 
 from .dto import (
     ProjectResponse,
@@ -21,6 +22,7 @@ router = APIRouter()
 
 
 @router.get("/")
+@audit()
 @authorize(AccessLevel.CONTROLLED)
 async def read_projects(
     db: PostgresRunnerDep, subject: CurrentSubjectDep
@@ -45,6 +47,7 @@ async def read_projects(
 
 
 @router.get("/{id}")
+@audit()
 @authorize(AccessLevel.CONTROLLED)
 async def read_project(
     id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep
@@ -53,6 +56,7 @@ async def read_project(
 
 
 @router.post("/")
+@audit()
 @authorize(AccessLevel.CONTROLLED)
 async def create_project(
     req: ProjectCreateRequest, db: PostgresRunnerDep, subject: CurrentSubjectDep
@@ -61,6 +65,7 @@ async def create_project(
 
 
 @router.put("/{id}")
+@audit()
 @authorize(AccessLevel.CONTROLLED)
 async def update_project(
     id: Annotated[int, Path()],
@@ -72,6 +77,7 @@ async def update_project(
 
 
 @router.put("/{id}/students")
+@audit()
 @authorize(AccessLevel.CONTROLLED)
 async def update_project_students(
     id: Annotated[int, Path()],
@@ -83,6 +89,7 @@ async def update_project_students(
 
 
 @router.get("/{id}/students")
+@audit()
 @authorize(AccessLevel.CONTROLLED)
 async def read_project_students(
     id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep

@@ -15,6 +15,8 @@ class EnvSettings(BaseSettings):
     postgres_port: str = "5432"
     postgres_db: str
 
+    server_private_key_password: str
+
     @computed_field  # type: ignore
     @property
     def postgres_url(self) -> str:

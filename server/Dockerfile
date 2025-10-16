@@ -4,6 +4,8 @@ FROM python:3.13-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
+    espeak-ng \
+    libespeak1 \
  && rm -rf /var/lib/apt/lists/*
 
 # Install dbmate
@@ -19,6 +21,7 @@ RUN pip install --no-cache-dir --upgrade .
 
 COPY ./app /code/app
 COPY ./db /code/db
+COPY ./secrets /code/secrets
 
 EXPOSE 8000
 

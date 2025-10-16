@@ -75,8 +75,13 @@ def update_project(
 def assign_students_to_project(
     project_id: int, req: StudentAssignmentRequest, *, db: SqlRunner
 ) -> ProjectResponse:
+    # Convert emails to IDs
+    student_ids = [
+        project_repo.get_user_id_by_email(email, db=db) for email in req.student_emails
+    ]
+
     # Assign students (this also verifies project exists)
-    project_repo.assign_students_to_project(project_id, req.student_ids, db=db)
+    project_repo.assign_students_to_project(project_id, student_ids, db=db)
 
     # Return updated project
     return get_project_by_id(project_id, db=db)
