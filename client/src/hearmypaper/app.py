@@ -1,5 +1,6 @@
 import toga
 
+from .audit.ui.audit_screen import audit_catalog_screen
 from .shared.utils.navigator import Navigator
 from .auth.ui.login_screen import login_screen
 from .shared.ui.resource_catalog import resource_catalog_screen
@@ -25,6 +26,8 @@ class HearMyPaper(toga.App):
         self.navigator.register_screen("users_catalog", users_catalog_screen)
         self.navigator.register_screen("user_create_form", user_create_form_screen)
         self.navigator.register_screen("projects_catalog", projects_catalog_screen)
+        self.navigator.register_screen("audit_catalog", audit_catalog_screen)
+
         self.navigator.register_screen(
             "project_create_form", project_create_form_screen
         )
