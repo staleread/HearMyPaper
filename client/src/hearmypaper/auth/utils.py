@@ -2,7 +2,7 @@ import os
 import secrets
 from typing import Tuple
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization, padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 
@@ -97,3 +97,47 @@ def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
         raise CredentialsRepoError("Invalid plaintext format inside token")
 
     return user_id, bytes.fromhex(hex_priv)
+
+
+def encrypt_with_public_key(data: bytes, public_key_pem: bytes) -> bytes:
+    """
+    Шифрує дані за допомогою публічного ключа RSA.
+    """
+    public_key = serialization.load_pem_public_key(
+        public_key_pem, backend=default_backend()
+    )
+    encrypted = public_key.encrypt(
+        data,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None,
+        ),
+    )
+    return encrypted
+
+
+def decrypt_with_private_key(encrypted_data: bytes, private_key_pem: bytes) -> bytes:
+    """
+    Розшифровує дані за допомогою приватного ключа RSA.
+    """
+    private_key = serialization.load_pem_private_key(
+        private_key_pem, password=None, backend=default_backend()
+    )
+    decrypted = private_key.decrypt(
+        encrypted_data,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None,
+        ),
+    )
+    return decrypted
+
+
+def load_private_key_from_flash(path: str) -> bytes:
+    """
+    Завантажує приватний ключ із файлу (наприклад, після авторизації користувача).
+    """
+    with open(path, "rb") as key_file:
+        return key_file.read()

@@ -24,6 +24,7 @@ def authorize(
         "read": AccessType.READ,
         "update": AccessType.READ | AccessType.WRITE,
         "execute": AccessType.READ | AccessType.WRITE,
+        "delete": AccessType.WRITE,
     }
 
     def decorator(func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
