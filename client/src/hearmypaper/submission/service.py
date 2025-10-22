@@ -1,4 +1,3 @@
-import os
 import base64
 import subprocess
 import platform
@@ -134,7 +133,12 @@ def open_submission(
         if system == "Darwin":  # macOS
             subprocess.run(["open", str(file_path)], check=True)
         elif system == "Windows":
-            os.startfile(str(file_path))
+            import os
+
+            if hasattr(os, "startfile"):
+                os.startfile(str(file_path))  # type: ignore
+            else:
+                subprocess.run(["cmd", "/c", "start", str(file_path)], check=True)
         elif system == "Linux":
             subprocess.run(["xdg-open", str(file_path)], check=True)
         else:

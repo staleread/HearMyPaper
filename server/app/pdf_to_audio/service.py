@@ -19,7 +19,7 @@ def _detect_language(text: str) -> str:
         if not text or len(text.strip()) < 10:
             return "en"
         lang = detect(text)
-        return lang
+        return str(lang)
     except Exception:
         return "en"
 
@@ -68,3 +68,4 @@ def convert_text_to_audio(text: str, speed: int = 140) -> bytes:
         print(
             f"espeak command failed: {e}; stderr: {e.stderr.decode(errors='ignore') if e.stderr else ''}"
         )
+        raise

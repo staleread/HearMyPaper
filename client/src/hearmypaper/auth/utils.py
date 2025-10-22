@@ -2,7 +2,8 @@ import os
 import secrets
 from typing import Tuple
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes, serialization, padding
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 
@@ -106,6 +107,8 @@ def encrypt_with_public_key(data: bytes, public_key_pem: bytes) -> bytes:
     public_key = serialization.load_pem_public_key(
         public_key_pem, backend=default_backend()
     )
+    if not isinstance(public_key, rsa.RSAPublicKey):
+        raise ValueError("Expected RSA public key")
     encrypted = public_key.encrypt(
         data,
         padding.OAEP(
@@ -124,6 +127,8 @@ def decrypt_with_private_key(encrypted_data: bytes, private_key_pem: bytes) -> b
     private_key = serialization.load_pem_private_key(
         private_key_pem, password=None, backend=default_backend()
     )
+    if not isinstance(private_key, rsa.RSAPrivateKey):
+        raise ValueError("Expected RSA private key")
     decrypted = private_key.decrypt(
         encrypted_data,
         padding.OAEP(
