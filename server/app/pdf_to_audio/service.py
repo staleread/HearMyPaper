@@ -1,41 +1,70 @@
-from io import BytesIO
+import subprocess
 import fitz  # type: ignore
-from gtts import gTTS  # type: ignore
 from langdetect import detect  # type: ignore
 
 
 def extract_text_from_pdf(pdf_bytes: bytes) -> str:
-    """Extract text from PDF bytes using PyMuPDF."""
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-    text = ""
+    text_parts = []
+
     for page in doc:
-        text += page.get_text()
+        text_parts.append(page.get_text())
     doc.close()
-    return text
+
+    return "".join(text_parts)
 
 
-def convert_text_to_audio(text: str) -> bytes:
-    """
-    Convert text to audio using Google Text-to-Speech.
-    Automatically detects language and supports Ukrainian.
-    Returns audio data directly from memory buffer.
-    """
-    # Detect language from text
+def _detect_language(text: str) -> str:
     try:
+        if not text or len(text.strip()) < 10:
+            return "en"
         lang = detect(text)
-        # Map to gTTS supported codes
-        if lang not in ["uk", "en", "ru", "de", "fr", "es", "it", "pl", "ja", "zh-cn"]:
-            lang = "en"  # Default to English if unsupported
+        return lang
     except Exception:
-        lang = "uk"  # Default to Ukrainian if detection fails
+        return "en"
 
-    # Create TTS object
-    tts = gTTS(text=text, lang=lang, slow=False)
 
-    # Write directly to BytesIO buffer
-    audio_buffer = BytesIO()
-    tts.write_to_fp(audio_buffer)
+def _espeak_voice_for_lang(lang: str) -> str:
+    """Map detected lang to an espeak-ng voice code."""
+    if lang == "uk":
+        return "uk"  # Ukrainian
 
-    # Get bytes from buffer
-    audio_buffer.seek(0)
-    return audio_buffer.read()
+    return "en-us"
+
+
+def convert_text_to_audio(text: str, speed: int = 140) -> bytes:
+    """
+    Convert text to audio bytes in WAV format.
+
+    Uses espeak-ng --stdout to get WAV bytes in-memory.
+
+    Parameters:
+    - text: str - input text to synthesize
+    - speed: speaking rate for espeak-ng (words per minute)
+
+    Returns:
+    - bytes of WAV audio
+    """
+    lang = _detect_language(text)
+    espeak_voice = _espeak_voice_for_lang(lang)
+
+    # espeak(-ng) writes RIFF WAV to stdout when --stdout is used
+    cmd = [
+        "espeak-ng",
+        "--stdout",
+        "-v",
+        espeak_voice,
+        "-s",
+        str(speed),
+        text,
+    ]
+    try:
+        proc = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
+        )
+        wav_bytes = proc.stdout
+        return wav_bytes
+    except subprocess.CalledProcessError as e:
+        print(
+            f"espeak command failed: {e}; stderr: {e.stderr.decode(errors='ignore') if e.stderr else ''}"
+        )

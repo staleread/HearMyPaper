@@ -118,7 +118,7 @@ async def execute_pdf_to_audio(
             )
 
         # Convert text to audio
-        audio_bytes = pdf_service.convert_text_to_audio(text)
+        audio_bytes = pdf_service.convert_text_to_audio(text, speed=req.speed)
 
         # Generate new AES key for audio encryption
         audio_aes_key = generate_aes_key()

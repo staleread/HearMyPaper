@@ -161,6 +161,7 @@ def convert_submission_to_audio(
     app_paths: Paths,
     submission_id: int,
     private_key_bytes: bytes,
+    speed: int = 140,
 ) -> Result[bytes, str]:
     """
     Convert submission PDF to audio using secure encrypted file transfer.
@@ -171,6 +172,7 @@ def convert_submission_to_audio(
         app_paths: Toga app paths object for locating resources
         submission_id: ID of the submission to convert
         private_key_bytes: User's private key bytes
+        speed: Speech rate in words per minute (80-300)
 
     Returns:
         Result containing audio bytes or error message
@@ -218,7 +220,9 @@ def convert_submission_to_audio(
         from . import dto
 
         request = dto.PdfToAudioRequest(
-            encrypted_file=encrypted_file, encrypted_aes_key=encrypted_aes_key
+            encrypted_file=encrypted_file,
+            encrypted_aes_key=encrypted_aes_key,
+            speed=speed,
         )
 
         # Execute PDF to audio conversion
