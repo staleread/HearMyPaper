@@ -1,6 +1,6 @@
 import toga
 
-from ..service import assign_students
+from ..service import assign_students, get_project_students
 from ..dto import StudentAssignmentDto
 
 
@@ -18,8 +18,16 @@ def manage_students_form_screen(navigator, project_id):
         ),
     ]
 
+    # Fetch existing student emails
+    existing_emails_result = get_project_students(navigator.session, project_id)
+    initial_value = ""
+    if existing_emails_result.is_ok():
+        existing_emails = existing_emails_result.unwrap()
+        initial_value = "\n".join(existing_emails)
+
     emails_input = toga.MultilineTextInput(
         placeholder="student1@example.com\nstudent2@example.com",
+        value=initial_value,
         style=toga.style.Pack(height=200),
     )
 

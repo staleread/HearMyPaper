@@ -1,4 +1,4 @@
-import requests
+from ..shared.utils.session import ApiSession
 from result import Result, Err
 
 from .dto import (
@@ -12,23 +12,18 @@ from .dto import (
 from ..shared.utils.api import check_response
 
 
-# Project endpoints
-def get_projects(session: requests.Session) -> Result[list[ProjectListResponse], str]:
-    """Get list of projects"""
+def get_projects(session: ApiSession) -> Result[list[ProjectListResponse], str]:
     try:
-        r = session.get("https://localhost/project/")
+        r = session.get("/project/")
         result = check_response(r)
         return result.map(lambda data: [ProjectListResponse(**item) for item in data])
     except Exception as e:
         return Err(f"Network error: {e}")
 
 
-def get_project(
-    session: requests.Session, project_id: int
-) -> Result[ProjectResponse, str]:
-    """Get full project details"""
+def get_project(session: ApiSession, project_id: int) -> Result[ProjectResponse, str]:
     try:
-        r = session.get(f"https://localhost/project/{project_id}")
+        r = session.get(f"/project/{project_id}")
         result = check_response(r)
         return result.map(lambda data: ProjectResponse(**data))
     except Exception as e:
@@ -36,11 +31,10 @@ def get_project(
 
 
 def create_project(
-    session: requests.Session, req: ProjectCreateRequest
+    session: ApiSession, req: ProjectCreateRequest
 ) -> Result[ProjectCreateResponse, str]:
-    """Create a new project"""
     try:
-        r = session.post("https://localhost/project/", json=req.model_dump())
+        r = session.post("/project/", json=req.model_dump())
         result = check_response(r)
         return result.map(lambda data: ProjectCreateResponse(**data))
     except Exception as e:
@@ -48,13 +42,10 @@ def create_project(
 
 
 def update_project(
-    session: requests.Session, project_id: int, req: ProjectUpdateRequest
+    session: ApiSession, project_id: int, req: ProjectUpdateRequest
 ) -> Result[ProjectResponse, str]:
-    """Update an existing project"""
     try:
-        r = session.put(
-            f"https://localhost/project/{project_id}", json=req.model_dump()
-        )
+        r = session.put(f"/project/{project_id}", json=req.model_dump())
         result = check_response(r)
         return result.map(lambda data: ProjectResponse(**data))
     except Exception as e:
@@ -62,14 +53,23 @@ def update_project(
 
 
 def assign_students(
-    session: requests.Session, project_id: int, req: StudentAssignmentRequest
+    session: ApiSession, project_id: int, req: StudentAssignmentRequest
 ) -> Result[ProjectResponse, str]:
-    """Assign students to a project by their emails"""
     try:
-        r = session.put(
-            f"https://localhost/project/{project_id}/students", json=req.model_dump()
-        )
+        r = session.put(f"/project/{project_id}/students", json=req.model_dump())
         result = check_response(r)
         return result.map(lambda data: ProjectResponse(**data))
+    except Exception as e:
+        return Err(f"Network error: {e}")
+
+
+def get_project_students(
+    session: ApiSession, project_id: int
+) -> Result[list[str], str]:
+    """Get list of student emails assigned to a project."""
+    try:
+        r = session.get(f"/project/{project_id}/students")
+        result = check_response(r)
+        return result.map(lambda data: [student["email"] for student in data])
     except Exception as e:
         return Err(f"Network error: {e}")

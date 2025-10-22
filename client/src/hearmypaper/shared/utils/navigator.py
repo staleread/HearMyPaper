@@ -1,7 +1,8 @@
 import toga
-import requests
 from toga.paths import Paths
 from typing import Callable, Any
+
+from .session import ApiSession
 
 
 class Navigator:
@@ -9,8 +10,9 @@ class Navigator:
         self.main_window = main_window
         self.app_paths = app_paths
         self.screens: dict[str, Callable[[Any], toga.Widget]] = {}
-        self.session = requests.Session()
+        self.session = ApiSession(base_url="https://localhost/")
         self.session.verify = str(app_paths.app / "resources/server.crt")
+        self.credentials_path: str | None = None
 
     def register_screen(self, name, screen_factory):
         self.screens[name] = screen_factory

@@ -1,4 +1,4 @@
-import requests
+from ..shared.utils.session import ApiSession
 from result import Result
 
 from . import api
@@ -14,29 +14,36 @@ from .dto import (
 
 
 def create_project(
-    session: requests.Session, project_dto: ProjectCreateDto
+    session: ApiSession, project_dto: ProjectCreateDto
 ) -> Result[ProjectCreateResponse, str]:
     create_request = project_dto.to_request()
     return api.create_project(session, create_request)
 
 
 def update_project(
-    session: requests.Session, project_id: int, project_dto: ProjectUpdateDto
+    session: ApiSession, project_id: int, project_dto: ProjectUpdateDto
 ) -> Result[ProjectResponse, str]:
     update_request = project_dto.to_request()
     return api.update_project(session, project_id, update_request)
 
 
-def get_project(session: requests.Session, project_id: int) -> Result[ProjectView, str]:
+def get_project(session: ApiSession, project_id: int) -> Result[ProjectView, str]:
     return api.get_project(session, project_id).map(ProjectView.from_response)
 
 
-def get_projects(session: requests.Session) -> Result[list[ProjectListResponse], str]:
+def get_projects(session: ApiSession) -> Result[list[ProjectListResponse], str]:
     return api.get_projects(session)
 
 
 def assign_students(
-    session: requests.Session, project_id: int, assignment_dto: StudentAssignmentDto
+    session: ApiSession, project_id: int, assignment_dto: StudentAssignmentDto
 ) -> Result[ProjectResponse, str]:
     assignment_request = assignment_dto.to_request()
     return api.assign_students(session, project_id, assignment_request)
+
+
+def get_project_students(
+    session: ApiSession, project_id: int
+) -> Result[list[str], str]:
+    """Get list of student emails assigned to a project."""
+    return api.get_project_students(session, project_id)

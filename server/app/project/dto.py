@@ -45,5 +45,4 @@ class StudentAssignmentRequest(BaseModel):
 
 
 class ProjectStudentResponse(BaseModel):
-    id: int
-    username: str
+    email: str

@@ -1,4 +1,3 @@
-from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -7,10 +6,13 @@ class SubmissionResponse(BaseModel):
     title: str
     student_name: str
     instructor_name: str
-    submitted_at: datetime
+    submitted_at: str
+    content_hash: str
 
 
-class SubmissionCreateRequest(BaseModel):
-    project_student_id: int
-    title: str
+class SubmissionHashResponse(BaseModel):
+    content_hash: str
+
+
+class SubmissionContentResponse(BaseModel):
     encrypted_content: bytes

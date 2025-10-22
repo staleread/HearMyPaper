@@ -8,10 +8,12 @@ class Submission:
         project_student_id: int,
         title: str,
         content: bytes,
+        content_hash: str,
         submitted_at: datetime,
     ):
         self.id = id
         self.project_student_id = project_student_id
         self.title = title
         self.content = content
+        self.content_hash = content_hash
         self.submitted_at = submitted_at

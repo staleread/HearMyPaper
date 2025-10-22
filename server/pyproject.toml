@@ -5,13 +5,15 @@ description = "HearMyPaper server"
 requires-python = ">=3.13"
 dependencies = [
     "asyncpg>=0.30.0",
+    "cbor2>=5.7.0",
     "cryptography>=45.0.7",
     "fastapi[standard]>=0.116.1",
+    "gtts>=2.5.0",
+    "langdetect>=1.0.9",
     "psycopg2-binary>=2.9.10",
     "pydantic-settings>=2.10.1",
     "pyjwt>=2.10.1",
     "pymupdf>=1.25.2",
-    "pyttsx3>=2.90",
     "sqlalchemy>=2.0.43",
 ]
 
