@@ -1,4 +1,3 @@
-import requests
 from result import Result, Ok, Err
 
 from .dto import (
@@ -8,13 +7,14 @@ from .dto import (
     LoginResponse,
 )
 from ..shared.utils.api import check_response
+from ..shared.utils.session import ApiSession
 
 
 def request_challenge(
-    session: requests.Session, req: ChallengeRequest
+    session: ApiSession, req: ChallengeRequest
 ) -> Result[ChallengeResponse, str]:
     try:
-        r = session.post("https://localhost/auth/challenge", json=req.model_dump())
+        r = session.post("/auth/challenge", json=req.model_dump())
         result = check_response(r)
         return result.map(lambda data: ChallengeResponse(**data))
     except Exception as e:
@@ -22,10 +22,10 @@ def request_challenge(
 
 
 def submit_challenge(
-    session: requests.Session, req: LoginRequest
+    session: ApiSession, req: LoginRequest
 ) -> Result[LoginResponse, str]:
     try:
-        r = session.post("https://localhost/auth/login", json=req.model_dump())
+        r = session.post("/auth/login", json=req.model_dump())
         result = check_response(r)
         if result.is_ok():
             response = LoginResponse(**result.unwrap())

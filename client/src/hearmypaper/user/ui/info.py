@@ -5,8 +5,9 @@ from ..service import get_user
 def user_info_screen(navigator, user_id):
     data = get_user(navigator.session, user_id).map(lambda user: user.model_dump())
 
-    def on_edit_user(item_data, nav):
-        nav.navigate("user_edit_form", item_data)
+    def on_edit_user():
+        if data.is_ok():
+            navigator.navigate("user_edit_form", data.unwrap())
 
     actions = [("Edit", on_edit_user)]
 

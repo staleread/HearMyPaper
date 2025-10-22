@@ -1,5 +1,5 @@
 import base64
-import requests
+from ..shared.utils.session import ApiSession
 from result import Result, Ok, Err
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
@@ -19,7 +19,7 @@ from ..user.dto import UserCreateDto, UserCreateResponse
 
 
 def create_user_with_credentials(
-    session: requests.Session, user_dto: UserCreateDto
+    session: ApiSession, user_dto: UserCreateDto
 ) -> Result[UserCreateResponse, str]:
     """
     Create a user with auto-generated key pair and save credentials to file.
@@ -64,9 +64,7 @@ def create_user_with_credentials(
         return Err(f"Unexpected error during user creation: {e}")
 
 
-def login(
-    session: requests.Session, token_path: str, password: str
-) -> Result[None, str]:
+def login(session: ApiSession, token_path: str, password: str) -> Result[None, str]:
     """
     Authenticate user with credentials file.
 

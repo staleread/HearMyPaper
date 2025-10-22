@@ -114,19 +114,57 @@ def assign_students_to_project(
     # Verify project exists
     get_project_by_id(project_id, db=db)
 
-    # Remove existing assignments
-    db.query("""
-        DELETE FROM project_students
+    # Get existing student assignments
+    existing_rows = (
+        db.query("""
+        SELECT student_id
+        FROM project_students
         WHERE project_id = :project_id
-    """).bind(project_id=project_id).execute()
+    """)
+        .bind(project_id=project_id)
+        .many_rows()
+    )
 
-    # Add new assignments
-    if student_ids:
-        for student_id in student_ids:
+    existing_student_ids = {row["student_id"] for row in existing_rows}
+    new_student_ids = set(student_ids)
+
+    # Determine which students to remove and which to add
+    students_to_remove = existing_student_ids - new_student_ids
+    students_to_add = new_student_ids - existing_student_ids
+
+    # Remove students that are no longer assigned
+    failed_removals = []
+    for student_id in students_to_remove:
+        try:
             db.query("""
-                INSERT INTO project_students (project_id, student_id)
-                VALUES (:project_id, :student_id)
+                DELETE FROM project_students
+                WHERE project_id = :project_id AND student_id = :student_id
             """).bind(project_id=project_id, student_id=student_id).execute()
+        except Exception:
+            # Get student email for error message
+            email_row = (
+                db.query("""
+                SELECT email FROM users WHERE id = :student_id
+            """)
+                .bind(student_id=student_id)
+                .first_row()
+            )
+            student_email = email_row["email"] if email_row else f"ID {student_id}"
+            failed_removals.append(student_email)
+
+    if failed_removals:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot remove students who have already submitted: {', '.join(failed_removals)}",
+        )
+
+    # Add new student assignments
+    for student_id in students_to_add:
+        db.query("""
+            INSERT INTO project_students (project_id, student_id)
+            VALUES (:project_id, :student_id)
+            ON CONFLICT (project_id, student_id) DO NOTHING
+        """).bind(project_id=project_id, student_id=student_id).execute()
 
 
 def get_user_id_by_email(email: str, *, db: SqlRunner) -> int:
