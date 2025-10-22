@@ -1,4 +1,3 @@
-import os
 import base64
 import subprocess
 import platform
@@ -134,7 +133,12 @@ def open_submission(
         if system == "Darwin":  # macOS
             subprocess.run(["open", str(file_path)], check=True)
         elif system == "Windows":
-            os.startfile(str(file_path))
+            import os
+
+            if hasattr(os, "startfile"):
+                os.startfile(str(file_path))  # type: ignore
+            else:
+                subprocess.run(["cmd", "/c", "start", str(file_path)], check=True)
         elif system == "Linux":
             subprocess.run(["xdg-open", str(file_path)], check=True)
         else:
@@ -161,6 +165,7 @@ def convert_submission_to_audio(
     app_paths: Paths,
     submission_id: int,
     private_key_bytes: bytes,
+    speed: int = 140,
 ) -> Result[bytes, str]:
     """
     Convert submission PDF to audio using secure encrypted file transfer.
@@ -171,6 +176,7 @@ def convert_submission_to_audio(
         app_paths: Toga app paths object for locating resources
         submission_id: ID of the submission to convert
         private_key_bytes: User's private key bytes
+        speed: Speech rate in words per minute (80-300)
 
     Returns:
         Result containing audio bytes or error message
@@ -218,7 +224,9 @@ def convert_submission_to_audio(
         from . import dto
 
         request = dto.PdfToAudioRequest(
-            encrypted_file=encrypted_file, encrypted_aes_key=encrypted_aes_key
+            encrypted_file=encrypted_file,
+            encrypted_aes_key=encrypted_aes_key,
+            speed=speed,
         )
 
         # Execute PDF to audio conversion

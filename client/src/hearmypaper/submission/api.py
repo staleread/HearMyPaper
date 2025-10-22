@@ -1,5 +1,7 @@
 import cbor2
-from result import Result
+from result import Result, Err
+from typing import Any
+from pydantic import parse_obj_as
 
 from ..shared.utils import api as api_utils
 from ..shared.utils.session import ApiSession
@@ -10,17 +12,13 @@ def list_submissions(session: ApiSession) -> Result[list[dto.SubmissionResponse]
     response = session.get("/submission")
     result = api_utils.check_response(response)
 
-    if result.is_err():
-        return result
-
-    result.unwrap()
-    return result.map(lambda d: [dto.SubmissionResponse(**item) for item in d])
+    return result.map(lambda d: parse_obj_as(list[dto.SubmissionResponse], d))
 
 
 def upload_submission(
     session: ApiSession, project_id: int, title: str, encrypted_content: bytes
 ) -> Result[int, str]:
-    payload = {
+    payload: dict[str, Any] = {
         "project_id": project_id,
         "title": title,
         "encrypted_content": encrypted_content,
@@ -34,7 +32,7 @@ def upload_submission(
     )
 
     result = api_utils.check_response(response)
-    return result.map(lambda d: d["id"])
+    return result.map(lambda d: d["id"] if isinstance(d, dict) and "id" in d else 0)
 
 
 def get_instructor_key(session: ApiSession, project_id: int) -> Result[str, str]:
@@ -43,7 +41,7 @@ def get_instructor_key(session: ApiSession, project_id: int) -> Result[str, str]
     )
 
     result = api_utils.check_response(response)
-    return result.map(lambda d: d["public_key"])
+    return result.map(lambda d: d["public_key"] if isinstance(d, dict) else "")
 
 
 def get_submission_hash(
@@ -52,7 +50,7 @@ def get_submission_hash(
     response = session.get(f"/submission/{submission_id}/hash")
 
     result = api_utils.check_response(response)
-    return result.map(lambda d: dto.SubmissionHashResponse(**d))
+    return result.map(lambda d: parse_obj_as(dto.SubmissionHashResponse, d))
 
 
 def download_submission_content(
@@ -60,16 +58,18 @@ def download_submission_content(
 ) -> Result[bytes, str]:
     response = session.get(f"/submission/{submission_id}/content")
 
-    return api_utils.check_response(response, raw_data=True)
+    result = api_utils.check_response(response, raw_data=True)
+    # Ensure we return bytes only
+    return result.map(lambda d: d if isinstance(d, bytes) else b"")
 
 
 def get_upload_key(session: ApiSession) -> Result[dto.UploadKeyResponse, str]:
     try:
         response = session.get("/pdf-to-audio/upload-key")
         result = api_utils.check_response(response)
-        return result.map(lambda data: dto.UploadKeyResponse(**data))
+        return result.map(lambda data: parse_obj_as(dto.UploadKeyResponse, data))
     except Exception as e:
-        return Result.Err(f"Network error: {e}")
+        return Err(f"Network error: {e}")
 
 
 def execute_pdf_to_audio(
@@ -78,6 +78,6 @@ def execute_pdf_to_audio(
     try:
         response = session.post("/pdf-to-audio/execute", json=req.model_dump())
         result = api_utils.check_response(response)
-        return result.map(lambda data: dto.PdfToAudioResponse(**data))
+        return result.map(lambda data: parse_obj_as(dto.PdfToAudioResponse, data))
     except Exception as e:
-        return Result.Err(f"Network error: {e}")
+        return Err(f"Network error: {e}")

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UploadKeyResponse(BaseModel):
@@ -8,6 +8,7 @@ class UploadKeyResponse(BaseModel):
 class PdfToAudioRequest(BaseModel):
     encrypted_file: str
     encrypted_aes_key: str
+    speed: int = Field(default=140, ge=80, le=300)
 
 
 class PdfToAudioResponse(BaseModel):

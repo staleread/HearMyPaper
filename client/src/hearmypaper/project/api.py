@@ -1,5 +1,6 @@
 from ..shared.utils.session import ApiSession
 from result import Result, Err
+from pydantic import parse_obj_as
 
 from .dto import (
     ProjectCreateRequest,
@@ -16,7 +17,7 @@ def get_projects(session: ApiSession) -> Result[list[ProjectListResponse], str]:
     try:
         r = session.get("/project/")
         result = check_response(r)
-        return result.map(lambda data: [ProjectListResponse(**item) for item in data])
+        return result.map(lambda data: parse_obj_as(list[ProjectListResponse], data))
     except Exception as e:
         return Err(f"Network error: {e}")
 
@@ -25,7 +26,7 @@ def get_project(session: ApiSession, project_id: int) -> Result[ProjectResponse,
     try:
         r = session.get(f"/project/{project_id}")
         result = check_response(r)
-        return result.map(lambda data: ProjectResponse(**data))
+        return result.map(lambda data: parse_obj_as(ProjectResponse, data))
     except Exception as e:
         return Err(f"Network error: {e}")
 
@@ -36,7 +37,7 @@ def create_project(
     try:
         r = session.post("/project/", json=req.model_dump())
         result = check_response(r)
-        return result.map(lambda data: ProjectCreateResponse(**data))
+        return result.map(lambda data: parse_obj_as(ProjectCreateResponse, data))
     except Exception as e:
         return Err(f"Network error: {e}")
 
@@ -47,7 +48,7 @@ def update_project(
     try:
         r = session.put(f"/project/{project_id}", json=req.model_dump())
         result = check_response(r)
-        return result.map(lambda data: ProjectResponse(**data))
+        return result.map(lambda data: parse_obj_as(ProjectResponse, data))
     except Exception as e:
         return Err(f"Network error: {e}")
 
@@ -58,7 +59,7 @@ def assign_students(
     try:
         r = session.put(f"/project/{project_id}/students", json=req.model_dump())
         result = check_response(r)
-        return result.map(lambda data: ProjectResponse(**data))
+        return result.map(lambda data: parse_obj_as(ProjectResponse, data))
     except Exception as e:
         return Err(f"Network error: {e}")
 
@@ -70,6 +71,8 @@ def get_project_students(
     try:
         r = session.get(f"/project/{project_id}/students")
         result = check_response(r)
-        return result.map(lambda data: [student["email"] for student in data])
+        return result.map(
+            lambda data: [student["email"] for student in data]  # type: ignore[index]
+        )
     except Exception as e:
         return Err(f"Network error: {e}")

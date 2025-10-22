@@ -32,6 +32,20 @@ def submission_convert_form_screen(navigator, submission_id: int):
         style=Pack(flex=1),
     )
 
+    # Speed slider with label
+    speed_value_label = toga.Label("140 wpm", style=Pack(width=70))
+    speed_slider = toga.Slider(
+        min=80,
+        max=300,
+        value=140,
+        style=Pack(flex=1),
+    )
+
+    def on_speed_change(widget):
+        speed_value_label.text = f"{int(widget.value)} wpm"
+
+    speed_slider.on_change = on_speed_change
+
     async def show_error(message: str):
         dialog = toga.ErrorDialog(title="Error", message=message)
         await navigator.main_window.dialog(dialog)
@@ -44,8 +58,8 @@ def submission_convert_form_screen(navigator, submission_id: int):
         try:
             file_path = await navigator.main_window.save_file_dialog(
                 title="Save Audio File As",
-                suggested_filename=f"submission_{submission_id}.mp3",
-                file_types=["mp3"],
+                suggested_filename=f"submission_{submission_id}.wav",
+                file_types=["wav"],
             )
             if file_path:
                 output_file_input.value = str(file_path)
@@ -96,6 +110,7 @@ def submission_convert_form_screen(navigator, submission_id: int):
                 navigator.app_paths,
                 submission_id,
                 user_private_key_bytes,
+                speed=int(speed_slider.value),
             )
 
             if result.is_ok():
@@ -120,6 +135,14 @@ def submission_convert_form_screen(navigator, submission_id: int):
         [
             toga.Label("Token Password:"),
             token_password_input,
+            toga.Label("Speech Rate:"),
+            toga.Box(
+                children=[
+                    speed_slider,
+                    speed_value_label,
+                ],
+                style=Pack(direction=ROW, gap=5),
+            ),
             toga.Label("Output Audio File:"),
             toga.Box(
                 children=[
