@@ -1,6 +1,6 @@
 from typing import Annotated
 import cbor2
-from fastapi import APIRouter, Body, Query
+from fastapi import APIRouter, Body, Query, Request
 from fastapi.responses import Response as FastAPIResponse
 
 from app.shared.dependencies.db import PostgresRunnerDep
@@ -22,6 +22,7 @@ async def create_submission(
     body: Annotated[bytes, Body()],
     db: PostgresRunnerDep,
     subject: CurrentSubjectDep,
+    request: Request,
 ):
     try:
         data = cbor2.loads(body)
@@ -45,7 +46,10 @@ async def create_submission(
 @audit()
 @authorize(AccessLevel.RESTRICTED)
 async def delete_submission(
-    submission_id: int, db: PostgresRunnerDep, subject: CurrentSubjectDep
+    submission_id: int,
+    db: PostgresRunnerDep,
+    subject: CurrentSubjectDep,
+    request: Request,
 ):
     service.remove_submission(submission_id=submission_id, db=db)
     return {"status": "deleted"}
@@ -55,7 +59,7 @@ async def delete_submission(
 @audit()
 @authorize(AccessLevel.RESTRICTED)
 async def read_submissions(
-    db: PostgresRunnerDep, subject: CurrentSubjectDep
+    db: PostgresRunnerDep, subject: CurrentSubjectDep, request: Request
 ) -> list[SubmissionResponse]:
     rows = service.list_submissions_for_ui(db=db)
     for row in rows:
@@ -71,6 +75,7 @@ async def read_instructor_key(
     project_id: Annotated[int, Query()],
     db: PostgresRunnerDep,
     subject: CurrentSubjectDep,
+    request: Request,
 ):
     key = service.get_instructor_key(project_id=project_id, db=db)
     return {"public_key": key}
@@ -83,6 +88,7 @@ async def read_submission_hash(
     submission_id: int,
     db: PostgresRunnerDep,
     subject: CurrentSubjectDep,
+    request: Request,
 ) -> SubmissionHashResponse:
     content_hash = service.get_submission_hash(submission_id=submission_id, db=db)
     return SubmissionHashResponse(content_hash=content_hash)
@@ -95,6 +101,7 @@ async def read_submission_content(
     submission_id: int,
     db: PostgresRunnerDep,
     subject: CurrentSubjectDep,
+    request: Request,
 ):
     encrypted_content = service.get_submission_content(
         submission_id=submission_id, db=db

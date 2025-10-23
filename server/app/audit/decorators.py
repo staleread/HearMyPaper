@@ -1,6 +1,7 @@
 from functools import wraps
 from typing import Callable, Awaitable, TypeVar, ParamSpec
 
+from fastapi import Request
 from app.shared.utils.db import SqlRunner
 from app.auth.models import Subject
 from . import service as audit_service
@@ -22,6 +23,7 @@ def audit() -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
             action = func.__name__
             db = kwargs.get("db")
             subject = kwargs.get("subject")
+            request = kwargs.get("request")
 
             if not isinstance(db, SqlRunner):
                 raise RuntimeError(
@@ -31,6 +33,10 @@ def audit() -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
             user_id: int | None = None
             if isinstance(subject, Subject):
                 user_id = subject.id
+
+            ip_address: str | None = None
+            if isinstance(request, Request) and request.client:
+                ip_address = request.client.host
 
             success = True
             reason: str | None = None
@@ -48,6 +54,7 @@ def audit() -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
                     is_success=success,
                     reason=reason,
                     user_id=user_id,
+                    ip_address=ip_address,
                     db=db,
                 )
 

@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 
 from app.shared.dependencies.db import PostgresRunnerDep
 from app.auth.dependencies import CurrentSubjectDep
@@ -20,6 +20,7 @@ async def read_audit_logs(
     end: Annotated[str, Query()],
     db: PostgresRunnerDep,
     subject: CurrentSubjectDep,
+    request: Request,
 ) -> list[ActionLogResponse]:
     rows = (
         db.query("""
@@ -31,7 +32,8 @@ async def read_audit_logs(
             CASE 
                 WHEN u.id IS NOT NULL THEN CONCAT(u.name, ' ', u.surname)
                 ELSE NULL
-            END AS user_name
+            END AS user_name,
+            al.ip_address
         FROM action_logs al
         LEFT JOIN users u ON al.user_id = u.id
         WHERE al.timestamp >= :start_timestamp AND al.timestamp <= :end_timestamp
@@ -47,6 +49,7 @@ async def read_audit_logs(
             is_success=row["is_success"],
             reason=row["reason"],
             user_name=row["user_name"],
+            ip_address=row["ip_address"],
         )
         for row in rows
     ]

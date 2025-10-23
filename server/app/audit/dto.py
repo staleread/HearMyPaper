@@ -7,3 +7,4 @@ class ActionLogResponse(BaseModel):
     is_success: bool
     reason: str | None
     user_name: str | None
+    ip_address: str | None
