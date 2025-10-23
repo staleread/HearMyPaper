@@ -1,5 +1,5 @@
 import base64
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from app.shared.dependencies.db import PostgresRunnerDep
@@ -36,7 +36,7 @@ except Exception as e:
 @audit()
 @authorize(AccessLevel.RESTRICTED)
 async def read_upload_key(
-    db: PostgresRunnerDep, subject: CurrentSubjectDep
+    db: PostgresRunnerDep, subject: CurrentSubjectDep, request: Request
 ) -> UploadKeyResponse:
     """
     Generate an AES key, encrypt it with user's public key, and return it.
@@ -78,7 +78,10 @@ async def read_upload_key(
 @audit()
 @authorize(AccessLevel.RESTRICTED)
 async def execute_pdf_to_audio(
-    req: PdfToAudioRequest, db: PostgresRunnerDep, subject: CurrentSubjectDep
+    req: PdfToAudioRequest,
+    db: PostgresRunnerDep,
+    subject: CurrentSubjectDep,
+    request: Request,
 ) -> PdfToAudioResponse:
     """
     Receive encrypted PDF, decrypt it, convert to audio, encrypt audio, and return.

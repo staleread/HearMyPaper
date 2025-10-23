@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, Request
 
 from app.shared.dependencies.db import PostgresRunnerDep
 from app.auth.dependencies import CurrentSubjectDep
@@ -27,14 +27,16 @@ router = APIRouter()
 @router.post("/challenge")
 @audit()
 async def get_login_challenge(
-    req: ChallengeRequest, db: PostgresRunnerDep
+    req: ChallengeRequest, db: PostgresRunnerDep, request: Request
 ) -> ChallengeResponse:
     return auth_service.create_login_challenge(req, db=db)
 
 
 @router.post("/login")
 @audit()
-async def login_user(req: LoginRequest, db: PostgresRunnerDep) -> LoginResponse:
+async def login_user(
+    req: LoginRequest, db: PostgresRunnerDep, request: Request
+) -> LoginResponse:
     return auth_service.login_user(req, db=db)
 
 
@@ -42,7 +44,10 @@ async def login_user(req: LoginRequest, db: PostgresRunnerDep) -> LoginResponse:
 @audit()
 @authorize(AccessLevel.CONFIDENTIAL)
 async def create_user(
-    req: UserCreateRequest, db: PostgresRunnerDep, subject: CurrentSubjectDep
+    req: UserCreateRequest,
+    db: PostgresRunnerDep,
+    subject: CurrentSubjectDep,
+    request: Request,
 ) -> UserCreateResponse:
     return auth_service.create_user(req, db=db)
 
@@ -51,7 +56,7 @@ async def create_user(
 @audit()
 @authorize(AccessLevel.CONFIDENTIAL)
 async def read_users(
-    db: PostgresRunnerDep, subject: CurrentSubjectDep
+    db: PostgresRunnerDep, subject: CurrentSubjectDep, request: Request
 ) -> list[UserListResponse]:
     """Get simplified list of all users with only id and full name for admin purposes"""
     rows = db.query("""
@@ -73,7 +78,10 @@ async def read_users(
 @audit()
 @authorize(AccessLevel.CONFIDENTIAL)
 async def read_user(
-    id: Annotated[int, Path()], db: PostgresRunnerDep, subject: CurrentSubjectDep
+    id: Annotated[int, Path()],
+    db: PostgresRunnerDep,
+    subject: CurrentSubjectDep,
+    request: Request,
 ) -> UserResponse:
     return auth_service.get_user_by_id(id, db=db)
 
@@ -86,5 +94,6 @@ async def update_user(
     req: UserUpdateRequest,
     db: PostgresRunnerDep,
     subject: CurrentSubjectDep,
+    request: Request,
 ) -> UserResponse:
     return auth_service.update_user(id, req, db=db)
