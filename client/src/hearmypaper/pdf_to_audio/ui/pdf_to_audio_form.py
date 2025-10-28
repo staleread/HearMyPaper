@@ -15,7 +15,7 @@ def pdf_to_audio_form_screen(navigator):
         toga.Label(
             "Convert your PDF documents to audio files",
             style=Pack(font_size=10, color="#666666", margin=(0, 0, 20, 0)),
-        ),
+        )
     ]
 
     pdf_file_input = toga.TextInput(
