@@ -31,4 +31,4 @@ async def get_public_key() -> dict[str, str]:
         public_key_bytes = private_key.public_key().public_bytes_raw()
         return {"public_key": base64.b64encode(public_key_bytes).decode("utf-8")}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to load public key: {e}")
+        raise HTTPException(status_code=500, detail="Failed to load public key")
