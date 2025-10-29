@@ -42,8 +42,8 @@ def pdf_to_audio_form_screen(navigator):
 
     async def on_select_pdf(widget):
         try:
-            file_path = await navigator.main_window.open_file_dialog(
-                title="Select PDF File", file_types=["pdf"]
+            file_path = await navigator.main_window.dialog(
+                toga.OpenFileDialog(title="Select PDF File", file_types=["pdf"])
             )
             if file_path:
                 pdf_file_input.value = str(file_path)

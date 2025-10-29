@@ -35,8 +35,13 @@ def audit() -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
                 user_id = subject.id
 
             ip_address: str | None = None
-            if isinstance(request, Request) and request.client:
-                ip_address = request.client.host
+            if isinstance(request, Request):
+                ip_address = (
+                    request.headers.get("do-connecting-ip")
+                    or request.headers.get("X-Real-IP")
+                    or request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+                    or (request.client.host if request.client else None)
+                )
 
             success = True
             reason: str | None = None

@@ -1,20 +1,17 @@
 services:
-  nginx:
-    image: nginx:latest
-    container_name: hmp-nginx
-    volumes:
-      - ./nginx:/etc/nginx:ro
-    ports:
-      - "443:443"
-    depends_on:
-      - api
-
   api:
-    build: .
+    build:
+      context: .
+      target: dev
     container_name: hmp-api
     env_file: .env
     environment:
       - SERVER_PRIVATE_KEY_PASSWORD=${SERVER_PRIVATE_KEY_PASSWORD}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/code/app
+      - ./db:/code/db
     depends_on:
       postgres:
         condition: service_healthy

@@ -36,9 +36,13 @@ def convert_pdf_to_audio(
     try:
         _, user_private_key_bytes = get_user_credentials(token_path, token_password)
 
-        server_public_key_path = str(app_paths.app / "resources/server.key")
-        with open(server_public_key_path, "rb") as f:
-            server_public_key_bytes = f.read()
+        server_public_key_result = api.get_server_public_key(session)
+        if server_public_key_result.is_err():
+            return Err(
+                f"Failed to get server public key: {server_public_key_result.unwrap_err()}"
+            )
+
+        server_public_key_bytes = server_public_key_result.unwrap()
 
         upload_key_result = api.get_upload_key(session)
         if upload_key_result.is_err():

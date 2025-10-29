@@ -1,3 +1,4 @@
+import toml
 import toga
 from toga.paths import Paths
 from typing import Callable, Any
@@ -10,8 +11,16 @@ class Navigator:
         self.main_window = main_window
         self.app_paths = app_paths
         self.screens: dict[str, Callable[[Any], toga.Widget]] = {}
-        self.session = ApiSession(base_url="https://localhost/")
-        self.session.verify = str(app_paths.app / "resources/server.crt")
+
+        # Load config from resources
+        config_path = app_paths.app / "resources/config.toml"
+        with open(config_path, "r") as f:
+            config = toml.load(f)
+
+        self.api_base_url = config.get("api", {}).get(
+            "base_url", "http://localhost:8000"
+        )
+        self.session = ApiSession(base_url=self.api_base_url)
         self.credentials_path: str | None = None
 
     def register_screen(self, name, screen_factory):

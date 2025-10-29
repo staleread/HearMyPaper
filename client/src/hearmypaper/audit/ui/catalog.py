@@ -2,7 +2,7 @@ from textwrap import wrap
 
 from datetime import datetime, timedelta, timezone
 from ...shared.ui.catalog_screen import catalog_screen
-from ..api import get_audit_logs
+from ..service import get_audit_logs
 
 
 def audit_catalog_screen(navigator, date: datetime | None = None):
@@ -21,12 +21,13 @@ def audit_catalog_screen(navigator, date: datetime | None = None):
         .map(
             lambda logs: [
                 [
-                    str(log.timestamp),
-                    str(log.action),
-                    "✔" if log.is_success else "✖",
-                    "\n".join(wrap(str(log.reason or "-"), width=50)),
-                    str(log.user_name or "-"),
-                    str(log.ip_address or "-"),
+                    str(log["timestamp"]),
+                    str(log["action"]),
+                    "✔" if log["is_success"] else "✖",
+                    "\n".join(wrap(str(log["reason"] or "-"), width=50)),
+                    str(log["user_name"] or "-"),
+                    str(log["ip_address"] or "-"),
+                    str(log["location"]),
                 ]
                 for log in logs
             ]
@@ -58,7 +59,15 @@ def audit_catalog_screen(navigator, date: datetime | None = None):
 
     return catalog_screen(
         title=title,
-        headings=["Timestamp", "Action", "Success", "Reason", "User", "IP Address"],
+        headings=[
+            "Timestamp",
+            "Action",
+            "Success",
+            "Reason",
+            "User",
+            "IP Address",
+            "Location",
+        ],
         data=data,
         on_back=lambda w: navigator.navigate("resource_catalog"),
         actions=actions,
