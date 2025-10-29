@@ -1,0 +1,112 @@
+grid-columns: 3
+
+actors: Актори {
+  grid-rows: 4
+  vertical-gap: 200
+  near: center-left
+
+  student: Студент
+  student.shape: person
+
+  instructor: Викладач  
+  instructor.shape: person
+
+  curator: Куратор
+  curator.shape: person
+
+  admin: Адміністратор
+  admin.shape: person
+}
+
+use_cases: Прецеденти використання {
+  grid-rows: 5
+
+  auth_cases: Автентифікація {
+    grid-rows: 3
+
+    login: Увійти до системи
+    login.shape: oval
+
+    challenge: Отримати challenge автентифікації
+    challenge.shape: oval
+  }
+
+  project_management: Управління проектами {
+    grid-rows: 5
+
+    view_projects: Переглянути проекти
+    view_projects.shape: oval
+
+    create_project: Створити проект
+    create_project.shape: oval
+
+    update_project: Оновити проект
+    update_project.shape: oval
+
+    view_project_info: Переглянути інформацію проекту
+    view_project_info.shape: oval
+  }
+
+  user_management: Управління користувачами {
+    grid-rows: 4
+
+    view_users: Переглянути користувачів
+    view_users.shape: oval
+
+    create_user: Створити користувача
+    create_user.shape: oval
+
+    update_user: Оновити користувача
+    update_user.shape: oval
+
+    view_user_info: Переглянути інформацію користувача
+    view_user_info.shape: oval
+  }
+
+}
+
+system: Системи {
+  near: center-right
+  grid-rows: 4
+  hearmypaper: HearMyPaper System
+  hearmypaper.shape: rectangle
+}
+
+actors.student -> use_cases.auth_cases.login
+actors.student -> use_cases.auth_cases.challenge
+actors.student -> use_cases.project_management.view_projects
+actors.student -> use_cases.project_management.view_project_info
+
+actors.curator -> use_cases.auth_cases.login
+actors.curator -> use_cases.auth_cases.challenge
+actors.curator -> use_cases.project_management.view_projects
+actors.curator -> use_cases.project_management.view_project_info
+
+actors.instructor -> use_cases.auth_cases.login
+actors.instructor -> use_cases.auth_cases.challenge
+actors.instructor -> use_cases.project_management.view_projects
+actors.instructor -> use_cases.project_management.create_project
+actors.instructor -> use_cases.project_management.update_project
+actors.instructor -> use_cases.project_management.view_project_info
+
+actors.admin -> use_cases.auth_cases.login
+actors.admin -> use_cases.auth_cases.challenge
+actors.admin -> use_cases.user_management.view_users
+actors.admin -> use_cases.user_management.create_user
+actors.admin -> use_cases.user_management.update_user
+actors.admin -> use_cases.user_management.view_user_info
+actors.admin -> use_cases.project_management.view_projects
+actors.admin -> use_cases.project_management.create_project
+actors.admin -> use_cases.project_management.update_project
+actors.admin -> use_cases.project_management.view_project_info
+
+use_cases.auth_cases.login -> system.hearmypaper
+use_cases.auth_cases.challenge -> system.hearmypaper
+use_cases.user_management.view_users -> system.hearmypaper
+use_cases.user_management.create_user -> system.hearmypaper
+use_cases.user_management.update_user -> system.hearmypaper
+use_cases.user_management.view_user_info -> system.hearmypaper
+use_cases.project_management.view_projects -> system.hearmypaper
+use_cases.project_management.create_project -> system.hearmypaper
+use_cases.project_management.update_project -> system.hearmypaper
+use_cases.project_management.view_project_info -> system.hearmypaper
