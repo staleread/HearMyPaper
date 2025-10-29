@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.13-slim AS base
 
 # Install dependencies and clear cache
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -25,4 +25,10 @@ COPY ./secrets /code/secrets
 
 EXPOSE 8000
 
+# Development target with hot reload
+FROM base AS dev
+CMD dbmate up && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Production target
+FROM base AS prod
 CMD dbmate up && fastapi run app/main.py --port 8000

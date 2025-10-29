@@ -584,15 +584,11 @@ dependencies = [
     { name = "toml" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "ruff" },
-]
-
-[package.dev-dependencies]
-dev = [
     { name = "types-requests" },
     { name = "types-toml" },
 ]
@@ -603,18 +599,17 @@ requires-dist = [
     { name = "cbor2", specifier = ">=5.7.0" },
     { name = "cryptography", specifier = ">=46.0.1" },
     { name = "ipinfo", specifier = ">=5.2.1" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.18.2" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.3.0" },
     { name = "pydantic", specifier = ">=2.11.9" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "result", specifier = ">=0.17.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.13.1" },
     { name = "toml", specifier = ">=0.10.2" },
 ]
-provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "mypy", specifier = ">=1.18.2" },
+    { name = "pre-commit", specifier = ">=4.3.0" },
+    { name = "ruff", specifier = ">=0.13.1" },
     { name = "types-requests", specifier = ">=2.32.4.20250913" },
     { name = "types-toml", specifier = ">=0.10.8.20240310" },
 ]

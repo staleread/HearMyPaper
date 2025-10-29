@@ -1,9 +1,25 @@
-from result import Result, Err
+import base64
+from result import Result, Err, Ok
 from pydantic import parse_obj_as
 
 from .dto import UploadKeyResponse, PdfToAudioRequest, PdfToAudioResponse
 from ..shared.utils.api import check_response
 from ..shared.utils.session import ApiSession
+
+
+def get_server_public_key(session: ApiSession) -> Result[bytes, str]:
+    try:
+        r = session.get("/public-key")
+        result = check_response(r)
+
+        def decode_key(data: dict | bytes) -> Result[bytes, str]:
+            if isinstance(data, dict):
+                return Ok(base64.b64decode(data["public_key"]))
+            return Err("Unexpected response format")
+
+        return result.and_then(decode_key)
+    except Exception as e:
+        return Err(f"Network error: {e}")
 
 
 def get_upload_key(session: ApiSession) -> Result[UploadKeyResponse, str]:
