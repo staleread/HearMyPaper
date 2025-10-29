@@ -1,7 +1,7 @@
 import cbor2
 from result import Result, Err
 from typing import Any
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 
 from ..shared.utils import api as api_utils
 from ..shared.utils.session import ApiSession
@@ -12,7 +12,9 @@ def list_submissions(session: ApiSession) -> Result[list[dto.SubmissionResponse]
     response = session.get("/submission")
     result = api_utils.check_response(response)
 
-    return result.map(lambda d: parse_obj_as(list[dto.SubmissionResponse], d))
+    return result.map(
+        lambda d: TypeAdapter(list[dto.SubmissionResponse]).validate_python(d)
+    )
 
 
 def upload_submission(
@@ -50,7 +52,9 @@ def get_submission_hash(
     response = session.get(f"/submission/{submission_id}/hash")
 
     result = api_utils.check_response(response)
-    return result.map(lambda d: parse_obj_as(dto.SubmissionHashResponse, d))
+    return result.map(
+        lambda d: TypeAdapter(dto.SubmissionHashResponse).validate_python(d)
+    )
 
 
 def download_submission_content(
@@ -67,7 +71,9 @@ def get_upload_key(session: ApiSession) -> Result[dto.UploadKeyResponse, str]:
     try:
         response = session.get("/pdf-to-audio/upload-key")
         result = api_utils.check_response(response)
-        return result.map(lambda data: parse_obj_as(dto.UploadKeyResponse, data))
+        return result.map(
+            lambda data: TypeAdapter(dto.UploadKeyResponse).validate_python(data)
+        )
     except Exception as e:
         return Err(f"Network error: {e}")
 
@@ -78,6 +84,8 @@ def execute_pdf_to_audio(
     try:
         response = session.post("/pdf-to-audio/execute", json=req.model_dump())
         result = api_utils.check_response(response)
-        return result.map(lambda data: parse_obj_as(dto.PdfToAudioResponse, data))
+        return result.map(
+            lambda data: TypeAdapter(dto.PdfToAudioResponse).validate_python(data)
+        )
     except Exception as e:
         return Err(f"Network error: {e}")

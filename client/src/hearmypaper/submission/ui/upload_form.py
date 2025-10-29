@@ -39,8 +39,8 @@ def submission_upload_form_screen(navigator, project_id: int):
 
     async def on_select_file(widget):
         try:
-            file_path = await navigator.main_window.open_file_dialog(
-                title="Select Submission File"
+            file_path = await navigator.main_window.dialog(
+                toga.OpenFileDialog(title="Select Submission File")
             )
             if file_path:
                 file_input.value = str(file_path)
