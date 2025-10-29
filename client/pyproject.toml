@@ -15,6 +15,7 @@ dependencies = [
     "pydantic>=2.11.9",
     "toml>=0.10.2",
     "cbor2>=5.7.0",
+    "ipinfo>=5.2.1",
 ]
 
 [project.optional-dependencies]
