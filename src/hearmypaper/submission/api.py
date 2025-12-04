@@ -67,15 +67,6 @@ def download_submission_content(
     return result.map(lambda d: d if isinstance(d, bytes) else b"")
 
 
-def get_server_public_key(session: ApiSession) -> Result[str, str]:
-    try:
-        response = session.get("/credentials/public-key")
-        result = api_utils.check_response(response)
-        return result.map(lambda d: d["public_key"] if isinstance(d, dict) else "")
-    except Exception as e:
-        return Err(f"Network error: {e}")
-
-
 def get_upload_key(session: ApiSession) -> Result[dto.UploadKeyResponse, str]:
     try:
         response = session.get("/pdf-to-audio/upload-key")
@@ -88,13 +79,13 @@ def get_upload_key(session: ApiSession) -> Result[dto.UploadKeyResponse, str]:
 
 
 def execute_pdf_to_audio(
-    session: ApiSession, req: dto.PdfToAudioRequest
-) -> Result[dto.PdfToAudioResponse, str]:
+    session: ApiSession, req: dto.PdfToAudioRequest, task_uuid: str
+) -> Result[dto.ConvertResponse, str]:
     try:
         payload = {
             "encrypted_file": req.encrypted_file,
-            "encrypted_aes_key": req.encrypted_aes_key,
             "speed": req.speed,
+            "task_uuid": task_uuid,
         }
         cbor_bytes = cbor2.dumps(payload)
 
@@ -106,9 +97,35 @@ def execute_pdf_to_audio(
             },
             data=cbor_bytes,
         )
+        result = api_utils.check_response(response)
+        return result.map(
+            lambda data: TypeAdapter(dto.ConvertResponse).validate_python(data)
+        )
+    except Exception as e:
+        return Err(f"Network error: {e}")
+
+
+def get_conversion_status(
+    session: ApiSession, task_uuid: str
+) -> Result[dto.ConversionStatusResponse, str]:
+    try:
+        response = session.get(f"/pdf-to-audio/conversion-status/{task_uuid}")
+        result = api_utils.check_response(response)
+        return result.map(
+            lambda data: TypeAdapter(dto.ConversionStatusResponse).validate_python(data)
+        )
+    except Exception as e:
+        return Err(f"Network error: {e}")
+
+
+def get_converted_audio(
+    session: ApiSession, task_uuid: str
+) -> Result[dto.ConvertedAudioResponse, str]:
+    try:
+        response = session.get(f"/pdf-to-audio/converted-audio/{task_uuid}")
         result = api_utils.check_response(response, cbor_data=True)
         return result.map(
-            lambda data: TypeAdapter(dto.PdfToAudioResponse).validate_python(data)
+            lambda data: TypeAdapter(dto.ConvertedAudioResponse).validate_python(data)
         )
     except Exception as e:
         return Err(f"Network error: {e}")

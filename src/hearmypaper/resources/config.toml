@@ -1,2 +1,2 @@
 [api]
-base_url = "https://hmp-api-dev-1-begqf.ondigitalocean.app/"
+base_url = "http://localhost:8000/"

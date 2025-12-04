@@ -41,6 +41,12 @@ def submission_convert_form_screen(navigator, submission_id: int):
         style=Pack(flex=1),
     )
 
+    # Status label for showing progress
+    status_label = toga.Label(
+        "",
+        style=Pack(font_size=10, color="#0066cc", margin=(10, 0)),
+    )
+
     def on_speed_change(widget):
         speed_value_label.text = f"{int(widget.value)} wpm"
 
@@ -80,13 +86,15 @@ def submission_convert_form_screen(navigator, submission_id: int):
             await show_error("Please select output file location")
             return
 
+        widget.enabled = False
+        status_label.text = "⏳ Starting conversion..."
+
         try:
-            # Get user credentials
             _, user_private_key_bytes = get_user_credentials(
                 navigator.credentials_path, token_password_input.value
             )
 
-            # First verify submission file exists and hash matches
+            status_label.text = "⏳ Verifying submission file..."
             file_result = download_submission(
                 navigator.session,
                 navigator.app_paths,
@@ -104,7 +112,10 @@ def submission_convert_form_screen(navigator, submission_id: int):
                 navigator.navigate("submission_info", submission_id=submission_id)
                 return
 
-            # Convert PDF to audio
+            status_label.text = (
+                "⏳ Requesting conversion slot (may take up to 5 min)..."
+            )
+
             result = convert_submission_to_audio(
                 navigator.session,
                 navigator.app_paths,
@@ -114,19 +125,25 @@ def submission_convert_form_screen(navigator, submission_id: int):
             )
 
             if result.is_ok():
+                status_label.text = "✓ Conversion complete! Saving file..."
                 audio_bytes = result.unwrap()
 
                 # Save audio to file
                 with open(output_file_input.value, "wb") as f:
                     f.write(audio_bytes)
 
+                status_label.text = ""
                 await show_info(
                     f"Audio file saved successfully!\n{output_file_input.value}"
                 )
             else:
+                status_label.text = ""
                 await show_error(f"Failed to convert PDF: {result.unwrap_err()}")
         except Exception as e:
+            status_label.text = ""
             await show_error(f"Conversion error: {e}")
+        finally:
+            widget.enabled = True
 
     def on_cancel(widget):
         navigator.navigate("submission_info", submission_id=submission_id)
@@ -151,6 +168,7 @@ def submission_convert_form_screen(navigator, submission_id: int):
                 ],
                 style=Pack(direction=ROW, gap=5),
             ),
+            status_label,
             toga.Box(
                 children=[
                     toga.Button(
