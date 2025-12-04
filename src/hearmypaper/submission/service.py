@@ -174,21 +174,25 @@ def convert_submission_to_audio(
             )
 
             if upload_key_response.is_success:
-                aes_key = submission_crypto.decrypt_aes_key_with_private_key(
-                    base64.b64decode(upload_key_response.encrypted_aes_key),
-                    private_key_bytes,
-                )
-                task_uuid = upload_key_response.task_uuid
-                encrypted_file = submission_crypto.encrypt_file_with_aes(
-                    pdf_bytes, aes_key
-                )
-                print(f"[DEBUG CLIENT] Got upload key, task_uuid={task_uuid}")
-                break
+                if (
+                    upload_key_response.encrypted_aes_key is not None
+                    and upload_key_response.task_uuid is not None
+                ):
+                    aes_key = submission_crypto.decrypt_aes_key_with_private_key(
+                        base64.b64decode(upload_key_response.encrypted_aes_key),
+                        private_key_bytes,
+                    )
+                    task_uuid = upload_key_response.task_uuid
+                    encrypted_file = submission_crypto.encrypt_file_with_aes(
+                        pdf_bytes, aes_key
+                    )
+                    print(f"[DEBUG CLIENT] Got upload key, task_uuid={task_uuid}")
+                    break
 
             if attempt < max_upload_key_attempts - 1:
                 time.sleep(5)
 
-        if task_uuid is None:
+        if task_uuid is None or encrypted_file is None:
             return Err("Failed to obtain upload key: converter busy for too long")
 
         from . import dto
