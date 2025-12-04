@@ -126,8 +126,7 @@ def convert_submission_to_audio(
     speed: int = 140,
 ) -> Result[bytes, str]:
     """
-    Convert submission PDF to audio using secure encrypted file transfer.
-    Downloads submission if needed, then converts to audio.
+    Convert submission PDF to audio using secure encrypted file transfer with polling.
 
     Args:
         session: Authenticated HTTP session
@@ -149,55 +148,129 @@ def convert_submission_to_audio(
 
         pdf_file_path = file_result.unwrap()
 
-        server_public_key_result = api.get_server_public_key(session)
-        if server_public_key_result.is_err():
-            return Err(
-                f"Failed to get server public key: {server_public_key_result.unwrap_err()}"
-            )
-
-        server_public_key_b64 = server_public_key_result.unwrap()
-        server_public_key_bytes = base64.b64decode(server_public_key_b64)
-
-        upload_key_result = api.get_upload_key(session)
-        if upload_key_result.is_err():
-            return Err(f"Failed to get upload key: {upload_key_result.unwrap_err()}")
-
-        upload_key_response = upload_key_result.unwrap()
-
-        aes_key = submission_crypto.decrypt_aes_key_with_private_key(
-            base64.b64decode(upload_key_response.encrypted_aes_key), private_key_bytes
-        )
-
         with open(pdf_file_path, "rb") as f:
             pdf_bytes = f.read()
 
-        encrypted_file = submission_crypto.encrypt_file_with_aes(pdf_bytes, aes_key)
-        encrypted_aes_key = submission_crypto.encrypt_aes_key_with_server_public_key(
-            aes_key, server_public_key_bytes
-        )
+        task_uuid = None
+        aes_key = None
+        encrypted_file = None
+
+        import time
+
+        max_upload_key_attempts = 60
+        for attempt in range(max_upload_key_attempts):
+            print(
+                f"[DEBUG CLIENT] Upload key attempt {attempt + 1}/{max_upload_key_attempts}"
+            )
+            upload_key_result = api.get_upload_key(session)
+            if upload_key_result.is_err():
+                return Err(
+                    f"Failed to get upload key: {upload_key_result.unwrap_err()}"
+                )
+
+            upload_key_response = upload_key_result.unwrap()
+            print(
+                f"[DEBUG CLIENT] Upload key response: is_success={upload_key_response.is_success}"
+            )
+
+            if upload_key_response.is_success:
+                if (
+                    upload_key_response.encrypted_aes_key is not None
+                    and upload_key_response.task_uuid is not None
+                ):
+                    aes_key = submission_crypto.decrypt_aes_key_with_private_key(
+                        base64.b64decode(upload_key_response.encrypted_aes_key),
+                        private_key_bytes,
+                    )
+                    task_uuid = upload_key_response.task_uuid
+                    encrypted_file = submission_crypto.encrypt_file_with_aes(
+                        pdf_bytes, aes_key
+                    )
+                    print(f"[DEBUG CLIENT] Got upload key, task_uuid={task_uuid}")
+                    break
+
+            if attempt < max_upload_key_attempts - 1:
+                time.sleep(5)
+
+        if task_uuid is None or encrypted_file is None:
+            return Err("Failed to obtain upload key: converter busy for too long")
 
         from . import dto
 
         request = dto.PdfToAudioRequest(
             encrypted_file=encrypted_file,
-            encrypted_aes_key=encrypted_aes_key,
             speed=speed,
         )
 
-        response_result = api.execute_pdf_to_audio(session, request)
-        if response_result.is_err():
-            return Err(
-                f"Failed to convert PDF to audio: {response_result.unwrap_err()}"
+        max_trigger_attempts = 60
+        for attempt in range(max_trigger_attempts):
+            print(
+                f"[DEBUG CLIENT] Execute attempt {attempt + 1}/{max_trigger_attempts}"
+            )
+            response_result = api.execute_pdf_to_audio(session, request, task_uuid)
+            if response_result.is_err():
+                return Err(
+                    f"Failed to trigger conversion: {response_result.unwrap_err()}"
+                )
+
+            response = response_result.unwrap()
+            print(f"[DEBUG CLIENT] Execute response: is_success={response.is_success}")
+            if response.is_success:
+                print("[DEBUG CLIENT] Conversion triggered successfully")
+                break
+
+            if attempt < max_trigger_attempts - 1:
+                time.sleep(5)
+        else:
+            return Err("Failed to trigger conversion: converter busy for too long")
+
+        print("[DEBUG CLIENT] Starting status polling...")
+        max_status_attempts = 120
+        for attempt in range(max_status_attempts):
+            print(
+                f"[DEBUG CLIENT] Status check attempt {attempt + 1}/{max_status_attempts}"
+            )
+            status_result = api.get_conversion_status(session, task_uuid)
+            if status_result.is_err():
+                print(
+                    f"[DEBUG CLIENT] Status check failed: {status_result.unwrap_err()}"
+                )
+                return Err(
+                    f"Failed to get conversion status: {status_result.unwrap_err()}"
+                )
+
+            status = status_result.unwrap()
+            print(
+                f"[DEBUG CLIENT] Status: is_done={status.is_done}, has_error={status.has_error}, error_message={status.error_message}"
             )
 
-        response = response_result.unwrap()
+            if status.has_error:
+                print("[DEBUG CLIENT] Conversion has error, exiting loop")
+                return Err(f"Conversion failed: {status.error_message}")
+
+            if status.is_done:
+                print("[DEBUG CLIENT] Conversion is done, exiting loop")
+                break
+
+            if attempt < max_status_attempts - 1:
+                print("[DEBUG CLIENT] Not done yet, sleeping 5 seconds...")
+                time.sleep(5)
+        else:
+            print(f"[DEBUG CLIENT] Timeout after {max_status_attempts} attempts")
+            return Err("Conversion timed out: took too long to complete")
+
+        audio_result = api.get_converted_audio(session, task_uuid)
+        if audio_result.is_err():
+            return Err(f"Failed to download audio: {audio_result.unwrap_err()}")
+
+        audio_response = audio_result.unwrap()
 
         audio_aes_key = submission_crypto.decrypt_aes_key_with_private_key(
-            response.encrypted_audio_key, private_key_bytes
+            audio_response.encrypted_audio_key, private_key_bytes
         )
 
         audio_bytes = submission_crypto.decrypt_file_with_aes(
-            response.encrypted_audio, audio_aes_key
+            audio_response.encrypted_audio, audio_aes_key
         )
 
         return Ok(audio_bytes)
