@@ -141,32 +141,3 @@ def decrypt_file_with_aes(encrypted_data_bytes: bytes, aes_key: bytes) -> bytes:
     ).decryptor()
 
     return decryptor.update(ciphertext) + decryptor.finalize()
-
-
-def encrypt_aes_key_with_server_public_key(
-    aes_key: bytes, server_public_key_bytes: bytes
-) -> bytes:
-    """
-    Encrypt AES key with server's public key and return encrypted bytes.
-    Uses the same derivation approach as the server.
-    """
-    # Derive encryption key from server's public key
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=server_public_key_bytes[:16],
-        iterations=65536,
-        backend=default_backend(),
-    )
-    derived_key = kdf.derive(server_public_key_bytes)
-
-    # Encrypt AES key
-    iv = secrets.token_bytes(12)
-    encryptor = Cipher(
-        algorithms.AES(derived_key), modes.GCM(iv), backend=default_backend()
-    ).encryptor()
-
-    ciphertext = encryptor.update(aes_key) + encryptor.finalize()
-    encrypted_data = iv + ciphertext + encryptor.tag
-
-    return encrypted_data
