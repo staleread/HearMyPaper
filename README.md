@@ -9,6 +9,29 @@ submissions.
 
 The backend source code lives here 👉 [hmp-server](https://github.com/staleread/hmp-server)
 
+## Development
+
+Create and activate virtual environment
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+```
+
+Install the dependencies
+
+```bash
+pip install .
+```
+
+Run the app in development mode
+
+```bash
+briefcase dev
+```
+
+---
+
 ## 📦 Supported Platforms
 
 HearMyPaper runs on all major desktop operating systems:
@@ -39,21 +62,6 @@ hearmypaper  # Launch from terminal or application menu
 sudo pacman -U hearmypaper-1.0.x-x86_64.pkg.tar.zst
 hearmypaper  # Launch from application menu
 ```
-
----
-
-## 🔐 Security & Privacy
-
-- Algorithm: AES-256-GCM (authenticated encryption)
-- Key derivation: PBKDF2 with SHA-256
-- Session tokens: JWT with HS256 signature
-
----
-
-## 📱 Platform-Specific Notes
-
-### Windows
-- Windows Defender SmartScreen may show a warning (this is normal for unsigned apps)
 
 ---
 
