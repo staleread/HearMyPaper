@@ -18,10 +18,10 @@ python -m venv .venv
 . .venv/bin/activate
 ```
 
-Install the dependencies
+Install dev dependencies
 
 ```bash
-pip install .
+pip install .[dev]
 ```
 
 Run the app in development mode
