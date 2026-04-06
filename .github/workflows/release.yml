@@ -20,8 +20,7 @@ jobs:
     env:
       BASE_URL: ${{ vars.BASE_URL }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Extract version from pyproject.toml
         id: version
@@ -35,21 +34,23 @@ jobs:
             exit 1
           }
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-          enable-cache: true
+          cache: "pip"
+
+      - run: pip install .
 
       - name: Install WiX Toolset (for MSI)
         shell: powershell
         run: |
           choco install wixtoolset -y
 
-      - name: Install deps with uv
+      - name: Install deps with pip (from pyproject.toml)
         shell: bash
         run: |
-          uv sync --frozen --no-install-project
+          python -m pip install --upgrade pip
+          python -m pip install .
 
       - name: Inject config.toml (replace placeholder)
         shell: pwsh
@@ -61,8 +62,8 @@ jobs:
       - name: Build and package (Windows)
         shell: bash
         run: |
-          uv run briefcase build windows
-          uv run briefcase package windows
+          python -m briefcase build windows
+          python -m briefcase package windows
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
@@ -78,18 +79,14 @@ jobs:
     env:
       BASE_URL: ${{ vars.BASE_URL }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-          enable-cache: true
+          cache: "pip"
 
-      - name: Install deps with uv
-        run: |
-          uv sync --frozen --no-install-project
+      - run: pip install .
 
       - name: Inject config.toml (replace placeholder)
         run: |
@@ -99,7 +96,7 @@ jobs:
 
       - name: Package Ubuntu 22.04 (DEB via Docker)
         run: |
-          uv run briefcase package --target ubuntu:jammy
+          python -m briefcase package --target ubuntu:jammy
 
       - name: Upload Ubuntu artifact
         uses: actions/upload-artifact@v4
@@ -114,18 +111,14 @@ jobs:
     env:
       BASE_URL: ${{ vars.BASE_URL }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-          enable-cache: true
+          cache: "pip"
 
-      - name: Install deps with uv
-        run: |
-          uv sync --frozen --no-install-project
+      - run: pip install .
 
       - name: Inject config.toml (replace placeholder)
         run: |
@@ -135,7 +128,7 @@ jobs:
 
       - name: Package Arch Linux (via Docker)
         run: |
-          uv run briefcase package --target archlinux:latest
+          python -m briefcase package --target archlinux:latest
 
       - name: Upload Arch artifact
         uses: actions/upload-artifact@v4
@@ -163,4 +156,3 @@ jobs:
           prerelease: false
           files: |
             artifacts/**/*
-

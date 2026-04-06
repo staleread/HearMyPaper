@@ -18,7 +18,7 @@ dependencies = [
     "ipinfo>=5.2.1",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "ruff>=0.13.1",
     "mypy>=1.18.2",
