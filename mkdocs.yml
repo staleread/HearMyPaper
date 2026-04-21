@@ -1,0 +1,21 @@
+site_name: HearMyPaper
+site_url: https://staleread.github.io/HearMyPaper/
+
+site_description: Secure your course project, and only let the instructor listen!
+
+repo_url: https://github.com/staleread/HearMyPaper
+
+theme:
+  name: mkdocs
+
+nav:
+  - Overview: index.md
+  - Architecture:
+    - SSD: architecture/SSD.md
+    - SDD: architecture/SDD.md
+    - ISD: architecture/ISD.md
+  - Quality:
+    - Test Strategy: quality/test-strategy.md
+    - Traceability Matrix: quality/traceability-matrix.md
+  - Developer:
+    - Onboarding: developer/onboarding.md
