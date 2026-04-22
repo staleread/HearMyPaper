@@ -1,36 +1,37 @@
-# HearMyPaper — Документація
+# HearMyPaper — Documentation
 
-## Опис системи
+## System Overview
 
-**HearMyPaper** — програмна система для безпечного обміну навчальними матеріалами між студентами та викладачами. Основна мета — забезпечення конфіденційності студентських робіт (лабораторних, курсових тощо) через криптографічні механізми, зокрема асиметричне шифрування.
+**HearMyPaper** is a software system for secure exchange of academic materials between students and instructors. Its primary goal is to protect the confidentiality of student work (lab assignments, course projects, etc.) using cryptographic mechanisms — specifically asymmetric encryption.
 
-Система дозволяє студентам надсилати роботи у форматі PDF, які можуть переглядати виключно авторизовані викладачі. Функціональність організована навколо **проектів** (курсів), до яких залучаються студенти, куратори та викладачі.
+The system allows students to submit work as PDF documents that can only be accessed by authorized instructors. Functionality is organized around **projects** (courses), each involving students, curators, and instructors.
 
-Додатково система підтримує конвертацію PDF-документів в аудіоформат для зручного споживання контенту викладачами.
+Additionally, the system supports converting PDF documents to audio format for convenient content consumption by instructors.
 
-З технічної точки зору система складається з:
-- **Desktop-застосунку** (клієнтська частина);
-- **Leader Service** — основний backend (бізнес-логіка, авторизація, управління документами);
-- **PDF-to-Audio Converter** — окремий мікросервіс для обробки документів.
+Technically, the system consists of:
 
-Інфраструктура: PostgreSQL, Object Storage (MinIO), RabbitMQ, Redis, Kubernetes.
+- **Desktop application** (client-side)
+- **Leader Service** — core backend (business logic, authorization, document management)
+- **PDF-to-Audio Converter** — a dedicated microservice for document processing
 
-## Цільова аудиторія
+Infrastructure: PostgreSQL, Object Storage (MinIO), RabbitMQ, Redis, Kubernetes.
 
-| Роль | Як використовує документацію |
-| ---- | ----------------------------- |
-| **Розробники** | Архітектура, API, взаємодія між мікросервісами |
-| **QA-інженери** | Тестові сценарії, функціональні та нефункціональні вимоги, безпека |
-| **DevOps** | Розгортання, Kubernetes, інтеграція з PostgreSQL / RabbitMQ / Object Storage |
-| **Бізнес / замовники** | Можливості системи, призначення, обмеження |
+## Target Audience
 
-## Структура документації
+| Role | How they use the documentation |
+| ---- | ------------------------------ |
+| **Developers** | Architecture, API, microservice interactions |
+| **QA Engineers** | Test scenarios, functional and non-functional requirements, security |
+| **DevOps** | Deployment, Kubernetes, integration with PostgreSQL / RabbitMQ / Object Storage |
+| **Business / Stakeholders** | System capabilities, purpose, and limitations |
 
-| Тип | Документ | Опис |
-| --- | -------- | ---- |
-| **Продукт** | [SSD](architecture/SSD.md) | Функціональність, межі системи, нефункціональні вимоги |
-| **Продукт** | [SDD](architecture/SDD.md) | Архітектура, компоненти та їх взаємодія |
-| **Продукт** | [ISD](architecture/ISD.md) | Інфраструктура, середовище розгортання, CI/CD |
-| **Якість** | [Test Strategy](quality/test-strategy.md) | Підхід до тестування, рівні та сценарії |
-| **Якість** | [Traceability Matrix](quality/traceability-matrix.md) | Зв'язок між вимогами та тестами |
-| **Процес** | [Onboarding](developer/onboarding.md) | Швидкий старт для розробників |
+## Documentation Structure
+
+| Type | Document | Description |
+| ---- | -------- | ----------- |
+| **Product** | [SSD](architecture/SSD.md) | Functionality, system boundaries, non-functional requirements |
+| **Product** | [SDD](architecture/SDD.md) | Architecture, components, and their interactions |
+| **Product** | [ISD](architecture/ISD.md) | Infrastructure, deployment environment, CI/CD |
+| **Quality** | [Test Strategy](quality/test-strategy.md) | Testing approach, levels, and scenarios |
+| **Quality** | [Traceability Matrix](quality/traceability-matrix.md) | Mapping between requirements and tests |
+| **Process** | [Onboarding](developer/onboarding.md) | Quick-start guide for developers |

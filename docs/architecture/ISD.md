@@ -1,25 +1,25 @@
 # ISD — Infrastructure Specification Document
 
-## Середовище розгортання
+## Deployment Environment
 
-Система розгортається з використанням Docker (контейнеризація) та Kubernetes (оркестрація).
+The system is deployed using Docker (containerization) and Kubernetes (orchestration).
 
-Передбачено хмарне розгортання на **DigitalOcean** (керований Kubernetes-кластер). Локальне тестування — через Minikube або аналогічні рішення.
+The target cloud environment is **DigitalOcean** (managed Kubernetes cluster). Local testing uses Minikube or equivalent solutions.
 
-Розділення середовищ:
+Environment separation:
 
-| Середовище | Призначення |
-| ---------- | ----------- |
-| **staging** | Тестування та перевірка змін |
-| **production** | Стабільна експлуатація |
+| Environment | Purpose |
+| ----------- | ------- |
+| **staging** | Testing and validating changes |
+| **production** | Stable operation |
 
-## Інфраструктурні компоненти
+## Infrastructure Components
 
 ### Kubernetes Cluster
 
-Компоненти системи розгортаються як Deployment-ресурси:
+System components are deployed as Kubernetes Deployment resources:
 
-| Компонент | Тип розгортання |
+| Component | Deployment type |
 | --------- | --------------- |
 | Leader Service | Deployment |
 | PDF-to-Audio Converter | Deployment |
@@ -27,73 +27,74 @@
 | RabbitMQ | Helm chart |
 | MinIO (Object Storage) | Deployment |
 
-Використовується декларативний підхід (YAML / Helm).
+A declarative approach is used throughout (YAML / Helm).
 
-### Контейнеризація
+### Containerization
 
-Кожен компонент пакується у Docker-образи та публікується у **Docker Hub**. Це забезпечує відтворюваність середовища, спрощує доставку та стандартизує запуск сервісів.
+Each component is packaged as a Docker image and published to **Docker Hub**. This ensures environment reproducibility, simplifies delivery, and standardizes service startup.
 
 ### Object Storage (MinIO)
 
-S3-сумісне сховище для:
-- PDF-файлів
-- Аудіофайлів
-- Проміжних результатів обробки
+S3-compatible storage for:
+
+- PDF files
+- Audio files
+- Intermediate processing results
 
 ## CI/CD
 
 ### Continuous Integration
 
-CI реалізовано через **GitHub Actions**. При кожному push виконуються:
+CI is implemented via **GitHub Actions**. Every push triggers:
 
-- Юніт-тести
-- Лінтер (ruff)
-- Перевірка типів (mypy)
-- Автоматичний аудит безпеки (Bandit)
+- Unit tests
+- Linter (ruff)
+- Type checking (mypy)
+- Automated security audit (Bandit)
 
-Bandit запускається при кожному push у `main` та щоденно за розкладом (cron). Результати зберігаються як security issues, доступні лише для колабораторів.
+Bandit runs on every push to `main` and daily on a cron schedule. Results are stored as security issues visible only to collaborators.
 
 ### Continuous Delivery — Backend
 
-1. GitHub Actions збирає Docker-образи
-2. Образи публікуються у Docker Hub
-3. Через CLI DigitalOcean виконується тригер деплойменту
-4. Система підтягує новий образ та оновлює сервіси
+1. GitHub Actions builds Docker images
+2. Images are published to Docker Hub
+3. A DigitalOcean CLI command triggers deployment
+4. The system pulls the new image and updates running services
 
-| Гілка | Середовище |
-| ----- | ---------- |
+| Branch | Environment |
+| ------ | ----------- |
 | `main` | staging |
 | `release` | production |
 
 ### Continuous Delivery — Client
 
-Тег-орієнтований підхід:
+Tag-based release approach:
 
-- Створення Git-тега ініціює реліз
-- Автоматично збираються пакети для:
+- Creating a Git tag triggers a release
+- Packages are automatically built for:
     - Windows (`.msi`)
     - Linux Ubuntu/Debian (`.deb`)
     - Arch Linux
 
-## Масштабування
+## Scaling
 
-| Компонент | Стратегія |
-| --------- | --------- |
-| PDF-to-Audio Converter | Горизонтальне масштабування залежно від навантаження |
-| Leader Service | Single-instance або multi-instance |
-| RabbitMQ | Балансування навантаження між воркерами через черги |
+| Component | Strategy |
+| --------- | -------- |
+| PDF-to-Audio Converter | Horizontal scaling based on processing load |
+| Leader Service | Single-instance or multi-instance |
+| RabbitMQ | Load balancing across workers via queues |
 
-## Безпека інфраструктури
+## Infrastructure Security
 
-- Ізоляція сервісів всередині Kubernetes-кластера
-- PDF-to-Audio Converter недоступний ззовні кластера
-- Чутливі дані зберігаються у GitHub Secrets та Kubernetes Secrets
-- JWT-сесії зберігаються лише в пам'яті клієнта
-- Аудит дій користувачів
+- Service isolation within the Kubernetes cluster
+- PDF-to-Audio Converter is not accessible from outside the cluster
+- Sensitive data stored in GitHub Secrets and Kubernetes Secrets
+- JWT sessions stored only in client memory
+- User action audit logging
 
-### Механізм автентифікації
+### Authentication Flow
 
-1. Сервер генерує payload (challenge)
-2. Клієнт підписує його приватним ключем (з токена)
-3. Сервер перевіряє підпис за допомогою публічного ключа
-4. При успіху видається сесійний токен
+1. Server generates a challenge payload
+2. Client signs it with the token's private key
+3. Server verifies the signature using the public key
+4. On success, a session token is issued

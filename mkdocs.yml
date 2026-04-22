@@ -6,7 +6,7 @@ site_description: Secure your course project, and only let the instructor listen
 repo_url: https://github.com/staleread/HearMyPaper
 
 theme:
-  name: mkdocs
+  name: material
 
 nav:
   - Overview: index.md

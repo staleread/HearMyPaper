@@ -1,53 +1,56 @@
 # Test Strategy
 
-## Загальний підхід
+## Approach
 
-Система **HearMyPaper** використовує багаторівневий підхід до тестування, що охоплює як функціональні, так і нефункціональні перевірки. Особливий акцент — на перевірці моделі доступу та криптографічної безпеки.
+**HearMyPaper** uses a multi-level testing approach covering both functional and non-functional verification. The primary focus is on access control model validation and cryptographic security.
 
-## Рівні тестування
+## Testing Levels
 
 ### Unit Testing
 
-Перевірка окремих компонентів:
-- Серверні сервіси (Leader Service)
-- Криптографічні модулі
-- Логіка обробки документів
-- Клієнтські компоненти
+Verification of individual components:
+
+- Server services (Leader Service)
+- Cryptographic modules
+- Document processing logic
+- Client-side components
 
 ### Access Control Testing
 
-Критичний клас тестів для системи безпеки:
-- Перевірка моделі доступу (Bell–LaPadula)
-- Викладач має доступ лише до призначених документів
-- Ізоляція рівнів доступу між ролями (студент / куратор / викладач / адміністратор)
+A critical test class for this security-focused system:
+
+- Verification of the access control model (Bell–LaPadula)
+- Instructors can only access documents assigned to them
+- Access level isolation between roles (student / curator / instructor / administrator)
 
 ### Integration Testing
 
-Перевірка взаємодії між компонентами:
+Verification of inter-component communication:
+
 - Leader Service ↔ RabbitMQ
 - Leader Service ↔ PDF-to-Audio Converter
-- Клієнт ↔ сервер через HTTPS
-- Робота з Object Storage
+- Client ↔ server over HTTPS
+- Object Storage operations
 
 ### Load Testing
 
-Інструмент: **Locust**. Для генерації навантаження створено CLI-інструмент, що імітує реальних клієнтів із тестовим датасетом (~30 викладачів, ~70 студентів).
+Tool: **Locust**. A CLI tool was built to simulate real clients using a test dataset (~30 instructors, ~70 students).
 
-| Тип тесту | Мета |
+| Test type | Goal |
 | --------- | ---- |
-| Smoke | Базова перевірка функціональності |
-| Average Load | Типові умови експлуатації |
-| Stress | Поведінка при високому навантаженні |
-| Spike | Раптові сплески трафіку (перед дедлайнами) |
-| Breakpoint | Визначення точки відмови |
-| Soak | Тривала стабільність |
+| Smoke | Basic functionality verification |
+| Average Load | Typical operating conditions |
+| Stress | Behavior under high load |
+| Spike | Sudden traffic bursts (pre-deadline periods) |
+| Breakpoint | Finding the failure threshold |
+| Soak | Long-duration stability |
 
-Тестові сценарії імітують: завантаження PDF-робіт, перегляд курсів, перевірку списку студентів, конвертацію документів в аудіо.
+Test scenarios simulate: PDF submission, course browsing, student list checks, and PDF-to-audio conversion.
 
-## Тестування безпеки
+## Security Testing
 
-- Перевірка криптографічного шифрування
-- Перевірка certificate pinning
-- Перевірка автентифікації через токени
-- Перевірка неможливості доступу до даних поза рівнем доступу
-- Перевірка rate limiting (Redis) для запобігання атакам
+- Cryptographic encryption verification
+- Certificate pinning verification
+- Token-based authentication verification
+- Verification that data cannot be accessed outside the allowed access level
+- Rate limiting (Redis) verification to prevent abuse

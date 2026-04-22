@@ -1,73 +1,73 @@
 # SSD — System Specification Document
 
-## Призначення системи
+## Purpose
 
-Система **HearMyPaper** призначена для безпечної взаємодії між студентами, викладачами та адміністративним персоналом у процесі обміну навчальними матеріалами.
+**HearMyPaper** is designed for secure interaction between students, instructors, and administrative staff during the exchange of academic materials.
 
-Основна мета — гарантування конфіденційності студентських робіт через криптографічні механізми та модель контролю доступу на принципах Bell–LaPadula. Система забезпечує, що лише авторизований викладач може отримати доступ до надісланих матеріалів.
+The primary goal is to guarantee the confidentiality of student work through cryptographic mechanisms and a Bell–LaPadula access control model. The system ensures that only an authorized instructor can access submitted materials.
 
-## Основні функції за ролями
+## Core Functions by Role
 
-### Студент
+### Student
 
-- Перегляд інформації про проєкт (курс), включаючи syllabus та матеріали
-- Створення та завантаження виконаних робіт (PDF та інші формати)
-- Надсилання робіт викладачу
-- Автоматичне шифрування роботи з використанням публічного ключа викладача
+- View project (course) information, including syllabi and materials
+- Create and upload completed work (PDF and other formats)
+- Submit work to an instructor
+- Automatic encryption of submissions using the instructor's public key
 
-### Куратор
+### Curator
 
-- Створення та управління проєктами (курсами)
-- Додавання студентів до проектів
-- Призначення викладачів до курсів
-- Редагування та публікація навчальних матеріалів (syllabus)
+- Create and manage projects (courses)
+- Add students to projects
+- Assign instructors to courses
+- Edit and publish course materials (syllabi)
 
-### Викладач
+### Instructor
 
-- Перегляд інформації про курси, до яких він призначений
-- Отримання та розшифрування студентських робіт за допомогою приватного ключа
-- Завантаження робіт
-- Ініціювання обробки робіт (конвертація PDF в аудіоформат)
+- View information about assigned courses
+- Receive and decrypt student submissions using a private key
+- Download work
+- Initiate document processing (PDF-to-audio conversion)
 
-### Адміністратор
+### Administrator
 
-- Створення та управління обліковими записами користувачів
-- Генерація та видача токенів автентифікації
-- Моніторинг дій користувачів через систему аудиту
-- Управління доступом до системи
+- Create and manage user accounts
+- Generate and issue authentication tokens
+- Monitor user activity via the audit log
+- Manage system access
 
-## Обмеження та припущення
+## Constraints and Assumptions
 
-- Система передбачає використання апаратного або зовнішнього носія (USB) для зберігання токена автентифікації.
-- Доступ можливий лише за наявності токена та знання пароля для його розшифрування.
-- Ідентифікація користувачів — за електронною поштою.
-- Реалізована сувора модель контролю доступу: куратор не має доступу до інформації рівня викладача.
-- Система веде журнал аудиту всіх ключових дій.
+- The system requires a hardware or external storage device (USB) for storing the authentication token.
+- Access is only possible with both the token and the password to decrypt it.
+- Users are identified by email address.
+- A strict access control model is enforced: curators do not have access to instructor-level information.
+- The system maintains an audit log of all key actions.
 
-## Нефункціональні вимоги
+## Non-Functional Requirements
 
-### Безпека
+### Security
 
-- Асиметричне шифрування для захисту даних
-- Зберігання даних у зашифрованому вигляді
-- Контроль доступу на основі рівнів конфіденційності
-- Захищена автентифікація через криптографічні токени
-- Аудит усіх критичних операцій
+- Asymmetric encryption for data protection
+- Data stored in encrypted form
+- Access control based on confidentiality levels
+- Secure authentication via cryptographic tokens
+- Audit of all critical operations
 
-### Продуктивність
+### Performance
 
-- Обробка запитів у реальному часі
-- Асинхронна конвертація PDF в аудіо
-- Підтримка масштабування для великої кількості документів
+- Real-time request processing
+- Asynchronous PDF-to-audio conversion
+- Scalability support for large volumes of documents
 
-### Надійність та доступність
+### Reliability and Availability
 
-- Стабільна робота при високому навантаженні
-- Збереження даних при збоях
-- Можливість відновлення після помилок
+- Stable operation under high load
+- Data preservation during failures
+- Recovery from errors
 
-### Масштабованість
+### Scalability
 
-- Незалежне масштабування мікросервісів
-- Черги повідомлень для балансування навантаження
-- Підтримка контейнеризації та оркестрації (Kubernetes)
+- Independent scaling of microservices
+- Message queues for load balancing
+- Support for containerization and orchestration (Kubernetes)

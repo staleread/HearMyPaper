@@ -1,112 +1,118 @@
 # SDD — Software Design Document
 
-## Загальна архітектура
+## Overall Architecture
 
-Система **HearMyPaper** побудована за мікросервісною архітектурою з виділенням клієнтської та серверної частин.
+**HearMyPaper** follows a microservices architecture with distinct client and server sides.
 
-Ключова особливість — орієнтація на безпеку:
+The defining characteristic is a security-first orientation:
 
-- Клієнтська частина реалізована як desktop-застосунок
-- Всі криптографічні операції виконуються на стороні клієнта
-- Незашифровані дані не покидають межі пристрою користувача
-- Серверна частина мінімізує обробку відкритих даних
+- The client is implemented as a desktop application
+- All cryptographic operations run on the client side
+- Plaintext data never leaves the user's device
+- The server minimizes handling of unencrypted data
 
-## Основні компоненти
+## Components
 
 ### Desktop Application (Client)
 
-Python desktop-застосунок — повноцінний компонент, не "тонкий клієнт".
+A Python desktop app — a full-featured component, not a thin client.
 
-Функції:
-- Виконання криптографічних операцій (шифрування/дешифрування)
-- Робота з файловою системою
-- Автентифікація через апаратний токен
-- Взаємодія з сервером через HTTPS
-- Certificate pinning для захисту від MITM-атак
+Responsibilities:
+
+- Cryptographic operations (encryption / decryption)
+- File system access
+- Authentication via hardware token
+- HTTPS communication with the server
+- Certificate pinning to protect against MITM attacks
 
 ### Leader Service (Core Backend)
 
-Основний серверний компонент з бізнес-логікою.
+The primary server component containing business logic.
 
-Функції:
-- Обробка запитів від клієнта
-- Управління користувачами та доступом
-- Управління документами
-- Ініціація процесів обробки (конвертація)
-- Координація взаємодії між сервісами
+Responsibilities:
 
-Реалізований на Python для сумісності з криптографічними бібліотеками.
+- Handling client requests
+- User and access management
+- Document management
+- Initiating processing tasks (conversion)
+- Coordinating inter-service communication
+
+Implemented in Python for compatibility with cryptographic libraries.
 
 ### PDF-to-Audio Converter Service
 
-Окремий мікросервіс для конвертації PDF в аудіоформат.
+A dedicated microservice for converting PDFs to audio.
 
-Особливості:
-- Ізольований від зовнішнього доступу (недоступний з інтернету)
-- Працює виключно всередині кластера
-- Локальні інструменти обробки (без сторонніх хмарних TTS API)
-- Незалежне горизонтальне масштабування
+Characteristics:
 
-Виділення в окремий компонент обумовлено: високою обчислювальною складністю, потребою в окремому масштабуванні та вимогами безпеки.
+- Isolated from external access (not reachable from the internet)
+- Operates exclusively within the cluster
+- Local processing tools (no third-party cloud TTS APIs)
+- Independent horizontal scaling
+
+Separated into its own component due to: high computational cost, need for independent scaling, and security requirements.
 
 ### Message Broker (RabbitMQ)
 
-Асинхронна взаємодія між сервісами:
-- Передача подій між Leader Service та PDF-to-Audio Converter
-- Event-driven архітектура
-- Стійкість до навантаження
+Handles asynchronous communication between services:
 
-Передача великих файлів через брокер не використовується.
+- Event passing between Leader Service and PDF-to-Audio Converter
+- Event-driven architecture
+- Load resilience
+
+Large files are not transmitted through the broker.
 
 ### Object Storage (MinIO)
 
-Зберігання:
-- PDF-файлів
-- Результатів конвертації (аудіо)
-- Проміжних даних
+Stores:
+
+- PDF files
+- Conversion results (audio)
+- Intermediate processing data
 
 ### Database (PostgreSQL)
 
-Основні дані:
-- Користувачі
-- Проекти (курси)
-- Метадані документів
-- Журнали аудиту
+Core data:
+
+- Users
+- Projects (courses)
+- Document metadata
+- Audit logs
 
 ### Key-Value Storage (Redis)
 
-- Кешування запитів
-- Rate-limiting
+- Request caching
+- Rate limiting
 
-## Взаємодія між компонентами
+## Component Interactions
 
-### Основний сценарій — завантаження роботи
+### Primary Flow — Submitting Work
 
-1. Клієнт шифрує документ публічним ключем викладача
-2. Клієнт надсилає зашифрований файл до Leader Service через HTTPS
-3. Leader Service зберігає файл у Object Storage
-4. Метадані зберігаються у базі даних
+1. Client encrypts the document with the instructor's public key
+2. Client sends the encrypted file to Leader Service over HTTPS
+3. Leader Service stores the file in Object Storage
+4. Metadata is written to the database
 
-### Сценарій конвертації PDF в аудіо
+### PDF-to-Audio Conversion Flow
 
-1. Викладач розшифровує документ локально
-2. Для конвертації:
-    - Сервер генерує тимчасовий ключ
-    - Клієнт шифрує PDF цим ключем
-    - Ключ шифрується публічним ключем викладача
-3. Дані передаються на сервер у захищеному вигляді
-4. Leader Service передає задачу через RabbitMQ
-5. PDF-to-Audio Converter отримує файл з Object Storage, конвертує локально, зберігає результат
-6. Після завершення проміжні дані видаляються
+1. Instructor decrypts the document locally
+2. For conversion:
+    - Server generates a temporary key
+    - Client encrypts the PDF with that key
+    - The key is encrypted with the instructor's public key
+3. Data is transmitted to the server in protected form
+4. Leader Service dispatches the task via RabbitMQ
+5. PDF-to-Audio Converter retrieves the file from Object Storage, converts locally, stores the result
+6. Intermediate data is deleted after processing completes
 
-## Забезпечення безпеки в архітектурі
+## Security in the Architecture
 
-| Механізм | Опис |
-| -------- | ---- |
-| End-to-end шифрування | Дані не передаються у відкритому вигляді |
-| Certificate Pinning | Захист від MITM-атак |
-| Ізоляція сервісів | Критичні компоненти недоступні ззовні |
-| Мінімізація доступу | Сервер не зберігає відкриті дані постійно |
-| Тимчасове зберігання | Відкриті дані існують лише під час обробки |
+| Mechanism | Description |
+| --------- | ----------- |
+| End-to-end encryption | Data is never transmitted in plaintext |
+| Certificate Pinning | Protection against MITM attacks |
+| Service isolation | Critical components are unreachable from outside |
+| Minimal data access | The server does not permanently store plaintext |
+| Temporary storage | Plaintext exists only during active processing |
 
-Архітектура відповідає принципам Zero Trust: відсутність довіри до мережі, перевірка кожного запиту, мінімізація доступу до ресурсів.
+The architecture aligns with Zero Trust principles: no implicit network trust, every request verified, minimal resource access.
