@@ -1,0 +1,28 @@
+name: Docs (MkDocs → GitHub Pages)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - run: pip install .[dev]
+
+      - name: Build and publish MkDocs site
+        run: mkdocs gh-deploy --force

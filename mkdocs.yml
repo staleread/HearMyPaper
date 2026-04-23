@@ -19,3 +19,6 @@ nav:
     - Traceability Matrix: quality/traceability-matrix.md
   - Developer:
     - Onboarding: developer/onboarding.md
+  - Process:
+    - CI/CD for Docs: ci-cd-docs.md
+    - Definition of Done: definition-of-done.md
