@@ -1,0 +1,1190 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Secure your course project, and only let the instructor listen!">
+      
+      
+      
+        <link rel="canonical" href="https://staleread.github.io/HearMyPaper/reports/pw05_load-testing-strategy/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>HMP load testing strategy - HearMyPaper</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hmp-load-testing-strategy" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="HearMyPaper" class="md-header__button md-logo" aria-label="HearMyPaper" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HearMyPaper
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              HMP load testing strategy
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/staleread/HearMyPaper" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="HearMyPaper" class="md-nav__button md-logo" aria-label="HearMyPaper" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    HearMyPaper
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/staleread/HearMyPaper" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/SSD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/SDD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/ISD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ISD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quality
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quality/test-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quality/traceability-matrix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traceability Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/onboarding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Onboarding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Process
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Process
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ci-cd-docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD for Docs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../definition-of-done/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-scope-goals-and-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1) Scope, goals, and success criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-test-environment-and-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2) Test environment and baseline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-critical-endpoints-and-business-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3) Critical endpoints and business flows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-tools-metrics-and-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4) Tools, metrics, and observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5) Scenarios
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-test-types-and-execution-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6) Test types and execution algorithm
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6) Test types and execution algorithm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Definitions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execution-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Execution Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-order-of-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On order of execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-immediate-actions-if-results-are-not-good-enough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7) Immediate actions if results are “not good enough”
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7) Immediate actions if results are “not good enough”">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#possible-ways-for-improvements-with-indicative-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Possible Ways for Improvements (with indicative cost)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="hmp-load-testing-strategy">HMP load testing strategy</h1>
+<p>This document defines the technical plan for load testing HMP using k6 and DigitalOcean (DO) Insights. It focuses on:
+- Average-load scenarios (used verbatim for load, soak, and stress tests)
+- Spike scenarios around submission deadlines
+- Critical endpoints and metrics
+- Execution order per Grafana’s load testing guidance
+- A pathway for iterative improvements after analyzing results</p>
+<p>Links:
+- Reference: Types of load testing (Grafana): https://grafana.com/load-testing/types-of-load-testing/</p>
+<hr />
+<h2 id="1-scope-goals-and-success-criteria">1) Scope, goals, and success criteria</h2>
+<p>Goals
+- Establish baseline performance and resource consumption on our current minimal DO App Platform environment.
+- Validate that the system supports our estimated average usage (10–15 concurrent users) and peak usage (up to 60 concurrent users, especially during the last 30 minutes before a deadline).
+- Identify breakpoints, bottlenecks, and regression risks for future optimization (caching, rate limiting, infra scaling).</p>
+<p>Primary success criteria (initial, provisional; refine after first run)
+- Availability: overall error rate &lt; 1% at average load; &lt; 3% during spikes/stress (transient).
+- Latency targets (p99; refine after the first test cycle):
+  - Auth (challenge, login): ≤ 400 ms
+  - Read-heavy list endpoints (GET /project/, GET /submission/): ≤ 700 ms
+  - Read detail endpoints (GET /project/{id}, GET /submission/{id}/hash, content fetch): ≤ 800 ms depending on payload size
+  - Pdf-to-audio trigger (POST /pdf-to-audio/execute): ≤ 2s to accept/queue work (not necessarily to complete conversion)
+- System health headroom: sustained CPU &lt; 70% and RAM &lt; 80% under average load; brief spikes allowed under stress/spike.</p>
+<p>Notes
+- These thresholds anchor early decisions; they will be revised based on measured baselines and business priorities.</p>
+<hr />
+<h2 id="2-test-environment-and-baseline">2) Test environment and baseline</h2>
+<p>Environment
+- DO App Platform: minimal instance, low CPU, ~0.5 GB RAM
+- DB and any backing services: whatever is currently used by the app (assess I/O and connection pool limits)
+- Production-like configuration where possible; if not, document deviations here</p>
+<p>Measured no-load baseline
+- CPU: ~2.3%
+- RAM: ~22%</p>
+<p>Preconditions and test data (seed or fixture)
+- Users:
+  - 1–2 instructors
+  - 50–100 students (emails, public keys, integrity/confidentiality attributes)
+- Projects:
+  - 20–30 projects (varied deadlines, instructors)
+- Submissions:
+  - 200–400 historical submissions to exercise list endpoints (adjust downward if memory-constrained)
+- Documents for pdf-to-audio:
+  - PDFs of 1–5 MB typical size for conversions</p>
+<p>Assumptions and uncertainties
+- No historical usage data; we model “average” user behavior deterministically for load/soak/stress.
+- Spike scenario introduces a bursty pattern to reflect deadline behavior.
+- Caching is not available at present, so no cache-related scenarios are tested.</p>
+<hr />
+<h2 id="3-critical-endpoints-and-business-flows">3) Critical endpoints and business flows</h2>
+<p>Critical endpoints (by sensitivity and frequency)
+- High frequency read:
+  - GET /project/
+  - GET /submission/
+- CPU/data intensive:
+  - POST /pdf-to-audio/execute
+- Core flows:
+  - Auth: POST /auth/challenge → POST /auth/login
+  - Project browsing: GET /project/ → GET /project/{id}
+  - Submission upload: POST /submission/ (application/cbor)
+  - Submission detail: GET /submission/{id}/hash, GET /submission/{id}/content
+  - Audit/logs (as needed): GET /audit/
+  - Keys and misc: GET /credentials/public-key, GET /submission/instructor_key</p>
+<p>User journeys (used by scenarios)
+- Student (S):
+  - Login handshake → fetch all projects → read 1–2 project details → optional: upload one submission
+- Instructor (I):
+  - Login handshake → fetch project list → open 1–2 project details → fetch submission list → open 1–3 submission details → optional: convert a submission to audio</p>
+<p>Role distribution
+- Average scenario: ~80% Students, ~20% Instructors
+- Spike scenario (deadline): ~95% Students (many uploads), ~5% Instructors (some conversions)</p>
+<hr />
+<h2 id="4-tools-metrics-and-observability">4) Tools, metrics, and observability</h2>
+<p>Tools
+- Generator: Locust (Python-based load testing with Ed25519 and CBOR support)
+- Monitoring: DO Insights (CPU, memory, disk/network I/O), plus app logs</p>
+<p>Metrics to capture
+- Per endpoint: latency p50/p90/p99, throughput (req/s), error rate, timeouts
+- System: CPU, memory, network I/O, disk I/O (from DO Insights)
+- App logs: response codes, slow requests, internal errors, queue delays (if any)</p>
+<p>Locust outputs and thresholds
+- Export Locust summary JSON and HTML reports per run
+- Define endpoint-specific thresholds aligned with provisional SLOs
+- Record and store artifacts per run (results JSON/HTML, DO Insight screenshots)</p>
+<hr />
+<h2 id="5-scenarios">5) Scenarios</h2>
+<p>The “Average Scenario” is reused for Load, Stress, and Soak tests. Spike has a dedicated pattern.</p>
+<p>5.1 Average Scenario (for Load, Stress, Soak)
+- Users: 10-15 concurrent users
+- User mix: 80% S, 20% I
+- Student action weights per session:
+  - Login handshake: 1x
+  - GET /project/: 1x
+  - GET /project/{id}: 1–2x
+  - POST /submission/: 0.2x (20% of student sessions perform one upload)
+- Instructor action weights per session:
+  - Login handshake: 1x
+  - GET /project/: 1x
+  - GET /project/{id}: 1–2x
+  - GET /submission/: 1x
+  - GET /submission/{id}/content or hash: 1–3x
+  - POST /pdf-to-audio/execute: 0.2x (20% of instructor sessions trigger one conversion)</p>
+<p>5.2 Spike Scenario (deadline window)
+- Users: 60 concurrent users
+- User mix: 95% S, 5% I
+- Student action weights per session:
+  - Login handshake: 1x
+  - GET /project/: 1x
+  - POST /submission/: 1x (most sessions upload)
+- Instructor action weights per session:
+  - Login handshake: 1x
+  - GET /project/: 1x
+  - GET /submission/: 1x
+  - GET /submission/{id}/content: 1–2x
+  - POST /pdf-to-audio/execute: 0.5x (some conversions occur during spike)
+- Burst shape:
+  - Sudden ramp to 60 active VUs within 1 minute
+  - Hold 3 minutes to emulate deadline crunch
+  - Optional micro-bursts: ±10% VUs jitter every 30–60s</p>
+<hr />
+<h2 id="6-test-types-and-execution-algorithm">6) Test types and execution algorithm</h2>
+<p>We follow the recommended test sequence from Grafana's load testing guidance. Each test type has specific parameters and serves a distinct purpose in validating system behavior.</p>
+<h3 id="test-definitions">Test Definitions</h3>
+<p><strong>1. Smoke Test</strong>
+- Purpose: Verify all endpoints work correctly under minimal load
+- Users: 5 users
+- Duration: 2 minutes
+- Pattern: Immediate ramp to 5 users, hold for 2 min, ramp down
+- Success criteria: 0 errors, all endpoints respond</p>
+<p><strong>2. Load Test (Average)</strong>
+- Purpose: Establish baseline performance and resource usage under typical load
+- Users: 10 users → 15 users
+- Duration: 25 minutes
+- Pattern: 2m ramp to 10 users → 9m hold → 2m ramp to 15 users → 10m hold → 2m ramp down
+- User distribution: 80% students, 20% instructors
+- Success criteria: Error rate &lt; 1%, p99 latencies within SLOs, CPU &lt; 70%, RAM &lt; 80%</p>
+<p><strong>3. Stress Test</strong>
+- Purpose: Test system behavior under prolonged higher-than-average load
+- Users: 30 users
+- Duration: 35 minutes
+- Pattern: 4m ramp to 30 users → 29m hold → 2m ramp down
+- User distribution: 80% students, 20% instructors
+- Success criteria: Error rate &lt; 2%, graceful degradation, no crashes
+- Note: This resembles average load but with higher sustained load and proportionally longer ramp-up</p>
+<p><strong>4. Spike Test</strong>
+- Purpose: Validate burst resilience and recovery during deadline submissions
+- Users: 60 users
+- Duration: 5 minutes
+- Pattern: 1m ramp to 60 users → 3m hold → 1m ramp down
+- User distribution: 95% students (heavy submission activity), 5% instructors
+- Success criteria: Error rate &lt; 3%, system recovers gracefully, no data loss</p>
+<p><strong>5. Breakpoint Test</strong>
+- Purpose: Find the breaking point by gradually increasing load until failure
+- Users: 10 → 20 → 40 → 60 → 80 → 100 → 120 → 140 → 160 → 180 → 200 users
+- Duration: 57 minutes
+- Pattern: 2m ramp per step, 3m hold at each level until failure or completion
+- User distribution: 80% students, 20% instructors
+- Success criteria: Identify maximum sustainable load and failure modes</p>
+<p><strong>6. Soak Test</strong>
+- Purpose: Detect memory leaks and resource drift over extended periods
+- Users: 8 users
+- Duration: 180 minutes (3 hours)
+- Pattern: 2m ramp to 8 users → 176m hold → 2m ramp down
+- User distribution: 80% students, 20% instructors
+- Success criteria: No memory leaks, stable performance, error rate &lt; 1%</p>
+<h3 id="execution-algorithm">Execution Algorithm</h3>
+<pre><code>EXECUTE test_sequence:
+  INPUT: environment (server_url, admin_credentials)
+
+  STEP 1: Setup
+    CALL test-env.py up WITH credentials, host
+    VERIFY test_data.json created
+
+  STEP 2: Smoke Test
+    RUN smoke-test.py
+    IF errors &gt; 0 THEN
+      ABORT &quot;Functional issues detected&quot;
+    END IF
+
+  STEP 3: Load Test (Average)
+    RUN average-test.py
+    IF error_rate &gt; 1% OR p99_latencies exceed SLOs THEN
+      FLAG &quot;Baseline performance insufficient&quot;
+      RECOMMEND optimizations (caching, indexes, pagination)
+    END IF
+    RECORD baseline metrics
+
+  STEP 4: Stress Test
+    RUN stress-test.py
+    IF system crashes OR error_rate &gt; 5% THEN
+      FLAG &quot;System unstable under higher sustained load&quot;
+      RECOMMEND infrastructure scaling or rate limiting
+    END IF
+    RECORD stress behavior
+
+  STEP 5: Spike Test
+    RUN spike-test.py
+    IF error_rate &gt; 3% OR recovery_time &gt; 5m THEN
+      FLAG &quot;Poor burst handling&quot;
+      RECOMMEND async queues, circuit breakers, autoscaling
+    END IF
+    RECORD spike behavior
+
+  STEP 6: Breakpoint Test (conditional)
+    RUN breakpoint-test.py
+    RECORD max_users_before_failure
+    RECORD failure_mode (CPU, memory, timeouts, etc.)
+    ANALYZE bottleneck
+
+  STEP 7: Soak Test (conditional)
+    IF all previous tests passed THEN
+      RUN soak-test.py
+      IF memory_growth &gt; 10% OR performance_degradation &gt; 15% THEN
+        FLAG &quot;Long-term stability issues&quot;
+        RECOMMEND memory profiling and leak detection
+      END IF
+    ELSE
+      SKIP &quot;Prerequisites not met&quot;
+    END IF
+
+  STEP 8: Teardown
+    CALL test-env.py down WITH credentials, host
+    VERIFY test data removed
+
+  STEP 9: Report Generation
+    AGGREGATE metrics from all tests
+    EXPORT Locust JSON/HTML reports
+    CAPTURE DO Insights screenshots
+    GENERATE summary with recommendations
+
+  RETURN test_results
+</code></pre>
+<h3 id="on-order-of-execution">On order of execution</h3>
+<p>The execution order is designed to progressively stress the system while gathering actionable insights:</p>
+<ol>
+<li><strong>Smoke</strong> catches functional bugs before resource-intensive tests</li>
+<li><strong>Load</strong> establishes performance baselines needed to evaluate other tests</li>
+<li><strong>Stress</strong> validates behavior under sustained higher load (distinguishes from breakpoint testing)</li>
+<li><strong>Spike</strong> tests burst resilience using real-world deadline scenario</li>
+<li><strong>Breakpoint</strong> identifies absolute limits and failure modes</li>
+<li><strong>Soak</strong> confirms long-term stability (only after passing foundational tests)</li>
+</ol>
+<p>Each test builds on knowledge from previous tests, allowing early termination if critical issues are found.</p>
+<hr />
+<h2 id="7-immediate-actions-if-results-are-not-good-enough">7) Immediate actions if results are “not good enough”</h2>
+<h3 id="possible-ways-for-improvements-with-indicative-cost">Possible Ways for Improvements (with indicative cost)</h3>
+<ul>
+<li><strong>Low-cost (code changes):</strong></li>
+<li>Introduce/optimize caching for read-heavy list endpoints (GET /project/, GET /submission/)</li>
+<li>Add rate limiting and circuit breakers on heavy endpoints (especially POST /pdf-to-audio/execute and POST /submission/)</li>
+<li>Make pdf-to-audio asynchronous with a job queue and idempotent triggers; return 202 Accept with job id</li>
+<li>Apply pagination consistently and lower default page sizes</li>
+<li>Optimize DB access: indexes, N+1 elimination, connection pooling</li>
+<li>Stream uploads/downloads; limit payload sizes; compress responses where appropriate</li>
+<li>
+<p>Add server-side request timeouts and backpressure to protect the app under overload</p>
+</li>
+<li>
+<p><strong>High-cost (infrastructure):</strong></p>
+</li>
+<li>Scale vCPU/RAM; enable autoscaling where cost-effective</li>
+<li>Introduce Redis for cache/session/queues</li>
+<li>Separate workers for CPU-bound audio conversion (dedicated service/container)</li>
+<li>Consider object storage for submissions and audio artifacts</li>
+<li>Tune Postgres (work_mem, shared_buffers), or managed DB sizing</li>
+<li>Add CDN or edge cache for static or frequently accessed assets/content</li>
+</ul>
+<p>Process
+- Automate test runs as part of release hardening
+- Track performance budgets and regressions over time</p>
+<hr />
+<p>This strategy will evolve after the first cycle of runs. We will tighten or relax thresholds, refine user behavior models, and prioritize improvements based on the highest impact per unit effort observed in the results.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
