@@ -7,7 +7,7 @@ class AccessLevel(Enum):
     RESTRICTED = 3
     CONFIDENTIAL = 4
 
-    def __lt__(self, other):  # type: ignore
+    def __lt__(self, other):
         if isinstance(other, AccessLevel):
             return self.value < other.value
         return NotImplemented

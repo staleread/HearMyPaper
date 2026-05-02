@@ -13,3 +13,9 @@ members = [
     "apps/converter",
     "apps/client",
 ]
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.34",
+    "ruff>=0.15.12",
+]

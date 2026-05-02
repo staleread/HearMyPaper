@@ -122,14 +122,14 @@ class DateTimePicker:
                 "October",
                 "November",
                 "December",
-            ].index(self.month_selector.value) + 1
+            ].index(str(self.month_selector.value)) + 1
 
             return datetime(
-                year=int(self.year_input.value),
+                year=int(self.year_input.value or 0),
                 month=month_index,
-                day=int(self.day_input.value),
-                hour=int(self.hour_input.value),
-                minute=int(self.minute_input.value),
+                day=int(self.day_input.value or 0),
+                hour=int(self.hour_input.value or 0),
+                minute=int(self.minute_input.value or 0),
             )
         except (ValueError, TypeError):
             return self.initial_dt

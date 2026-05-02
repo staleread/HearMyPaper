@@ -9,12 +9,12 @@ from typing import Any
 
 def catalog_screen(
     *,
-    title,
+    title: str,
     headings: list[str],
     data: Result,
-    actions=None,
-    on_back=None,
-    on_activate=None,
+    actions: list[tuple[str, Any]] | None = None,
+    on_back: Any | None = None,
+    on_activate: Any | None = None,
 ):
     back_button = toga.Button(
         "<",
@@ -56,7 +56,8 @@ def catalog_screen(
     )
 
     def on_row_activate(widget: toga.Table, row: Any, **kwargs: Any):
-        on_activate(row)
+        if on_activate:
+            on_activate(row)
 
     if on_activate:
         table.on_activate = on_row_activate

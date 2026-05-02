@@ -1,4 +1,5 @@
 import toga
+from typing import cast
 
 from .audit.ui.catalog import audit_catalog_screen
 from .audit.ui.export_form import audit_export_form_screen
@@ -24,7 +25,8 @@ from .submission.ui.convert_form import submission_convert_form_screen
 class HearMyPaper(toga.App):
     def startup(self):
         self.main_window = toga.MainWindow(title="HearMyPaper")
-        self.navigator = Navigator(self.main_window, self.paths)
+        main_window = cast(toga.MainWindow, self.main_window)
+        self.navigator = Navigator(main_window, self.paths)
 
         self.navigator.register_screen("login", login_screen)
         self.navigator.register_screen("resource_catalog", resource_catalog_screen)
@@ -59,7 +61,7 @@ class HearMyPaper(toga.App):
         )
 
         self.navigator.navigate("login")
-        self.main_window.show()
+        main_window.show()
 
 
 def main():

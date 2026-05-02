@@ -1,5 +1,7 @@
 import toga
 from datetime import datetime
+from toga.style import Pack
+from toga.style.pack import COLUMN, ROW
 
 from ..service import update_project
 from ..dto import ProjectUpdateDto
@@ -10,7 +12,7 @@ def project_edit_form_screen(navigator, project_data):
     children = [
         toga.Label(
             "Edit Project",
-            style=toga.style.Pack(
+            style=Pack(
                 font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
             ),
         )
@@ -19,10 +21,10 @@ def project_edit_form_screen(navigator, project_data):
     title_input = toga.TextInput(value=project_data.get("title", ""))
     syllabus_input = toga.MultilineTextInput(
         value=project_data.get("syllabus_summary", ""),
-        style=toga.style.Pack(height=100),
+        style=Pack(height=100),
     )
     description_input = toga.MultilineTextInput(
-        value=project_data.get("description", ""), style=toga.style.Pack(height=100)
+        value=project_data.get("description", ""), style=Pack(height=100)
     )
 
     instructor_email_input = toga.TextInput(
@@ -110,7 +112,7 @@ def project_edit_form_screen(navigator, project_data):
             toga.Label("Instructor Email:"),
             toga.Label(
                 "(Enter the email address of the instructor)",
-                style=toga.style.Pack(font_size=10, color="#666666"),
+                style=Pack(font_size=10, color="#666666"),
             ),
             instructor_email_input,
             toga.Label("Deadline:"),
@@ -120,8 +122,8 @@ def project_edit_form_screen(navigator, project_data):
                     toga.Button("Update Project", on_press=on_submit),
                     toga.Button("Cancel", on_press=on_cancel),
                 ],
-                style=toga.style.Pack(
-                    direction=toga.style.pack.ROW, margin=(10, 0, 0, 0)
+                style=Pack(
+                    direction=ROW, margin=(10, 0, 0, 0)
                 ),
             ),
         ]
@@ -131,6 +133,6 @@ def project_edit_form_screen(navigator, project_data):
         horizontal=False,
         content=toga.Box(
             children=children,
-            style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
+            style=Pack(direction=COLUMN, margin=20, gap=10),
         ),
     )

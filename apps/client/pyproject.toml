@@ -59,6 +59,6 @@ requires = [
 
 [dependency-groups]
 dev = [
-    "ty>=0.0.34",
     "core",
+    "pytest>=9.0.3",
 ]

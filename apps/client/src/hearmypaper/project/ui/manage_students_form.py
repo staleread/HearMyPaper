@@ -1,4 +1,6 @@
 import toga
+from toga.style import Pack
+from toga.style.pack import COLUMN, ROW
 
 from ..service import assign_students, get_project_students
 from ..dto import StudentAssignmentDto
@@ -8,13 +10,13 @@ def manage_students_form_screen(navigator, project_id):
     children = [
         toga.Label(
             "Manage Students",
-            style=toga.style.Pack(
+            style=Pack(
                 font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
             ),
         ),
         toga.Label(
             "Enter student emails, one per line:",
-            style=toga.style.Pack(margin=(0, 0, 5, 0)),
+            style=Pack(margin=(0, 0, 5, 0)),
         ),
     ]
 
@@ -28,7 +30,7 @@ def manage_students_form_screen(navigator, project_id):
     emails_input = toga.MultilineTextInput(
         placeholder="student1@example.com\nstudent2@example.com",
         value=initial_value,
-        style=toga.style.Pack(height=200),
+        style=Pack(height=200),
     )
 
     async def on_submit(widget):
@@ -89,8 +91,8 @@ def manage_students_form_screen(navigator, project_id):
                     toga.Button("Save", on_press=on_submit),
                     toga.Button("Cancel", on_press=on_cancel),
                 ],
-                style=toga.style.Pack(
-                    direction=toga.style.pack.ROW, margin=(10, 0, 0, 0)
+                style=Pack(
+                    direction=ROW, margin=(10, 0, 0, 0)
                 ),
             ),
         ]
@@ -100,6 +102,6 @@ def manage_students_form_screen(navigator, project_id):
         horizontal=False,
         content=toga.Box(
             children=children,
-            style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
+            style=Pack(direction=COLUMN, margin=20, gap=10),
         ),
     )

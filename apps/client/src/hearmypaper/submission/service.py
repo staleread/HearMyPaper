@@ -95,7 +95,7 @@ def open_submission(
             import os
 
             if hasattr(os, "startfile"):
-                os.startfile(str(file_path))  # type: ignore
+                os.startfile(str(file_path))
             else:
                 subprocess.run(["cmd", "/c", "start", str(file_path)], check=True)
         elif system == "Linux":

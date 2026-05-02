@@ -1,5 +1,7 @@
 import toga
 from datetime import datetime
+from toga.style import Pack
+from toga.style.pack import COLUMN, ROW
 
 from ..service import update_user
 from ...auth.enums import AccessLevel
@@ -11,7 +13,7 @@ def user_edit_form_screen(navigator, user_data):
     children = [
         toga.Label(
             "Edit User",
-            style=toga.style.Pack(
+            style=Pack(
                 font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
             ),
         )
@@ -32,7 +34,7 @@ def user_edit_form_screen(navigator, user_data):
 
     integrity_checkboxes = {}
     integrity_box = toga.Box(
-        style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=(10, 0))
+        style=Pack(direction=COLUMN, margin=(10, 0))
     )
     current_integrity_levels = user_data.get("integrity_levels", [])
 
@@ -121,13 +123,13 @@ def user_edit_form_screen(navigator, user_data):
             toga.Label("Confidentiality Level:"),
             toga.Label(
                 "(Maximum level user can read)",
-                style=toga.style.Pack(font_size=10, color="#666666"),
+                style=Pack(font_size=10, color="#666666"),
             ),
             confidentiality_input,
             toga.Label("Integrity Levels (optional):"),
             toga.Label(
                 "(Levels user can write to - none selected means no write access)",
-                style=toga.style.Pack(font_size=10, color="#666666"),
+                style=Pack(font_size=10, color="#666666"),
             ),
             integrity_box,
             toga.Label("Expires At:"),
@@ -137,8 +139,8 @@ def user_edit_form_screen(navigator, user_data):
                     toga.Button("Update User", on_press=on_submit),
                     toga.Button("Cancel", on_press=on_cancel),
                 ],
-                style=toga.style.Pack(
-                    direction=toga.style.pack.ROW, margin=(10, 0, 0, 0)
+                style=Pack(
+                    direction=ROW, margin=(10, 0, 0, 0)
                 ),
             ),
         ]
@@ -148,6 +150,6 @@ def user_edit_form_screen(navigator, user_data):
         horizontal=False,
         content=toga.Box(
             children=children,
-            style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
+            style=Pack(direction=COLUMN, margin=20, gap=10),
         ),
     )

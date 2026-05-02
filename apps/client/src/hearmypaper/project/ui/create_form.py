@@ -1,5 +1,7 @@
 import toga
 from datetime import datetime, timedelta
+from toga.style import Pack
+from toga.style.pack import COLUMN, ROW
 
 from ..service import create_project
 from ..dto import ProjectCreateDto
@@ -10,7 +12,7 @@ def project_create_form_screen(navigator):
     children = [
         toga.Label(
             "Create New Project",
-            style=toga.style.Pack(
+            style=Pack(
                 font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
             ),
         )
@@ -97,7 +99,7 @@ def project_create_form_screen(navigator):
             toga.Label("Instructor Email:"),
             toga.Label(
                 "(Enter the email address of the instructor)",
-                style=toga.style.Pack(font_size=10, color="#666666"),
+                style=Pack(font_size=10, color="#666666"),
             ),
             instructor_email_input,
             toga.Label("Deadline:"),
@@ -107,8 +109,8 @@ def project_create_form_screen(navigator):
                     toga.Button("Create Project", on_press=on_submit),
                     toga.Button("Cancel", on_press=on_cancel),
                 ],
-                style=toga.style.Pack(
-                    direction=toga.style.pack.ROW, margin=(10, 0, 0, 0)
+                style=Pack(
+                    direction=ROW, margin=(10, 0, 0, 0)
                 ),
             ),
         ]
@@ -118,6 +120,6 @@ def project_create_form_screen(navigator):
         horizontal=False,
         content=toga.Box(
             children=children,
-            style=toga.style.Pack(direction=toga.style.pack.COLUMN, margin=20, gap=10),
+            style=Pack(direction=COLUMN, margin=20, gap=10),
         ),
     )

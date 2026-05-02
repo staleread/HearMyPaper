@@ -17,7 +17,7 @@ def check_response(
     Returns:
         Result with data (dict or bytes) or error message
     """
-    status_code = int(r.status_code)
+    status_code = int(r.status_code) if r.status_code is not None else 0
 
     if raw_data:
         if status_code in [200, 201]:
