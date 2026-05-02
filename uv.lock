@@ -8,11 +8,11 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "converter",
-    "core",
-    "hearmypaper",
-    "hearmypaper-client",
-    "leader",
+    "hearmypaper-mono",
+    "hmp-client",
+    "hmp-core",
+    "hmp-manager",
+    "hmp-tts",
 ]
 
 [[package]]
@@ -329,11 +329,6 @@ wheels = [
 ]
 
 [[package]]
-name = "converter"
-version = "0.1.0"
-source = { virtual = "apps/converter" }
-
-[[package]]
 name = "cookiecutter"
 version = "2.7.1"
 source = { registry = "https://pypi.org/simple" }
@@ -351,25 +346,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/92/03/f4c96d8fd4f5e8af0
 wheels = [
     { url = "https://files.pythonhosted.org/packages/14/a9/8c855c14b401dc67d20739345295af5afce5e930a69600ab20f6cfa50b5c/cookiecutter-2.7.1-py3-none-any.whl", hash = "sha256:cee50defc1eaa7ad0071ee9b9893b746c1b3201b66bf4d3686d0f127c8ed6cf9", size = 41317, upload-time = "2026-03-04T04:06:01.221Z" },
 ]
-
-[[package]]
-name = "core"
-version = "0.1.0"
-source = { editable = "core" }
-dependencies = [
-    { name = "cryptography" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "cryptography", specifier = ">=47.0.0" }]
-
-[package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=9.0.3" }]
 
 [[package]]
 name = "cryptography"
@@ -524,7 +500,7 @@ wheels = [
 ]
 
 [[package]]
-name = "hearmypaper"
+name = "hearmypaper-mono"
 version = "2.0.0"
 source = { virtual = "." }
 
@@ -543,9 +519,9 @@ dev = [
 ]
 
 [[package]]
-name = "hearmypaper-client"
+name = "hmp-client"
 version = "1.1.0"
-source = { virtual = "apps/client" }
+source = { virtual = "apps/hmp_client" }
 dependencies = [
     { name = "briefcase" },
     { name = "cbor2" },
@@ -560,7 +536,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "core" },
+    { name = "hmp-core" },
     { name = "pytest" },
 ]
 
@@ -579,9 +555,38 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "core", editable = "core" },
+    { name = "hmp-core", editable = "libs/hmp_core" },
     { name = "pytest", specifier = ">=9.0.3" },
 ]
+
+[[package]]
+name = "hmp-core"
+version = "0.1.0"
+source = { editable = "libs/hmp_core" }
+dependencies = [
+    { name = "cryptography" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "cryptography", specifier = ">=47.0.0" }]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.0.3" }]
+
+[[package]]
+name = "hmp-manager"
+version = "1.0.0"
+source = { virtual = "apps/hmp_manager" }
+
+[[package]]
+name = "hmp-tts"
+version = "0.1.0"
+source = { virtual = "apps/hmp_tts" }
 
 [[package]]
 name = "httpcore"
@@ -654,11 +659,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/df/bf/f7da0350254c0ed7c
 wheels = [
     { url = "https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67", size = 134899, upload-time = "2025-03-05T20:05:00.369Z" },
 ]
-
-[[package]]
-name = "leader"
-version = "0.1.0"
-source = { virtual = "apps/leader" }
 
 [[package]]
 name = "mac-alias"

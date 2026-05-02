@@ -1,7 +1,7 @@
 [project]
-name = "leader"
+name = "hmp_tts"
 version = "0.1.0"
-description = "Add your description here"
+description = "HearMyPaper Text-To-Speach service"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = []

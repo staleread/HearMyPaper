@@ -1,4 +1,4 @@
-from hearmypaper.shared.ui.item_info_screen import item_info_screen
+from hmp_client.shared.ui.item_info_screen import item_info_screen
 from ..service import get_user
 
 

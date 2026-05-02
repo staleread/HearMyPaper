@@ -1,17 +1,17 @@
 [project]
-name = "hearmypaper"
+name = "hearmypaper-mono"
 version = "2.0.0"
-description = "Add your description here"
+description = "HearMyPaper monorepo"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = []
 
 [tool.uv.workspace]
 members = [
-    "core",
-    "apps/leader",
-    "apps/converter",
-    "apps/client",
+    "libs/hmp_core",
+    "apps/hmp_manager",
+    "apps/hmp_tts",
+    "apps/hmp_client",
 ]
 
 [dependency-groups]

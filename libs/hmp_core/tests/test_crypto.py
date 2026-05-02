@@ -1,7 +1,7 @@
 import pytest
 from cryptography.hazmat.primitives.asymmetric import ed25519
 
-from core import decrypt, derive_key, encrypt, generate_key, seal, sign, unseal, verify
+from hmp_core import decrypt, derive_key, encrypt, generate_key, seal, sign, unseal, verify
 
 
 def test_symmetric_encryption() -> None:

@@ -1,5 +1,5 @@
 [project]
-name = "core"
+name = "hmp_core"
 version = "0.1.0"
 description = "Core package for HearMyPaper"
 readme = "README.md"

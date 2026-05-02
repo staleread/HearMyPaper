@@ -1,6 +1,6 @@
 [project]
-name = "hearmypaper-client"
-description = "Secure your course project, and only let the instructor listen!"
+name = "hmp_client"
+description = "HearMyPaper desktop client"
 version = "1.1.0"
 requires-python = ">= 3.14"
 authors = [
@@ -20,21 +20,21 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-core = { workspace = true }
+hmp_core = { workspace = true }
 
 [tool.briefcase]
 project_name = "HearMyPaper"
 bundle = "edu.chnu"
 license.file = "LICENSE"
 
-[tool.briefcase.app.hearmypaper]
+[tool.briefcase.app.hmp_client]
 formal_name = "HearMyPaper"
 long_description = """HearMyPaper protects your student work with cryptography.
 Only instructors can unlock and access the real content.
 """
 sources = [
-    "src/hearmypaper",
-    "../../core/src/core",
+    "src/hmp_client",
+    "../../libs/hmp_core/src/hmp_core",
 ]
 test_sources = [
     "tests",
@@ -44,14 +44,14 @@ test_requires = [
     "pytest",
 ]
 
-[tool.briefcase.app.hearmypaper.macOS]
+[tool.briefcase.app.hmp_client.macOS]
 universal_build = true
 requires = [
     "toga-cocoa~=0.5.0",
     "std-nslog~=1.0.3",
 ]
 
-[tool.briefcase.app.hearmypaper.linux]
+[tool.briefcase.app.hmp_client.linux]
 requires = [
     "toga-gtk~=0.5.0",
     "pygobject < 3.52.1",
@@ -59,6 +59,6 @@ requires = [
 
 [dependency-groups]
 dev = [
-    "core",
+    "hmp_core",
     "pytest>=9.0.3",
 ]

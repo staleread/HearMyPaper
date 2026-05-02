@@ -1,0 +1,7 @@
+[project]
+name = "hmp_manager"
+version = "1.0.0"
+description = "HearMyPaper manager service"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []

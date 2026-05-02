@@ -1,4 +1,4 @@
-from hearmypaper.shared.ui.catalog_screen import catalog_screen
+from hmp_client.shared.ui.catalog_screen import catalog_screen
 from ..service import get_projects
 
 

@@ -1,6 +1,5 @@
 import os
-from typing import Tuple
-from core import derive_key, encrypt, decrypt, generate_key
+from hmp_core import crypto
 
 
 class CredentialsRepoError(Exception):
@@ -18,14 +17,14 @@ def save_user_credentials(
     Plaintext: "user_id,hex(private_key_bytes)"
     """
     try:
-        if not isinstance(token_path, str) or not token_path.strip():
+        if not token_path.strip():
             raise CredentialsRepoError("Invalid token_path: must be a non-empty string")
 
         plaintext = f"{user_id},{private_key_bytes.hex()}".encode("utf-8")
 
-        salt = generate_key(16)
-        key = derive_key(password.encode("utf-8"), salt)
-        encrypted_data = encrypt(plaintext, key)
+        salt = crypto.generate_key(16)
+        key = crypto.derive_key(password.encode("utf-8"), salt)
+        encrypted_data = crypto.encrypt(plaintext, key)
 
         with open(token_path, "wb") as f:
             f.write(salt + encrypted_data)
@@ -34,7 +33,7 @@ def save_user_credentials(
         raise CredentialsRepoError("Failed to save credentials")
 
 
-def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
+def get_user_credentials(token_path: str, password: str) -> tuple[str, bytes]:
     """
     Decrypt the file at token_path using the provided password.
     Returns: (user_id: str, private_key_bytes: bytes)
@@ -52,8 +51,8 @@ def get_user_credentials(token_path: str, password: str) -> Tuple[str, bytes]:
     encrypted_data = data[16:]
 
     try:
-        key = derive_key(password.encode("utf-8"), salt)
-        plaintext = decrypt(encrypted_data, key)
+        key = crypto.derive_key(password.encode("utf-8"), salt)
+        plaintext = crypto.decrypt(encrypted_data, key)
         decoded = plaintext.decode("utf-8")
     except Exception:
         raise CredentialsRepoError("Failed to read credentials")
