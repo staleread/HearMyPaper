@@ -526,6 +526,7 @@ dependencies = [
     { name = "briefcase" },
     { name = "cbor2" },
     { name = "cryptography" },
+    { name = "hmp-core" },
     { name = "ipinfo" },
     { name = "pydantic" },
     { name = "requests" },
@@ -536,8 +537,9 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "hmp-core" },
     { name = "pytest" },
+    { name = "ruff" },
+    { name = "ty" },
 ]
 
 [package.metadata]
@@ -545,6 +547,7 @@ requires-dist = [
     { name = "briefcase", specifier = ">=0.3.25" },
     { name = "cbor2", specifier = ">=5.7.0" },
     { name = "cryptography", specifier = ">=46.0.1" },
+    { name = "hmp-core", editable = "libs/hmp_core" },
     { name = "ipinfo", specifier = ">=5.2.1" },
     { name = "pydantic", specifier = ">=2.11.9" },
     { name = "requests", specifier = ">=2.32.5" },
@@ -555,8 +558,9 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "hmp-core", editable = "libs/hmp_core" },
     { name = "pytest", specifier = ">=9.0.3" },
+    { name = "ruff", specifier = ">=0.15.12" },
+    { name = "ty", specifier = ">=0.0.34" },
 ]
 
 [[package]]
@@ -570,13 +574,19 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
+    { name = "ruff" },
+    { name = "ty" },
 ]
 
 [package.metadata]
 requires-dist = [{ name = "cryptography", specifier = ">=47.0.0" }]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=9.0.3" }]
+dev = [
+    { name = "pytest", specifier = ">=9.0.3" },
+    { name = "ruff", specifier = ">=0.15.12" },
+    { name = "ty", specifier = ">=0.0.34" },
+]
 
 [[package]]
 name = "hmp-manager"

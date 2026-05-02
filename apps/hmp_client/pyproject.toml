@@ -8,6 +8,7 @@ authors = [
   {name = "Neholiuk Oleksandr", email = "kingstn29@gmail.com"},
 ]
 dependencies = [
+    "hmp_core",
     "briefcase>=0.3.25",
     "cryptography>=46.0.1",
     "requests>=2.32.5",
@@ -17,6 +18,13 @@ dependencies = [
     "cbor2>=5.7.0",
     "ipinfo>=5.2.1",
     "toga-gtk~=0.5.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ty>=0.0.34",
+    "ruff>=0.15.12",
 ]
 
 [tool.uv.sources]
@@ -55,10 +63,4 @@ requires = [
 requires = [
     "toga-gtk~=0.5.0",
     "pygobject < 3.52.1",
-]
-
-[dependency-groups]
-dev = [
-    "hmp_core",
-    "pytest>=9.0.3",
 ]
