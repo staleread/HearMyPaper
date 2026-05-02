@@ -8,5 +8,5 @@ class ApiSession(Session):
         super().__init__()
 
     def request(self, method, url, *args, **kwargs):
-        joined_url = urljoin(self.base_url, url)
+        joined_url = urljoin(str(self.base_url), url)
         return super().request(method, joined_url, *args, **kwargs)

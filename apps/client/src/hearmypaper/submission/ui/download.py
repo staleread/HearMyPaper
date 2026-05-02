@@ -62,7 +62,7 @@ def submission_download_form_screen(navigator, submission_id):
             )
 
             result = download_submission(
-                navigator.session, submission_id, private_key_bytes
+                navigator.session, navigator.app_paths, submission_id, private_key_bytes
             )
 
             if result.is_ok():

@@ -17,23 +17,25 @@ def check_response(
     Returns:
         Result with data (dict or bytes) or error message
     """
+    status_code = int(r.status_code)
+
     if raw_data:
-        if r.status_code in [200, 201]:
+        if status_code in [200, 201]:
             return Ok(r.content)
-        elif r.status_code == 401:
+        elif status_code == 401:
             return Err("Authentication required. Please log in again.")
-        elif r.status_code == 403:
+        elif status_code == 403:
             return Err(
                 "Access forbidden. You don't have permission for this operation."
             )
-        elif r.status_code == 404:
+        elif status_code == 404:
             return Err("Resource not found.")
-        elif r.status_code >= 500:
+        elif status_code >= 500:
             return Err("Server error. Please try again later.")
         else:
-            return Err(f"{r.status_code}: Request failed")
+            return Err(f"{status_code}: Request failed")
 
-    if r.status_code in [200, 201]:
+    if status_code in [200, 201]:
         try:
             if cbor_data:
                 data = cbor2.loads(r.content)
@@ -41,7 +43,7 @@ def check_response(
                 data = r.json()
             return Ok(data)
         except (ValueError, cbor2.CBORDecodeError):
-            return Err(f"{r.status_code}: Invalid response format")
+            return Err(f"{status_code}: Invalid response format")
 
     # Error responses are always JSON
     try:
@@ -52,13 +54,13 @@ def check_response(
     except (ValueError, Exception):
         error_message = "Invalid error response format"
 
-    if r.status_code == 401:
+    if status_code == 401:
         return Err("Authentication required. Please log in again.")
-    elif r.status_code == 403:
+    elif status_code == 403:
         return Err("Access forbidden. You don't have permission for this operation.")
-    elif r.status_code == 404:
+    elif status_code == 404:
         return Err("Resource not found.")
-    elif r.status_code >= 500:
+    elif status_code >= 500:
         return Err("Server error. Please try again later.")
     else:
-        return Err(f"{r.status_code}: {error_message}")
+        return Err(f"{status_code}: {error_message}")

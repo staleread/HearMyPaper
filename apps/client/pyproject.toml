@@ -1,0 +1,64 @@
+[project]
+name = "hearmypaper-client"
+description = "Secure your course project, and only let the instructor listen!"
+version = "1.1.0"
+requires-python = ">= 3.14"
+authors = [
+  {name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com"},
+  {name = "Neholiuk Oleksandr", email = "kingstn29@gmail.com"},
+]
+dependencies = [
+    "briefcase>=0.3.25",
+    "cryptography>=46.0.1",
+    "requests>=2.32.5",
+    "result>=0.17.0",
+    "pydantic>=2.11.9",
+    "toml>=0.10.2",
+    "cbor2>=5.7.0",
+    "ipinfo>=5.2.1",
+    "toga-gtk~=0.5.0",
+]
+
+[tool.uv.sources]
+core = { workspace = true }
+
+[tool.briefcase]
+project_name = "HearMyPaper"
+bundle = "edu.chnu"
+license.file = "LICENSE"
+
+[tool.briefcase.app.hearmypaper]
+formal_name = "HearMyPaper"
+long_description = """HearMyPaper protects your student work with cryptography.
+Only instructors can unlock and access the real content.
+"""
+sources = [
+    "src/hearmypaper",
+    "../../core/src/core",
+]
+test_sources = [
+    "tests",
+]
+
+test_requires = [
+    "pytest",
+]
+
+[tool.briefcase.app.hearmypaper.macOS]
+universal_build = true
+requires = [
+    "toga-cocoa~=0.5.0",
+    "std-nslog~=1.0.3",
+]
+
+[tool.briefcase.app.hearmypaper.linux]
+requires = [
+    "toga-gtk~=0.5.0",
+    "pygobject < 3.52.1",
+]
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.34",
+    "core",
+]

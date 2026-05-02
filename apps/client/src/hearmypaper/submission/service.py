@@ -32,7 +32,7 @@ def upload_submission(
         with open(file_path, "rb") as f:
             content = f.read()
 
-        encrypted = submission_crypto.encrypt_file_with_public_key(content, public_key)
+        encrypted = submission_crypto.seal(content, public_key)
 
         result = api.upload_submission(session, project_id, title, encrypted)
         if result.is_err():
@@ -63,7 +63,7 @@ def download_submission(
 
         encrypted_content = download_result.unwrap()
 
-        decrypted_content = submission_crypto.decrypt_file_with_private_key(
+        decrypted_content = submission_crypto.unseal(
             encrypted_content, private_key_bytes
         )
 
@@ -178,12 +178,12 @@ def convert_submission_to_audio(
                     upload_key_response.encrypted_aes_key is not None
                     and upload_key_response.task_uuid is not None
                 ):
-                    aes_key = submission_crypto.decrypt_aes_key_with_private_key(
+                    aes_key = submission_crypto.unseal(
                         base64.b64decode(upload_key_response.encrypted_aes_key),
                         private_key_bytes,
                     )
                     task_uuid = upload_key_response.task_uuid
-                    encrypted_file = submission_crypto.encrypt_file_with_aes(
+                    encrypted_file = submission_crypto.encrypt(
                         pdf_bytes, aes_key
                     )
                     print(f"[DEBUG CLIENT] Got upload key, task_uuid={task_uuid}")
@@ -265,11 +265,11 @@ def convert_submission_to_audio(
 
         audio_response = audio_result.unwrap()
 
-        audio_aes_key = submission_crypto.decrypt_aes_key_with_private_key(
+        audio_aes_key = submission_crypto.unseal(
             audio_response.encrypted_audio_key, private_key_bytes
         )
 
-        audio_bytes = submission_crypto.decrypt_file_with_aes(
+        audio_bytes = submission_crypto.decrypt(
             audio_response.encrypted_audio, audio_aes_key
         )
 

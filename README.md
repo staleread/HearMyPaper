@@ -7,8 +7,6 @@ their academic work with military-grade cryptography. Submit your projects with
 confidence knowing only authorized instructors can access and listen to your
 submissions.
 
-The backend source code lives here 👉 [hmp-server](https://github.com/staleread/hmp-server)
-
 ## Development
 
 Create and activate virtual environment

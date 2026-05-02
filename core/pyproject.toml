@@ -1,0 +1,26 @@
+[project]
+name = "core"
+version = "0.1.0"
+description = "Core package for HearMyPaper"
+readme = "README.md"
+authors = [
+    { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "cryptography>=47.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "C4"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.15.12",
+    "ty>=0.0.34",
+]
