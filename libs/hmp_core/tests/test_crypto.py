@@ -1,53 +1,60 @@
+import nacl.exceptions
 import pytest
-from cryptography.hazmat.primitives.asymmetric import ed25519
 
-from hmp_core import decrypt, derive_key, encrypt, generate_key, seal, sign, unseal, verify
+from hmp_core.crypto import crypto
 
+
+def test_generate_keypair() -> None:
+    priv, pub = crypto.generate_keypair()
+    assert len(priv) == 32
+    assert len(pub) == 32
+    assert priv != pub
 
 def test_symmetric_encryption() -> None:
-    key = generate_key()
+    password = b"strong-password"
     data = b"secret message"
-    encrypted = encrypt(data, key)
+    
+    encrypted = crypto.encrypt_symmetric(data, password=password)
     assert encrypted != data
-    decrypted = decrypt(encrypted, key)
+    
+    decrypted = crypto.decrypt_symmetric(encrypted, password=password)
     assert decrypted == data
 
-
-def test_key_derivation() -> None:
-    secret = b"password"
-    salt = b"staticsalt123456"
-    key1 = derive_key(secret, salt)
-    key2 = derive_key(secret, salt)
-    assert key1 == key2
-    assert len(key1) == 32
-
+def test_symmetric_encryption_wrong_password() -> None:
+    password = b"strong-password"
+    wrong_password = b"wrong-password"
+    data = b"secret message"
+    
+    encrypted = crypto.encrypt_symmetric(data, password=password)
+    
+    with pytest.raises(nacl.exceptions.CryptoError):
+        crypto.decrypt_symmetric(encrypted, password=wrong_password)
 
 def test_asymmetric_sealing() -> None:
-    private_key = ed25519.Ed25519PrivateKey.generate()
-    private_key_bytes = private_key.private_bytes_raw()
-    public_key_bytes = private_key.public_key().public_bytes_raw()
-
+    priv, pub = crypto.generate_keypair()
     data = b"confidential data"
-    sealed = seal(data, public_key_bytes)
+    
+    sealed = crypto.seal(data, public_key_bytes=pub)
     assert sealed != data
 
-    unsealed = unseal(sealed, private_key_bytes)
+    unsealed = crypto.unseal(sealed, private_key_bytes=priv)
     assert unsealed == data
 
-
 def test_signing() -> None:
-    private_key = ed25519.Ed25519PrivateKey.generate()
-    private_key_bytes = private_key.private_bytes_raw()
-    public_key_bytes = private_key.public_key().public_bytes_raw()
-
+    priv, pub = crypto.generate_keypair()
     data = b"important document"
-    signature = sign(data, private_key_bytes)
+    
+    signature = crypto.sign(data, private_key_bytes=priv)
+    assert len(signature) == 64
 
-    assert verify(data, signature, public_key_bytes) is True
-    assert verify(b"tampered document", signature, public_key_bytes) is False
-
+    assert crypto.verify(
+        data, signature=signature, public_key_bytes=pub
+    ) is True
+    assert crypto.verify(
+        b"tampered document", signature=signature, public_key_bytes=pub
+    ) is False
 
 def test_invalid_decrypt() -> None:
-    key = generate_key()
-    with pytest.raises(ValueError, match="Invalid encrypted data format"):
-        decrypt(b"short", key)
+    password = b"password"
+    with pytest.raises(nacl.exceptions.CryptoError):
+        crypto.decrypt_symmetric(b"short", password=password)

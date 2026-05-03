@@ -1,5 +1,5 @@
 [project]
-name = "hmp_core"
+name = "hmp-core"
 version = "0.1.0"
 description = "Core package for HearMyPaper"
 readme = "README.md"
@@ -8,7 +8,9 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "cryptography>=47.0.0",
+    "fastapi[standard]>=0.136.1",
+    "pydantic>=2.13.3",
+    "pynacl>=1.6.2",
 ]
 
 [tool.ruff]
