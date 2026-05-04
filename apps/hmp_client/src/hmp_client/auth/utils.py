@@ -10,11 +10,8 @@ def save_user_credentials(
     user_id: str, token_path: str, private_key_bytes: bytes, password: str
 ) -> None:
     """
-    Encrypt user_id and private_key_bytes with password (PBKDF2 + AES-256-GCM)
+    Encrypt user_id and private_key_bytes with password (Argon2id + XSalsa20-Poly1305)
     and save to token_path as binary file.
-
-    Format: [salt(16B) | iv(12B) | ciphertext(N) | tag(16B)]
-    Plaintext: "user_id,hex(private_key_bytes)"
     """
     try:
         if not token_path.strip():
@@ -22,12 +19,12 @@ def save_user_credentials(
 
         plaintext = f"{user_id},{private_key_bytes.hex()}".encode("utf-8")
 
-        salt = crypto.generate_key(16)
-        key = crypto.derive_key(password.encode("utf-8"), salt)
-        encrypted_data = crypto.encrypt(plaintext, key)
+        encrypted_data = crypto.encrypt_symmetric(
+            plaintext, password=password.encode("utf-8")
+        )
 
         with open(token_path, "wb") as f:
-            f.write(salt + encrypted_data)
+            f.write(encrypted_data)
 
     except Exception:
         raise CredentialsRepoError("Failed to save credentials")
@@ -44,15 +41,8 @@ def get_user_credentials(token_path: str, password: str) -> tuple[str, bytes]:
     with open(token_path, "rb") as f:
         data = f.read()
 
-    if len(data) < 16 + 12 + 16:  # salt + iv + tag at minimum
-        raise CredentialsRepoError("Corrupted file: too short")
-
-    salt = data[:16]
-    encrypted_data = data[16:]
-
     try:
-        key = crypto.derive_key(password.encode("utf-8"), salt)
-        plaintext = crypto.decrypt(encrypted_data, key)
+        plaintext = crypto.decrypt_symmetric(data, password=password.encode("utf-8"))
         decoded = plaintext.decode("utf-8")
     except Exception:
         raise CredentialsRepoError("Failed to read credentials")

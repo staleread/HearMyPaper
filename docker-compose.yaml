@@ -1,0 +1,84 @@
+services:
+  manager:
+    container_name: hmp-manager
+    build:
+      context: .
+      dockerfile: apps/hmp_manager/Dockerfile
+      target: dev
+    env_file: .env.development
+    environment:
+      JWT_SECRET: 4jez3Ruh5sbVMChP
+      JWT_ALGORITHM: HS256
+      JWT_LIFETIME_SEC: 90000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_USER: default
+      REDIS_PASSWORD: password
+      REDIS_DB: 0
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hmp-postgres
+      # For dbmate migrations
+      DATABASE_URL: postgres://user:password@postgres:5432/hmp-postgres?sslmode=disable
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/hmp_manager:/app/apps/hmp_manager
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_started
+
+  postgres:
+    container_name: hmp-postgres
+    image: postgres:18-alpine
+    volumes:
+      - postgres-volume:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hmp-postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  redis:
+    container_name: hmp-redis
+    image: redis:8-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-volume:/data
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: password
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  postgres-volume:
+  redis-volume:

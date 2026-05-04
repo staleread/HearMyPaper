@@ -1,7 +1,7 @@
 import base64
 from ..shared.utils.session import ApiSession
 from result import Result, Ok, Err
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from hmp_core import crypto
 
 
 from .api import (
@@ -33,10 +33,7 @@ def create_user_with_credentials(
     """
     try:
         # Generate key pair
-        private_key = Ed25519PrivateKey.generate()
-        public_key = private_key.public_key()
-
-        public_key_bytes = public_key.public_bytes_raw()
+        private_key_bytes, public_key_bytes = crypto.generate_keypair()
         public_key_b64 = base64.b64encode(public_key_bytes).decode("utf-8")
 
         # Convert DTO to API request
@@ -49,7 +46,6 @@ def create_user_with_credentials(
         response = api_result.unwrap()
 
         # Save credentials to file
-        private_key_bytes = private_key.private_bytes_raw()
         save_user_credentials(
             str(response.id),
             user_dto.credentials_path,
@@ -87,8 +83,9 @@ def login(session: ApiSession, token_path: str, password: str) -> Result[None, s
         challenge_resp = challenge_result.unwrap()
         challenge_bytes = base64.b64decode(challenge_resp.challenge)
 
-        private_key = Ed25519PrivateKey.from_private_bytes(private_key_bytes)
-        signed_challenge_bytes = private_key.sign(challenge_bytes)
+        signed_challenge_bytes = crypto.sign(
+            challenge_bytes, private_key_bytes=private_key_bytes
+        )
         signed_challenge_b64 = base64.b64encode(signed_challenge_bytes).decode("utf-8")
 
         # Submit login request

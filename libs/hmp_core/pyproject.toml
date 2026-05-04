@@ -8,9 +8,13 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
+    "aio-pika>=9.6.2",
+    "aioboto3>=15.5.0",
     "fastapi[standard]>=0.136.1",
+    "httpx>=0.28.1",
     "pydantic>=2.13.3",
     "pynacl>=1.6.2",
+    "types-aiobotocore-s3>=3.6.0",
 ]
 
 [tool.ruff]

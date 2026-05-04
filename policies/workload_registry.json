@@ -1,0 +1,25 @@
+{
+  "workload_registry": {
+    "spiffe://hmp.internal/ns/default/sa/hmp-manager": {
+      "role": "manager",
+      "confidentiality_level": "CONFIDENTIAL",
+      "integrity_levels": ["UNCLASSIFIED", "CONTROLLED", "RESTRICTED", "CONFIDENTIAL"],
+      "description": "Primary control plane and metadata orchestrator"
+    },
+    "spiffe://hmp.internal/ns/default/sa/hmp-converter": {
+      "role": "worker",
+      "confidentiality_level": "RESTRICTED",
+      "integrity_levels": ["RESTRICTED"],
+      "description": "PDF-to-Audio processing unit"
+    },
+    "spiffe://hmp.internal/ns/default/sa/student-terminal": {
+      "role": "client",
+      "confidentiality_level": "RESTRICTED",
+      "integrity_levels": ["RESTRICTED"],
+      "description": "University-managed student workstation"
+    }
+  },
+  "confidentiality_lattice": {
+    "levels": ["UNCLASSIFIED", "CONTROLLED", "RESTRICTED", "CONFIDENTIAL"]
+  }
+}
