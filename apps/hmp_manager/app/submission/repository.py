@@ -2,11 +2,6 @@ from uuid import UUID
 from typing import Any
 from hmp_core.storage import SqlRunner
 
-def get_user_id_by_pseudonym(pseudonym: str, *, db: SqlRunner) -> int | None:
-    return db.query("""
-        SELECT id FROM users WHERE pseudonym = :pseudonym
-    """).bind(pseudonym=pseudonym).scalar(lambda x: x)
-
 def get_project_student_id(project_id: int, user_id: int, *, db: SqlRunner) -> int | None:
     return db.query("""
         SELECT id FROM project_students 

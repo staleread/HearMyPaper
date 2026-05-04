@@ -2,11 +2,6 @@ from uuid import UUID
 from typing import Any
 from hmp_core.storage import SqlRunner
 
-def get_user_id_by_pseudonym(pseudonym: str, *, db: SqlRunner) -> int | None:
-    return db.query("""
-        SELECT id FROM users WHERE pseudonym = :pseudonym
-    """).bind(pseudonym=pseudonym).scalar(lambda x: x)
-
 def insert_conversion_job(
     submission_id: int,
     instructor_id: int,
@@ -36,8 +31,20 @@ def update_conversion_status(
     conversion_uuid: UUID,
     status: str,
     *,
-    db: SqlRunner
+    db: SqlRunner,
+    error_message: str | None = None,
+    output_path: str | None = None
 ) -> None:
     db.query("""
-        UPDATE conversions SET status = :status WHERE uuid = :uuid
-    """).bind(status=status, uuid=conversion_uuid).execute()
+        UPDATE conversions 
+        SET status = :status, 
+            error_message = :error_message,
+            output_path = :output_path,
+            updated_at = NOW()
+        WHERE uuid = :uuid
+    """).bind(
+        status=status, 
+        uuid=conversion_uuid,
+        error_message=error_message,
+        output_path=output_path
+    ).execute()

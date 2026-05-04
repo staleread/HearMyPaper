@@ -6,6 +6,7 @@ from hmp_core.auth.utils import get_workload_claims
 from hmp_core.events import ConversionJobTask, EventClient
 from .dto import ConversionIntentRequest, ConversionIntentResponse
 from . import repository
+from app.user.repository import get_user_id_by_pseudonym
 
 async def create_conversion_intent(
     identity: IdentityContext,
@@ -22,7 +23,7 @@ async def create_conversion_intent(
     4. Records the conversion job as 'queued'.
     """
     # 1. Resolve Instructor
-    instructor_id = repository.get_user_id_by_pseudonym(identity.user_pseudonym, db=db)
+    instructor_id = get_user_id_by_pseudonym(identity.user_pseudonym, db=db)
     if instructor_id is None:
         raise HTTPException(status_code=404, detail="Instructor not found")
 
@@ -89,6 +90,8 @@ async def commit_conversion(
     task = ConversionJobTask(
         job_id=conversion_uuid,
         subject_pseudonym=identity.user_pseudonym,
+        # Instructor converts a student's lab for himself
+        recipient_pseudonym=identity.user_pseudonym,
         confidentiality_level=claims.confidentiality_level,
         input_object_path=job["input_path"],
         correlation_id=str(uuid.uuid4())

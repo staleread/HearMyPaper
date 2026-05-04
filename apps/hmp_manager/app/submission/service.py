@@ -2,6 +2,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from hmp_core.storage import ObjectStorageClient, SqlRunner
 from hmp_core.auth import IdentityContext
+from app.user.repository import get_user_id_by_pseudonym
 from .dto import SubmissionIntentRequest, SubmissionIntentResponse
 from . import repository
 
@@ -16,7 +17,7 @@ async def create_submission_intent(
     Orchestrates the submission intent using the Trusted Headers identity context.
     """
     # 1. Resolve User
-    user_id = repository.get_user_id_by_pseudonym(identity.user_pseudonym, db=db)
+    user_id = get_user_id_by_pseudonym(identity.user_pseudonym, db=db)
     if user_id is None:
         raise HTTPException(status_code=404, detail="User not found")
     
@@ -79,7 +80,7 @@ async def commit_submission(
 
     # 4. Finalize
     # Resolve user_id for logging
-    user_id = repository.get_user_id_by_pseudonym(identity.user_pseudonym, db=db)
+    user_id = get_user_id_by_pseudonym(identity.user_pseudonym, db=db)
     
     repository.update_submission_status(
         submission_uuid,

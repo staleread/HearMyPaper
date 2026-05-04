@@ -10,6 +10,8 @@ class EnvSettings(BaseSettings):
     minio_access_key: str = "minioadmin"
     minio_secret_key: str = "minioadmin"
     
+    manager_url: str = "http://hmp-manager:8000"
+
     # SPIRE/SPIFFE configuration
     spiffe_endpoint_socket: str = "unix:///run/spire/sockets/agent.sock"
 

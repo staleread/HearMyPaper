@@ -1,7 +1,8 @@
 from typing import Annotated
 from fastapi import Depends
 from sqlalchemy import Connection
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Generator, AsyncGenerator
+from contextlib import asynccontextmanager
 
 from app.shared.config.db import get_db_engine, DataSource
 from hmp_core.storage import SqlRunner
@@ -27,3 +28,10 @@ def get_postgres_runner(connection: PostgresConnectionDep) -> SqlRunner:
 
 
 PostgresRunnerDep = Annotated[SqlRunner, Depends(get_postgres_runner)]
+
+@asynccontextmanager
+async def get_db_runner_context() -> AsyncGenerator[SqlRunner, None]:
+    """Provides a SqlRunner for background tasks or non-FastAPI contexts."""
+    engine = get_db_engine(DataSource.POSTGRES)
+    with engine.begin() as connection:
+        yield SqlRunner(connection=connection)

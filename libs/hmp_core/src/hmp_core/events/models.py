@@ -9,6 +9,7 @@ class ConversionJobTask(BaseModel):
     job_id: UUID
     # The 'Subject' properties for BLP checks in the worker
     subject_pseudonym: str
+    recipient_pseudonym: str
     confidentiality_level: AccessLevel
 
     # Path to the encrypted PDF in MinIO
