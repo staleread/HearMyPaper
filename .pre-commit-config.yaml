@@ -1,13 +1,39 @@
 repos:
- - repo: https://github.com/astral-sh/ruff-pre-commit
-   rev: v0.13.1                                                                  
-   hooks:                                                                        
-     - id: ruff-check                                                            
-       args: ["--fix"]
-     - id: ruff-format
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.4
+    hooks:
+      - id: ruff
+        name: "Ruff Check"
+        args: ["--fix"]
+      - id: ruff-format
+        name: "Ruff Format"
 
- - repo: https://github.com/pre-commit/mirrors-mypy          
-   rev: v1.18.2                                                                  
-   hooks:                                                                        
-     - id: mypy                
-       additional_dependencies: ["types-requests>=2.32.4.20250913", "types-toml>=0.10.8.20240310"]
+  - repo: local
+    hooks:
+      - id: ty-core
+        name: "Typecheck: libs/hmp_core"
+        entry: uv run --package hmp-core ty check libs/hmp_core/
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: ty-converter
+        name: "Typecheck: apps/hmp_converter"
+        entry: uv run --package hmp-converter ty check apps/hmp_converter/
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: ty-manager
+        name: "Typecheck: apps/hmp_manager"
+        entry: uv run --package hmp-manager ty check apps/hmp_manager/
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: ty-client
+        name: "Typecheck: apps/hmp_client"
+        entry: uv run --package hmp-client ty check apps/hmp_client/
+        language: system
+        types: [python]
+        pass_filenames: false
