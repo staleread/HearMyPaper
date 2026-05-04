@@ -1,5 +1,3 @@
-import base64
-import httpx
 import uuid
 import subprocess
 import json
@@ -7,7 +5,7 @@ from langdetect import detect
 from hmp_core.crypto import crypto
 from hmp_core.storage import ObjectStorageClient
 from hmp_core.events import EventClient
-from app.shared.config.env import get_env_settings
+from hmp_core.clients import HmpManagerClient
 
 
 def _detect_language(text: str) -> str:
@@ -57,17 +55,6 @@ def convert_text_to_audio(text: str, speed: int = 140) -> bytes:
         raise ValueError(f"Text-to-speech conversion failed: {e}")
 
 
-async def get_instructor_public_key(pseudonym: str) -> bytes:
-    settings = get_env_settings()
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"{settings.manager_url}/users/{pseudonym}/public-key"
-        )
-        response.raise_for_status()
-        data = response.json()
-        return base64.b64decode(data["public_key"])
-
-
 async def get_worker_private_key() -> bytes:
     # Mock for development:
     return b"dummy-worker-private-key-32bytes!!"  # Must be 32 bytes for X25519
@@ -80,6 +67,7 @@ async def process_conversion(
     speed: int,
     storage: ObjectStorageClient,
     event_client: EventClient,
+    manager_client: HmpManagerClient,
 ):
     # 1. Download
     encrypted_pdf = await storage.download_file("hmp-processing", input_path)
@@ -100,7 +88,7 @@ async def process_conversion(
     audio_bytes = convert_text_to_audio(text, speed=speed)
 
     # 5. Encrypt for Instructor
-    instructor_pk = await get_instructor_public_key(recipient_pseudonym)
+    instructor_pk = await manager_client.get_public_key(recipient_pseudonym)
     encrypted_audio = crypto.seal(audio_bytes, public_key_bytes=instructor_pk)
 
     # 6. Upload

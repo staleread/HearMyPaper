@@ -4,6 +4,7 @@ import json
 from hmp_core.events import ConversionJobTask
 from app.shared.dependencies.rabbitmq import get_event_client
 from app.shared.dependencies.storage import get_storage_client
+from app.shared.dependencies.manager import get_manager_client
 from . import service
 
 
@@ -16,6 +17,7 @@ async def process_task(message: aio_pika.abc.AbstractIncomingMessage):
 
             storage = get_storage_client()
             event_client = await get_event_client()
+            manager_client = await get_manager_client()
 
             await service.process_conversion(
                 job_id=task.job_id,
@@ -24,6 +26,7 @@ async def process_task(message: aio_pika.abc.AbstractIncomingMessage):
                 speed=task.speed,
                 storage=storage,
                 event_client=event_client,
+                manager_client=manager_client,
             )
 
             print(f" [v] Completed task: {task.job_id}")

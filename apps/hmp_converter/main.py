@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.shared.dependencies.rabbitmq import close_rabbitmq_connection
+from app.shared.dependencies.manager import close_manager_client
 from app.tts.listener import run_consumer
 
 
@@ -15,6 +16,7 @@ async def lifespan(_app: FastAPI):
     # Clean up
     consumer_task.cancel()
     await close_rabbitmq_connection()
+    await close_manager_client()
 
 
 app = FastAPI(lifespan=lifespan, title="HearMyPaper TTS Service")
