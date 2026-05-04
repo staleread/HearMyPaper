@@ -1,7 +1,8 @@
-import aioboto3
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
-from collections.abc import AsyncGenerator
+
+import aioboto3
 
 if TYPE_CHECKING:
     from types_aiobotocore_s3.client import S3Client
@@ -28,7 +29,7 @@ class ObjectStorageClient:
         self.region_name = region_name
 
     @asynccontextmanager
-    async def _get_client(self) -> AsyncGenerator[S3Client, None]:
+    async def _get_client(self) -> AsyncGenerator[S3Client]:
         async with self.session.client(
             "s3",
             endpoint_url=self.endpoint_url,
@@ -85,3 +86,12 @@ class ObjectStorageClient:
                 Params={"Bucket": bucket, "Key": key},
                 ExpiresIn=expires_in,
             )
+
+    async def file_exists(self, bucket: str, key: str) -> bool:
+        """Checks if a file exists in the specific bucket and key."""
+        async with self._get_client() as client:
+            try:
+                await client.head_object(Bucket=bucket, Key=key)
+                return True
+            except Exception:
+                return False

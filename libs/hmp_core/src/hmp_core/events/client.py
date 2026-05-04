@@ -1,5 +1,8 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 import aio_pika
-from typing import Callable, Any, Awaitable
+
 
 class EventClient:
     """
@@ -19,7 +22,9 @@ class EventClient:
             self._channel = await self._connection.channel()
 
     async def declare_exchange(
-        self, name: str = "hmp.events", type: aio_pika.ExchangeType = aio_pika.ExchangeType.TOPIC
+        self,
+        name: str = "hmp.events",
+        type: aio_pika.ExchangeType = aio_pika.ExchangeType.TOPIC,
     ) -> aio_pika.abc.AbstractExchange:
         """Declares a durable exchange."""
         await self.connect()

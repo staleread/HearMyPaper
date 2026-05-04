@@ -2,6 +2,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     p_uuid UUID UNIQUE DEFAULT gen_random_uuid(), -- Pseudonym for Zero Trust flows
+    pseudonym VARCHAR(100) UNIQUE NOT NULL,       -- Adjective-noun-number identifier
     name VARCHAR(75) NOT NULL,
     surname VARCHAR(75) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -11,6 +12,8 @@ CREATE TABLE users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT unique_user_name UNIQUE (name, surname)
 );
+
+CREATE INDEX idx_users_pseudonym ON users(pseudonym);
 
 CREATE TABLE service_identities (
     id SERIAL PRIMARY KEY,

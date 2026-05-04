@@ -10,6 +10,7 @@ from app.project.router import router as project_router
 from app.audit.router import router as audit_router
 from app.submission.router import router as submission_router
 from app.admin.router import router as admin_router
+from app.conversion.router import router as conversion_router
 from app.shared.config.env import get_env_settings
 from app.shared.dependencies.rabbitmq import close_rabbitmq_connection
 
@@ -33,6 +34,7 @@ app.include_router(project_router, prefix="/project", tags=["project"])
 app.include_router(audit_router, prefix="/audit", tags=["audit"])
 app.include_router(submission_router, prefix="/submission", tags=["submission"])
 app.include_router(admin_router, prefix="/admin", tags=["admin"])
+app.include_router(conversion_router, prefix="/conversions", tags=["conversion"])
 
 
 @app.get("/health")

@@ -323,6 +323,18 @@ wheels = [
 ]
 
 [[package]]
+name = "botocore-stubs"
+version = "1.42.41"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "types-awscrt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0c/a8/a26608ff39e3a5866c6c79eda10133490205cbddd45074190becece3ff2a/botocore_stubs-1.42.41.tar.gz", hash = "sha256:dbeac2f744df6b814ce83ec3f3777b299a015cbea57a2efc41c33b8c38265825", size = 42411, upload-time = "2026-02-03T20:46:14.479Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/76/cab7af7f16c0b09347f2ebe7ffda7101132f786acb767666dce43055faab/botocore_stubs-1.42.41-py3-none-any.whl", hash = "sha256:9423110fb0e391834bd2ed44ae5f879d8cb370a444703d966d30842ce2bcb5f0", size = 66759, upload-time = "2026-02-03T20:46:13.02Z" },
+]
+
+[[package]]
 name = "briefcase"
 version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1069,6 +1081,7 @@ dependencies = [
     { name = "pynacl" },
     { name = "sqlalchemy" },
     { name = "types-aiobotocore-s3" },
+    { name = "uidgen" },
 ]
 
 [package.dev-dependencies]
@@ -1076,6 +1089,7 @@ dev = [
     { name = "pytest" },
     { name = "ruff" },
     { name = "ty" },
+    { name = "types-aioboto3" },
 ]
 
 [package.metadata]
@@ -1088,6 +1102,7 @@ requires-dist = [
     { name = "pynacl", specifier = ">=1.6.2" },
     { name = "sqlalchemy", specifier = ">=2.0.49" },
     { name = "types-aiobotocore-s3", specifier = ">=3.6.0" },
+    { name = "uidgen", specifier = ">=1.0.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -1095,6 +1110,7 @@ dev = [
     { name = "pytest", specifier = ">=9.0.3" },
     { name = "ruff", specifier = ">=0.15.12" },
     { name = "ty", specifier = ">=0.0.34" },
+    { name = "types-aioboto3", specifier = ">=15.5.0" },
 ]
 
 [[package]]
@@ -2547,12 +2563,56 @@ wheels = [
 ]
 
 [[package]]
+name = "types-aioboto3"
+version = "15.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore-stubs" },
+    { name = "types-aiobotocore" },
+    { name = "types-s3transfer" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/56/76/e162ea2ef8d414d4f36f28a6e0b6078ccef3f2f9d5f957859f303995c528/types_aioboto3-15.5.0.tar.gz", hash = "sha256:5769a1c3df7ca1abedf3656ddf0b970c9b0436d0f88cf4686040b55cd2a02925", size = 81059, upload-time = "2025-10-31T01:11:54.445Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/1d/e187fbe9771dffb5f0801e315ac23a6c383c14d1cbb90da6ca3ad1ea9b06/types_aioboto3-15.5.0-py3-none-any.whl", hash = "sha256:8aed7c9b6fe9b59e6ce74f7a6db7b8a9912a34c8f80ed639fac1fa59d6b20aa1", size = 42521, upload-time = "2025-10-31T01:11:47.832Z" },
+]
+
+[[package]]
+name = "types-aiobotocore"
+version = "3.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore-stubs" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b9/e4/5dd83c879eff726931ef222d3ae27f67999c3bc33dfae1ca8237ebccdf17/types_aiobotocore-3.6.0.tar.gz", hash = "sha256:e990056ce9d19094a9d9b36008ca0b2a4d69948ff58f50868dd159a81f6ad69c", size = 87978, upload-time = "2026-05-02T03:05:30.694Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/19/7c/cadd4b4d0bdd6f1cbc601177a115966dabd9afa022287f3f25423274ab97/types_aiobotocore-3.6.0-py3-none-any.whl", hash = "sha256:e38d5340bfb7ecc17a40acfd1043f4ed91af9f8189daa5e438bda2e7d276d406", size = 54805, upload-time = "2026-05-02T03:05:27.911Z" },
+]
+
+[[package]]
 name = "types-aiobotocore-s3"
 version = "3.6.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/66/90/eec276a418a417441a785dd394424fee87682cf34af29fe026f46883149e/types_aiobotocore_s3-3.6.0.tar.gz", hash = "sha256:5eb816af93791b7f42f58b2dd3b5ecfe24da9de414a7390c05c392cf1d9ef5b4", size = 77715, upload-time = "2026-05-02T03:03:31.274Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e7/df/4f2dce96e6b71f3d8287351558824021a9857eb88506c6eb72c61b23bcb4/types_aiobotocore_s3-3.6.0-py3-none-any.whl", hash = "sha256:5af9f9710c9fe6ba9645852a0b13f6fca4eb44d87a35b0959063341a32f11b37", size = 85450, upload-time = "2026-05-02T03:03:29.054Z" },
+]
+
+[[package]]
+name = "types-awscrt"
+version = "0.31.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/76/26/0aa563e229c269c528a3b8c709fc671ac2a5c564732fab0852ac6ee006cf/types_awscrt-0.31.3.tar.gz", hash = "sha256:09d3eaf00231e0f47e101bd9867e430873bc57040050e2a3bd8305cb4fc30865", size = 18178, upload-time = "2026-03-08T02:31:14.569Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3e/e5/47a573bbbd0a790f8f9fe452f7188ea72b212d21c9be57d5fc0cbc442075/types_awscrt-0.31.3-py3-none-any.whl", hash = "sha256:e5ce65a00a2ab4f35eacc1e3d700d792338d56e4823ee7b4dbe017f94cfc4458", size = 43340, upload-time = "2026-03-08T02:31:13.38Z" },
+]
+
+[[package]]
+name = "types-s3transfer"
+version = "0.16.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/64/42689150509eb3e6e82b33ee3d89045de1592488842ddf23c56957786d05/types_s3transfer-0.16.0.tar.gz", hash = "sha256:b4636472024c5e2b62278c5b759661efeb52a81851cde5f092f24100b1ecb443", size = 13557, upload-time = "2025-12-08T08:13:09.928Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/98/27/e88220fe6274eccd3bdf95d9382918716d312f6f6cef6a46332d1ee2feff/types_s3transfer-0.16.0-py3-none-any.whl", hash = "sha256:1c0cd111ecf6e21437cb410f5cddb631bfb2263b77ad973e79b9c6d0cb24e0ef", size = 19247, upload-time = "2025-12-08T08:13:08.426Z" },
 ]
 
 [[package]]
@@ -2583,6 +2643,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ba/19/1b9b0e29f30c6d35cb345486df41110984ea67ae69dddbc0e8a100999493/tzdata-2026.2.tar.gz", hash = "sha256:9173fde7d80d9018e02a662e168e5a2d04f87c41ea174b139fbef642eda62d10", size = 198254, upload-time = "2026-04-24T15:22:08.651Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ce/e4/dccd7f47c4b64213ac01ef921a1337ee6e30e8c6466046018326977efd95/tzdata-2026.2-py2.py3-none-any.whl", hash = "sha256:bbe9af844f658da81a5f95019480da3a89415801f6cc966806612cc7169bffe7", size = 349321, upload-time = "2026-04-24T15:22:05.876Z" },
+]
+
+[[package]]
+name = "uidgen"
+version = "1.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/90/4cbaff7ed1c883997f8e4d5f91691b5aa57586c23983aea430d728661b03/uidgen-1.0.2.tar.gz", hash = "sha256:f8ffd65aa4ca9189b7fe1bb12bc34abd230ba398f9ee337b1a7ed63582fc6d0a", size = 14084, upload-time = "2024-05-02T01:14:02.983Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3e/26/2017cc2619465851ae3c6d9b323795ff72852b55a1b89b9a41e522780652/uidgen-1.0.2-py3-none-any.whl", hash = "sha256:fc7c311ff3ba36c8f413147120f0bff49b4eac1b186a06e9e6ed99f342bb3ae5", size = 15203, upload-time = "2024-05-02T01:13:59.461Z" },
 ]
 
 [[package]]

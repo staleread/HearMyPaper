@@ -18,6 +18,7 @@ CREATE TABLE action_logs (
     id SERIAL PRIMARY KEY,
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     actor_spiffe_id VARCHAR(255), -- Logs if a service (SVID) performed the action
+    actor_pseudonym VARCHAR(100), -- Human-readable pseudonym for curators
     user_id INTEGER REFERENCES users(id),
     action VARCHAR(100) NOT NULL,
     is_success BOOLEAN NOT NULL,

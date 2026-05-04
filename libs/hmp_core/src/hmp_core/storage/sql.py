@@ -1,11 +1,14 @@
+from collections.abc import Callable
+from contextlib import contextmanager
+from typing import Any, TypeVar
+from uuid import UUID
+
 from sqlalchemy import text
 from sqlalchemy.engine import Connection, Engine
-from typing import TypeVar, Callable, Any
-from contextlib import contextmanager
 
 T = TypeVar("T")
 RowDict = dict[str, Any]
-SupportedData = str | int | float | bool | list[Any] | bytes | None
+SupportedData = str | int | float | bool | list[Any] | bytes | UUID | None
 
 
 class SqlRunner:
@@ -18,11 +21,11 @@ class SqlRunner:
         self.kwargs: dict[str, Any] = {}
         self.sql: str = ""
 
-    def query(self, sql: str) -> "SqlRunner":
+    def query(self, sql: str) -> SqlRunner:
         self.sql = sql
         return self
 
-    def bind(self, **kwargs: SupportedData) -> "SqlRunner":
+    def bind(self, **kwargs: SupportedData) -> SqlRunner:
         self.kwargs = kwargs
         return self
 
@@ -77,11 +80,11 @@ class TransactionalSqlRunner:
         with self._engine.begin() as conn:
             yield conn
 
-    def query(self, sql: str) -> "TransactionalSqlRunner":
+    def query(self, sql: str) -> TransactionalSqlRunner:
         self.sql = sql
         return self
 
-    def bind(self, **kwargs: SupportedData) -> "TransactionalSqlRunner":
+    def bind(self, **kwargs: SupportedData) -> TransactionalSqlRunner:
         self.kwargs = kwargs
         return self
 
