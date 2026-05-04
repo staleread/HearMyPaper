@@ -10,7 +10,7 @@ dependencies = []
 members = [
     "libs/hmp_core",
     "apps/hmp_manager",
-    "apps/hmp_tts",
+    "apps/hmp_converter",
     "apps/hmp_client",
 ]
 

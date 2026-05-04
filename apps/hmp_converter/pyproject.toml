@@ -1,7 +1,7 @@
 [project]
-name = "hmp-tts"
+name = "hmp-converter"
 version = "0.1.0"
-description = "HearMyPaper Text-To-Speach service"
+description = "HearMyPaper file conversion service"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
