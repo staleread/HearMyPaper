@@ -29,6 +29,7 @@ def get_postgres_runner(connection: PostgresConnectionDep) -> SqlRunner:
 
 PostgresRunnerDep = Annotated[SqlRunner, Depends(get_postgres_runner)]
 
+
 @asynccontextmanager
 async def get_db_runner_context() -> AsyncGenerator[SqlRunner, None]:
     """Provides a SqlRunner for background tasks or non-FastAPI contexts."""

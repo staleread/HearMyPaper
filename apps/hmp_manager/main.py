@@ -25,12 +25,12 @@ async def lifespan(_app: FastAPI):
         get_env_settings().redis_url, encoding="utf-8", decode_responses=True
     )
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-    
+
     # 2. Start Background RabbitMQ Consumer for Conversion Results
     result_task = asyncio.create_task(run_result_consumer())
-    
+
     yield
-    
+
     # 3. Shutdown Cleanup
     result_task.cancel()
     await close_rabbitmq_connection()

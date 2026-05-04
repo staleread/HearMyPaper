@@ -10,12 +10,13 @@ from . import service
 
 router = APIRouter()
 
+
 @router.post("/intent", response_model=ConversionIntentResponse)
 async def post_conversion_intent(
     payload: ConversionIntentRequest,
     identity: IdentityDep,
     db: PostgresRunnerDep,
-    storage: ObjectStorageClient = Depends(get_storage_client)
+    storage: ObjectStorageClient = Depends(get_storage_client),
 ):
     """
     Endpoint for instructors to declare intent to convert a submission.
@@ -25,12 +26,13 @@ async def post_conversion_intent(
         identity, payload, db=db, storage=storage
     )
 
+
 @router.post("/{conversion_uuid}/commit", status_code=status.HTTP_204_NO_CONTENT)
 async def post_conversion_commit(
     conversion_uuid: UUID,
     identity: IdentityDep,
     db: PostgresRunnerDep,
-    event_client: EventClient = Depends(get_event_client)
+    event_client: EventClient = Depends(get_event_client),
 ):
     """
     Finalizes a conversion job after the client has uploaded the re-encrypted file.

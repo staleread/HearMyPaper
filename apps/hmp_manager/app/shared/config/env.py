@@ -4,7 +4,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class EnvSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env.development", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env.development", env_file_encoding="utf-8"
+    )
 
     jwt_secret: str = "4jez3Ruh5sbVMChP"
     jwt_algorithm: str = "HS256"

@@ -3,6 +3,7 @@ from app.shared.config.env import get_env_settings
 
 _storage_client: ObjectStorageClient | None = None
 
+
 def get_storage_client() -> ObjectStorageClient:
     global _storage_client
     if _storage_client is None:

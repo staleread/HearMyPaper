@@ -54,7 +54,7 @@ async def resolve_workload_access_claims(kwargs: dict[str, Any]) -> AccessClaims
         )
 
     spiffe_id = getattr(request.state, "spiffe_id", None)
-    
+
     # In production, we'd use the OPAClient here:
     # claims = await OPAClient().get_workload_claims(spiffe_id)
     # if claims: return claims

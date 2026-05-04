@@ -9,18 +9,20 @@ if TYPE_CHECKING:
 else:
     S3Client = object
 
+
 class ObjectStorageClient:
     """
     Asynchronous S3/MinIO client wrapper using aioboto3.
-    Supports the 'Claim Check' pattern by allowing secure file 
+    Supports the 'Claim Check' pattern by allowing secure file
     upload and download from object storage.
     """
+
     def __init__(
-        self, 
-        endpoint_url: str, 
-        access_key: str, 
-        secret_key: str, 
-        region_name: str = "us-east-1"
+        self,
+        endpoint_url: str,
+        access_key: str,
+        secret_key: str,
+        region_name: str = "us-east-1",
     ):
         self.session = aioboto3.Session()
         self.endpoint_url = endpoint_url

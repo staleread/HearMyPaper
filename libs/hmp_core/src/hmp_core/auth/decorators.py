@@ -41,5 +41,7 @@ def authorize(
             )
 
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator

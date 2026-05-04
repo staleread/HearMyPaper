@@ -8,12 +8,13 @@ from .dto import ConversionIntentRequest, ConversionIntentResponse
 from . import repository
 from app.user.repository import get_user_id_by_pseudonym
 
+
 async def create_conversion_intent(
     identity: IdentityContext,
     payload: ConversionIntentRequest,
     *,
     db: SqlRunner,
-    storage: ObjectStorageClient
+    storage: ObjectStorageClient,
 ) -> ConversionIntentResponse:
     """
     Orchestrates the conversion intent for an Instructor:
@@ -36,9 +37,7 @@ async def create_conversion_intent(
     bucket_name = "hmp-processing"
     await storage.ensure_bucket(bucket_name)
     upload_url = await storage.get_presigned_upload_url(
-        bucket=bucket_name,
-        key=storage_path,
-        expires_in=900
+        bucket=bucket_name, key=storage_path, expires_in=900
     )
 
     # 4. Insert into database
@@ -46,20 +45,20 @@ async def create_conversion_intent(
         submission_id=payload.submission_id,
         instructor_id=instructor_id,
         input_path=storage_path,
-        db=db
+        db=db,
     )
 
     return ConversionIntentResponse(
-        upload_url=upload_url,
-        conversion_uuid=conversion_uuid
+        upload_url=upload_url, conversion_uuid=conversion_uuid
     )
+
 
 async def commit_conversion(
     conversion_uuid: uuid.UUID,
     identity: IdentityContext,
     *,
     db: SqlRunner,
-    event_client: EventClient
+    event_client: EventClient,
 ) -> None:
     """
     Finalizes the conversion intent:
@@ -72,13 +71,17 @@ async def commit_conversion(
     job = repository.get_conversion_by_uuid(conversion_uuid, db=db)
     if not job:
         raise HTTPException(status_code=404, detail="Conversion job not found")
-    
+
     # 2. Security Check
     if job["instructor_pseudonym"] != identity.user_pseudonym:
-        raise HTTPException(status_code=403, detail="Unauthorized to commit this conversion")
-    
+        raise HTTPException(
+            status_code=403, detail="Unauthorized to commit this conversion"
+        )
+
     if job["status"] != "queued":
-        raise HTTPException(status_code=400, detail=f"Job is already in {job['status']} state")
+        raise HTTPException(
+            status_code=400, detail=f"Job is already in {job['status']} state"
+        )
 
     # 3. Update Status
     repository.update_conversion_status(conversion_uuid, status="processing", db=db)
@@ -94,7 +97,7 @@ async def commit_conversion(
         recipient_pseudonym=identity.user_pseudonym,
         confidentiality_level=claims.confidentiality_level,
         input_object_path=job["input_path"],
-        correlation_id=str(uuid.uuid4())
+        correlation_id=str(uuid.uuid4()),
     )
 
     # Ensure exchange is declared before publishing
@@ -103,7 +106,7 @@ async def commit_conversion(
     await event_client.publish(
         routing_key="job.request.pdf",
         payload=task.model_dump_json().encode(),
-        correlation_id=task.correlation_id
+        correlation_id=task.correlation_id,
     )
 
     print(f" [x] Conversion {conversion_uuid} committed and dispatched.")

@@ -8,12 +8,13 @@ from . import service
 
 router = APIRouter()
 
+
 @router.post("/intent", response_model=SubmissionIntentResponse)
 async def post_submission_intent(
     payload: SubmissionIntentRequest,
     identity: IdentityDep,
     db: PostgresRunnerDep,
-    storage: ObjectStorageClient = Depends(get_storage_client)
+    storage: ObjectStorageClient = Depends(get_storage_client),
 ):
     """
     Endpoint for students to declare their intent to submit an encrypted PDF.
@@ -23,17 +24,16 @@ async def post_submission_intent(
         identity, payload, db=db, storage=storage
     )
 
+
 @router.post("/{submission_uuid}/commit", status_code=status.HTTP_204_NO_CONTENT)
 async def post_submission_commit(
     submission_uuid: UUID,
     identity: IdentityDep,
     db: PostgresRunnerDep,
-    storage: ObjectStorageClient = Depends(get_storage_client)
+    storage: ObjectStorageClient = Depends(get_storage_client),
 ):
     """
     Finalizes a submission after the client has uploaded the file to MinIO.
     Verifies file existence and updates the submission status.
     """
-    await service.commit_submission(
-        submission_uuid, identity, db=db, storage=storage
-    )
+    await service.commit_submission(submission_uuid, identity, db=db, storage=storage)

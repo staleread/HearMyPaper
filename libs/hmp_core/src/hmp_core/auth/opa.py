@@ -1,4 +1,3 @@
-
 import httpx
 
 from .models import AccessClaims
@@ -22,8 +21,7 @@ class OPAClient:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    url, 
-                    json={"input": {"spiffe_id": spiffe_id}}
+                    url, json={"input": {"spiffe_id": spiffe_id}}
                 )
                 response.raise_for_status()
                 result = response.json().get("result")
@@ -35,11 +33,11 @@ class OPAClient:
         return None
 
     async def get_stacked_decision(
-        self, 
-        spiffe_id: str | None, 
-        user_claims: AccessClaims, 
+        self,
+        spiffe_id: str | None,
+        user_claims: AccessClaims,
         required_level: str,
-        access_type: str
+        access_type: str,
     ) -> bool:
         """
         Query OPA for a final 'allow' decision based on composite identity.
@@ -50,10 +48,10 @@ class OPAClient:
                 "workload_id": spiffe_id,
                 "user": user_claims.model_dump(),
                 "required_level": required_level,
-                "access_type": access_type
+                "access_type": access_type,
             }
         }
-        
+
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(url, json=input_data)

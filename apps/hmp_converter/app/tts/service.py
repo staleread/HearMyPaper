@@ -9,6 +9,7 @@ from hmp_core.storage import ObjectStorageClient
 from hmp_core.events import EventClient
 from app.shared.config.env import get_env_settings
 
+
 def _detect_language(text: str) -> str:
     try:
         if not text or len(text.strip()) < 10:
@@ -55,17 +56,22 @@ def convert_text_to_audio(text: str, speed: int = 140) -> bytes:
     except subprocess.CalledProcessError as e:
         raise ValueError(f"Text-to-speech conversion failed: {e}")
 
+
 async def get_instructor_public_key(pseudonym: str) -> bytes:
     settings = get_env_settings()
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"{settings.manager_url}/users/{pseudonym}/public-key")
+        response = await client.get(
+            f"{settings.manager_url}/users/{pseudonym}/public-key"
+        )
         response.raise_for_status()
         data = response.json()
         return base64.b64decode(data["public_key"])
 
+
 async def get_worker_private_key() -> bytes:
     # Mock for development:
-    return b"dummy-worker-private-key-32bytes!!" # Must be 32 bytes for X25519
+    return b"dummy-worker-private-key-32bytes!!"  # Must be 32 bytes for X25519
+
 
 async def process_conversion(
     job_id: uuid.UUID,
@@ -73,7 +79,7 @@ async def process_conversion(
     input_path: str,
     speed: int,
     storage: ObjectStorageClient,
-    event_client: EventClient
+    event_client: EventClient,
 ):
     # 1. Download
     encrypted_pdf = await storage.download_file("hmp-processing", input_path)
@@ -87,6 +93,7 @@ async def process_conversion(
 
     # 3. Parse PDF
     from app.parser.service import extract_text_from_pdf
+
     text = extract_text_from_pdf(pdf_bytes)
 
     # 4. TTS
@@ -106,15 +113,12 @@ async def process_conversion(
         "conversion_uuid": str(job_id),
         "output_path": output_path,
         "status": "completed",
-        "metadata": {
-            "size_bytes": len(audio_bytes),
-            "duration_seconds": 0 
-        }
+        "metadata": {"size_bytes": len(audio_bytes), "duration_seconds": 0},
     }
-    
+
     await event_client.declare_exchange("hmp.jobs.results")
     await event_client.publish(
         routing_key="job.result.success",
         payload=json.dumps(status_message).encode(),
-        correlation_id=str(job_id)
+        correlation_id=str(job_id),
     )
