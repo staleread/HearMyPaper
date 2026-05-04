@@ -1,3 +1,4 @@
-from .client import StorageClient
+from .object import ObjectStorageClient
+from .sql import SqlRunner, TransactionalSqlRunner
 
-__all__ = ["StorageClient"]
+__all__ = ["ObjectStorageClient", "SqlRunner", "TransactionalSqlRunner"]

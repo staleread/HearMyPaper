@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 else:
     S3Client = object
 
-class StorageClient:
+class ObjectStorageClient:
     """
     Asynchronous S3/MinIO client wrapper using aioboto3.
     Supports the 'Claim Check' pattern by allowing secure file 
