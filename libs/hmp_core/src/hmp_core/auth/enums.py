@@ -1,14 +1,11 @@
 from enum import Enum, Flag, auto
 
 
-class AccessLevel(Enum):
+class AccessLevel(int, Enum):
     UNCLASSIFIED = 1
     CONTROLLED = 2
     RESTRICTED = 3
     CONFIDENTIAL = 4
-
-    def __lt__(self, other: AccessLevel):
-        return self.value < other.value
 
 
 class AccessType(Flag):
