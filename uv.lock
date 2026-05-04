@@ -9,6 +9,7 @@ resolution-markers = [
 [manifest]
 members = [
     "hmp-client",
+    "hmp-contracts",
     "hmp-converter",
     "hmp-core",
     "hmp-manager",
@@ -1031,6 +1032,7 @@ dependencies = [
     { name = "briefcase" },
     { name = "cbor2" },
     { name = "cryptography" },
+    { name = "hmp-contracts" },
     { name = "hmp-core" },
     { name = "ipinfo" },
     { name = "pydantic" },
@@ -1052,6 +1054,7 @@ requires-dist = [
     { name = "briefcase", specifier = ">=0.3.25" },
     { name = "cbor2", specifier = ">=5.7.0" },
     { name = "cryptography", specifier = ">=46.0.1" },
+    { name = "hmp-contracts", editable = "libs/hmp_contracts" },
     { name = "hmp-core", editable = "libs/hmp_core" },
     { name = "ipinfo", specifier = ">=5.2.1" },
     { name = "pydantic", specifier = ">=2.11.9" },
@@ -1069,12 +1072,44 @@ dev = [
 ]
 
 [[package]]
+name = "hmp-contracts"
+version = "1.0.0"
+source = { editable = "libs/hmp_contracts" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pydantic" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "ruff" },
+    { name = "ty" },
+    { name = "types-aioboto3" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pydantic", specifier = ">=2.13.3" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=9.0.3" },
+    { name = "ruff", specifier = ">=0.15.12" },
+    { name = "ty", specifier = ">=0.0.34" },
+    { name = "types-aioboto3", specifier = ">=15.5.0" },
+]
+
+[[package]]
 name = "hmp-converter"
 version = "0.1.0"
 source = { virtual = "apps/hmp_converter" }
 dependencies = [
     { name = "aio-pika" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "hmp-contracts" },
     { name = "hmp-core" },
     { name = "langdetect" },
     { name = "prometheus-fastapi-instrumentator" },
@@ -1094,6 +1129,7 @@ dev = [
 requires-dist = [
     { name = "aio-pika", specifier = ">=9.6.2" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.136.1" },
+    { name = "hmp-contracts", editable = "libs/hmp_contracts" },
     { name = "hmp-core", editable = "libs/hmp_core" },
     { name = "langdetect", specifier = ">=1.0.9" },
     { name = "prometheus-fastapi-instrumentator", specifier = ">=7.1.0" },
@@ -1166,6 +1202,7 @@ dependencies = [
     { name = "cryptography" },
     { name = "fastapi", extra = ["standard"] },
     { name = "fastapi-cache2", extra = ["redis"] },
+    { name = "hmp-contracts" },
     { name = "hmp-core" },
     { name = "langdetect" },
     { name = "prometheus-fastapi-instrumentator" },
@@ -1197,6 +1234,7 @@ requires-dist = [
     { name = "cryptography", specifier = ">=45.0.7" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
     { name = "fastapi-cache2", extras = ["redis"], specifier = ">=0.2.2" },
+    { name = "hmp-contracts", editable = "libs/hmp_contracts" },
     { name = "hmp-core", editable = "libs/hmp_core" },
     { name = "langdetect", specifier = ">=1.0.9" },
     { name = "prometheus-fastapi-instrumentator", specifier = ">=7.1.0" },

@@ -12,6 +12,7 @@ members = [
     "apps/hmp_manager",
     "apps/hmp_converter",
     "apps/hmp_client",
+    "libs/hmp_contracts",
 ]
 
 [dependency-groups]
