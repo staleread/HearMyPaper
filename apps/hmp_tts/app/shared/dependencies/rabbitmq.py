@@ -1,4 +1,4 @@
-from hmp_core.events.client import EventClient
+from hmp_core.events import EventClient
 from app.shared.config.env import get_env_settings
 
 _event_client: EventClient | None = None

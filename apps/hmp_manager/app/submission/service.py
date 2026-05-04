@@ -1,4 +1,4 @@
-from hmp_core.events.models import ConversionJobTask
+from hmp_core.events import ConversionJobTask
 from app.shared.dependencies.rabbitmq import get_event_client
 
 async def publish_conversion_task(task: ConversionJobTask) -> None:

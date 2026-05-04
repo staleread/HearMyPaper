@@ -1,4 +1,4 @@
-from hmp_core.storage.client import StorageClient
+from hmp_core.storage import StorageClient
 from app.shared.config.env import get_env_settings
 
 _storage_client: StorageClient | None = None

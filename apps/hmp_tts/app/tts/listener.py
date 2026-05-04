@@ -1,6 +1,6 @@
 import asyncio
 import aio_pika
-from hmp_core.events.models import ConversionJobTask
+from hmp_core.events import ConversionJobTask
 from app.shared.dependencies.rabbitmq import get_event_client
 
 async def process_task(message: aio_pika.abc.AbstractIncomingMessage):

@@ -1,6 +1,7 @@
 import aioboto3
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from collections.abc import AsyncGenerator
 
 if TYPE_CHECKING:
     from types_aiobotocore_s3.client import S3Client
