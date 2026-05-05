@@ -21,6 +21,7 @@ dependencies = [
     "pytest>=8.4.2",
     "sqlalchemy>=2.0.43",
     "aio-pika>=9.6.2",
+    "redis>=4.6.0",
 ]
 
 [tool.uv.sources]
@@ -35,4 +36,5 @@ dev = [
     "mypy>=1.18.2",
     "pre-commit>=4.3.0",
     "requests>=2.32.5",
+    "types-redis>=4.6.0.20241004",
 ]
