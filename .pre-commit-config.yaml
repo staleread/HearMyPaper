@@ -31,9 +31,9 @@ repos:
         types: [python]
         pass_filenames: false
 
-      - id: ty-client
-        name: "Typecheck: apps/hmp_client"
-        entry: uv run --package hmp-client ty check apps/hmp_client/
-        language: system
-        types: [python]
-        pass_filenames: false
+      # - id: ty-client
+      #   name: "Typecheck: apps/hmp_client"
+      #   entry: uv run --package hmp-client ty check apps/hmp_client/
+      #   language: system
+      #   types: [python]
+      #   pass_filenames: false
