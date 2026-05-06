@@ -22,6 +22,7 @@ dependencies = [
     "sqlalchemy>=2.0.43",
     "aio-pika>=9.6.2",
     "redis>=4.6.0",
+    "uidgen>=1.0.2",
 ]
 
 [tool.uv.sources]

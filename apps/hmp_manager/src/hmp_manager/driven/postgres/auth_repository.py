@@ -12,16 +12,16 @@ class PostgresAuthRepository(AuthRepository):
         self._sql = SqlRunner(session)
 
     @override
-    async def get_user_by_pseudonym(self, pseudonym: str) -> AuthUser | None:
+    async def get_user_by_id(self, id: str) -> AuthUser | None:
         row = (
             await self._sql.query(
                 """
-                SELECT pseudonym, public_key, confidentiality_level, integrity_levels
+                SELECT id, public_key, confidentiality_level, integrity_levels
                 FROM users
-                WHERE pseudonym = :pseudonym
+                WHERE id = :id
                 """
             )
-            .bind(pseudonym=pseudonym)
+            .bind(id=id)
             .first_row()
         )
 
@@ -29,7 +29,7 @@ class PostgresAuthRepository(AuthRepository):
             return None
 
         return AuthUser(
-            pseudonym=row["pseudonym"],
+            id=row["id"],
             public_key=row["public_key"],
             confidentiality_level=AccessLevel(row["confidentiality_level"]),
             integrity_levels=[AccessLevel(lvl) for lvl in row["integrity_levels"]],

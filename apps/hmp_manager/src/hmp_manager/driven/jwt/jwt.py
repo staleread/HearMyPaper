@@ -16,7 +16,7 @@ class JwtTokenProvider(TokenProvider):
         )
 
         payload = {
-            "sub": user.pseudonym,
+            "sub": user.id,
             "confidentiality_level": user.confidentiality_level.value,
             "integrity_levels": [level.value for level in user.integrity_levels],
             "exp": expires_at,

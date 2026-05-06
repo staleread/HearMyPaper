@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class ChallengeRequest(BaseModel):
-    pseudonym: str
+    id: str
 
 
 class ChallengeResponse(BaseModel):
@@ -10,7 +10,7 @@ class ChallengeResponse(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    pseudonym: str
+    id: str
     challenge_b64: str
     signature_b64: str
 

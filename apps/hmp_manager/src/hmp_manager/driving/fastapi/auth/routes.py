@@ -24,7 +24,7 @@ async def create_challenge(
     service: AuthServiceDep,
 ):
     try:
-        challenge_bytes = await service.start_login(req.pseudonym)
+        challenge_bytes = await service.start_login(req.id)
         return ChallengeResponse(challenge_b64=to_b64(challenge_bytes))
     except UserNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -36,7 +36,7 @@ async def execute_login(
     service: AuthServiceDep,
 ):
     cmd = LoginCommand(
-        pseudonym=req.pseudonym,
+        id=req.id,
         challenge=from_b64(req.challenge_b64),
         signature=from_b64(req.signature_b64),
     )

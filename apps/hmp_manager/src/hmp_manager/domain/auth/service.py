@@ -21,24 +21,24 @@ class AuthService:
         self.challenges = challenges
         self.tokens = tokens
 
-    async def start_login(self, pseudonym: str) -> bytes:
-        user = await self.users.get_user_by_pseudonym(pseudonym)
+    async def start_login(self, id: str) -> bytes:
+        user = await self.users.get_user_by_id(id)
 
         if not user:
-            raise UserNotFoundError(f"No user with pseudonym {pseudonym}")
+            raise UserNotFoundError(f"No user with id {id}")
 
         challenge = generate_challenge()
-        await self.challenges.save_challenge(pseudonym, challenge, ttl=300)
+        await self.challenges.save_challenge(id, challenge, ttl=300)
 
         return challenge
 
     async def finalize_login(self, cmd: LoginCommand) -> AuthToken:
-        user = await self.users.get_user_by_pseudonym(cmd.pseudonym)
+        user = await self.users.get_user_by_id(cmd.id)
 
         if not user:
-            raise UserNotFoundError(f"No user with pseudonym {cmd.pseudonym}")
+            raise UserNotFoundError(f"No user with id {cmd.id}")
 
-        challenge = await self.challenges.get_challenge(cmd.pseudonym)
+        challenge = await self.challenges.get_challenge(cmd.id)
 
         if not challenge or challenge != cmd.challenge:
             raise InvalidChallengeError()
@@ -50,6 +50,6 @@ class AuthService:
         if not is_valid_signature:
             raise AuthenticationFailedError()
 
-        await self.challenges.delete_challenge(cmd.pseudonym)
+        await self.challenges.delete_challenge(cmd.id)
 
         return self.tokens.create_token(user)

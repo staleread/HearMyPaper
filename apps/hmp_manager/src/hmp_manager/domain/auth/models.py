@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class LoginCommand(BaseModel):
-    pseudonym: str
+    id: str
     challenge: bytes
     signature: bytes
 
@@ -17,7 +17,7 @@ class AccessLevel(StrEnum):
 
 
 class AuthUser(BaseModel):
-    pseudonym: str
+    id: str
     confidentiality_level: AccessLevel
     integrity_levels: list[AccessLevel]
     public_key: bytes

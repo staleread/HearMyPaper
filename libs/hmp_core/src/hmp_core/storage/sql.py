@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Any, TypeVar
 from uuid import UUID
 
@@ -8,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 T = TypeVar("T")
 RowDict = dict[str, Any]
-SupportedData = str | int | float | bool | list[Any] | bytes | UUID | None
+SupportedData = str | int | float | bool | list[Any] | bytes | UUID | datetime |None
 
 
 class SqlRunner:

@@ -1,10 +1,14 @@
-class UserNotFoundError(Exception):
+class AuthError(Exception):
     pass
 
 
-class InvalidChallengeError(Exception):
+class UserNotFoundError(AuthError):
     pass
 
 
-class AuthenticationFailedError(Exception):
+class InvalidChallengeError(AuthError):
+    pass
+
+
+class AuthenticationFailedError(AuthError):
     pass
