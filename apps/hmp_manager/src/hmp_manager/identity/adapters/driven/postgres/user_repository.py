@@ -62,33 +62,6 @@ class PostgresUserRepository(UserRepository):
         )
 
     @override
-    async def get_by_email(self, email: str) -> User | None:
-        row = (
-            await self._sql.query(
-                """
-                SELECT id, name, surname, email, confidentiality_level, integrity_levels, created_at
-                FROM users
-                WHERE email = :email
-                """
-            )
-            .bind(email=email)
-            .first_row()
-        )
-
-        if not row:
-            return None
-
-        return User(
-            id=row["id"],
-            name=row["name"],
-            surname=row["surname"],
-            email=row["email"],
-            confidentiality_level=AccessLevel(row["confidentiality_level"]),
-            integrity_levels=[AccessLevel(lvl) for lvl in row["integrity_levels"]],
-            created_at=row["created_at"],
-        )
-
-    @override
     async def get_public_key_by_id(self, id: str) -> bytes | None:
         return (
             await self._sql.query("SELECT public_key FROM users WHERE id = :id")
