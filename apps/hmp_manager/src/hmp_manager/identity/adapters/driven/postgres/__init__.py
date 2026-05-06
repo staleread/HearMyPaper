@@ -1,4 +1,4 @@
 from .auth_repository import PostgresAuthRepository
-from .engine import PostgresEngine
+from .user_repository import PostgresUserRepository
 
-__all__ = ["PostgresAuthRepository", "PostgresEngine"]
+__all__ = ["PostgresAuthRepository", "PostgresUserRepository"]

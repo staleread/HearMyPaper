@@ -1,12 +1,11 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from hmp_manager.identity.adapters.driving.fastapi.dependencies import (
+from .dependencies import (
     get_redis_service,
     get_postgres_engine,
 )
-from .auth import router as auth_router
-from .user import router as users_router
+from .identity.adapters.driving.fastapi import router as auth_router
 
 
 @asynccontextmanager
@@ -19,6 +18,4 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
-app.include_router(auth_router, prefix="/auth", tags=["auth"])
-app.include_router(users_router, prefix="/users", tags=["users"])
+app.include_router(auth_router, prefix="/api/v1", tags=["identity"])

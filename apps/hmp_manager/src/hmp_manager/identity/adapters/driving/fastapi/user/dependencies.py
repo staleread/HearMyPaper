@@ -2,12 +2,12 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from hmp_manager.dependencies import get_postgres
 from hmp_manager.identity.domain.services import UserService
-from hmp_manager.identity.adapters.driven.postgres.user_repository import (
+from hmp_manager.identity.adapters.driven.postgres import (
     PostgresUserRepository,
 )
 from hmp_manager.identity.adapters.driven.identity import PseudonymIdentityProvider
-from hmp_manager.identity.adapters.driving.fastapi.dependencies import get_postgres
 
 
 def get_user_service(
