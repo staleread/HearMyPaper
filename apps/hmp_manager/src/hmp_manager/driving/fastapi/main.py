@@ -1,8 +1,12 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from .dependencies import get_redis_service, get_postgres_engine
 
-from .auth.routes import router as auth_router
+from hmp_manager.driving.fastapi.dependencies import (
+    get_redis_service,
+    get_postgres_engine,
+)
+from hmp_manager.driving.fastapi.auth.routes import router as auth_router
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):

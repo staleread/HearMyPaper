@@ -1,8 +1,8 @@
 from functools import lru_cache
 
 from hmp_manager.config import get_settings
-from hmp_manager.out.postgres.engine import PostgresEngine
-from hmp_manager.out.redis.client import RedisClient
+from hmp_manager.driven.postgres.engine import PostgresEngine
+from hmp_manager.driven.redis.client import RedisClient
 
 
 @lru_cache

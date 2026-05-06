@@ -4,11 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio import Redis
 
 from hmp_manager.domain.auth.service import AuthService
-from hmp_manager.out.postgres import PostgresAuthRepository
-from hmp_manager.out.redis import RedisChallengeRepository
-from hmp_manager.out.jwt import JwtTokenProvider
-
-from ..dependencies import get_postgres, get_redis
+from hmp_manager.driven.postgres import PostgresAuthRepository
+from hmp_manager.driven.redis import RedisChallengeRepository
+from hmp_manager.driven.jwt import JwtTokenProvider
+from hmp_manager.driving.fastapi.dependencies import get_postgres, get_redis
 
 
 def get_auth_service(
@@ -20,3 +19,6 @@ def get_auth_service(
     tokens = JwtTokenProvider()
 
     return AuthService(users=users, challenges=challenges, tokens=tokens)
+
+
+AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]

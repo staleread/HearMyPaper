@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import IntEnum
+from enum import StrEnum
 from pydantic import BaseModel
 
 
@@ -9,11 +9,11 @@ class LoginCommand(BaseModel):
     signature: bytes
 
 
-class AccessLevel(IntEnum):
-    UNCLASSIFIED = 1
-    CONTROLLED = 2
-    RESTRICTED = 3
-    CONFIDENTIAL = 4
+class AccessLevel(StrEnum):
+    UNCLASSIFIED = "UNCLASSIFIED"
+    CONTROLLED = "CONTROLLED"
+    RESTRICTED = "RESTRICTED"
+    CONFIDENTIAL = "CONFIDENTIAL"
 
 
 class AuthUser(BaseModel):
