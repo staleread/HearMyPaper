@@ -82,7 +82,7 @@ def verify(data: bytes, *, signature: bytes, public_key_bytes: bytes) -> bool:
     """Verify an Ed25519 signature."""
     verify_key = nacl.signing.VerifyKey(public_key_bytes)
     try:
-        verify_key.verify(data, signature)
+        _ = verify_key.verify(data, signature)
         return True
     except nacl.exceptions.BadSignatureError:
         return False
