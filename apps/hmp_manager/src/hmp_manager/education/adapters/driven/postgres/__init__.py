@@ -1,4 +1,7 @@
-from .project_repository import PostgresProjectRepository
-from .project_student_repository import PostgresProjectStudentRepository
+from .project_repository import PostgresProjectRepositoryAdapter
+from .project_student_repository import PostgresProjectStudentRepositoryAdapter
 
-__all__ = ["PostgresProjectRepository", "PostgresProjectStudentRepository"]
+__all__ = [
+    "PostgresProjectRepositoryAdapter",
+    "PostgresProjectStudentRepositoryAdapter",
+]

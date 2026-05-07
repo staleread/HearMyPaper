@@ -3,10 +3,12 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from hmp_core.storage import SqlRunner
-from hmp_manager.education.domain.ports import ProjectStudentRepository
+from hmp_manager.education.domain.ports.outgoing.project_student_repository import (
+    ProjectStudentRepositoryPort,
+)
 
 
-class PostgresProjectStudentRepository(ProjectStudentRepository):
+class PostgresProjectStudentRepositoryAdapter(ProjectStudentRepositoryPort):
     def __init__(self, session: AsyncSession):
         self._session = session
         self._sql = SqlRunner(session)

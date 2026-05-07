@@ -4,10 +4,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from hmp_core.storage import SqlRunner
 from hmp_manager.education.domain.models import Project
-from hmp_manager.education.domain.ports import ProjectRepository
+from hmp_manager.education.domain.ports.outgoing import (
+    ProjectRepositoryPort,
+)
 
 
-class PostgresProjectRepository(ProjectRepository):
+class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
     def __init__(self, session: AsyncSession):
         self._session = session
         self._sql = SqlRunner(session)
