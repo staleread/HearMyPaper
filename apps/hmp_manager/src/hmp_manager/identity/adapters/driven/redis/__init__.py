@@ -1,3 +1,3 @@
-from .challenge_repository import RedisChallengeRepository
+from .challenge_repository import RedisChallengeRepositoryAdapter
 
-__all__ = ["RedisChallengeRepository"]
+__all__ = ["RedisChallengeRepositoryAdapter"]

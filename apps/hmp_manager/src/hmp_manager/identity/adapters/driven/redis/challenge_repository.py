@@ -1,10 +1,10 @@
 from typing import Any, override
 import redis.asyncio as aioredis
 
-from hmp_manager.identity.domain.ports import ChallengeRepository
+from hmp_manager.identity.domain.ports.outgoing import ChallengeRepositoryPort
 
 
-class RedisChallengeRepository(ChallengeRepository):
+class RedisChallengeRepositoryAdapter(ChallengeRepositoryPort):
     def __init__(self, client: aioredis.Redis[Any]):
         self._client = client
 

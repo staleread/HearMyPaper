@@ -1,3 +1,3 @@
-from .pseudonym_provider import PseudonymIdentityProvider
+from .pseudonym_provider import PseudonymIdentityProviderAdapter
 
-__all__ = ["PseudonymIdentityProvider"]
+__all__ = ["PseudonymIdentityProviderAdapter"]

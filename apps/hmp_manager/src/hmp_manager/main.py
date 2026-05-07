@@ -5,7 +5,7 @@ from .dependencies import (
     get_redis_service,
     get_postgres_engine,
 )
-from .identity.adapters.driving.fastapi import router as auth_router
+from .identity.adapters.driving.fastapi import router as identity_router
 from .education.adapters.driving.fastapi import router as education_router
 
 
@@ -19,5 +19,5 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(auth_router, prefix="/api/v1/id", tags=["identity"])
-app.include_router(education_router, prefix="/api/v1/edu", tags=["education"])
+app.include_router(identity_router, prefix="/api/v1", tags=["identity"])
+app.include_router(education_router, prefix="/api/v1", tags=["education"])

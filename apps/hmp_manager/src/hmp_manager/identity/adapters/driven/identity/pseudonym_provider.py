@@ -1,10 +1,10 @@
 import uidgen
 from typing import override
 
-from hmp_manager.identity.domain.ports import IdentityProvider
+from hmp_manager.identity.domain.ports.outgoing import IdentityProviderPort
 
 
-class PseudonymIdentityProvider(IdentityProvider):
+class PseudonymIdentityProviderAdapter(IdentityProviderPort):
     @override
     def generate(self) -> str:
         return uidgen.generate()

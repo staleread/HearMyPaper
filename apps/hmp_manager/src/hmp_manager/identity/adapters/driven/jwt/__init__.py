@@ -1,3 +1,3 @@
-from .jwt import JwtTokenProvider
+from .jwt import JwtTokenProviderAdapter
 
-__all__ = ["JwtTokenProvider"]
+__all__ = ["JwtTokenProviderAdapter"]

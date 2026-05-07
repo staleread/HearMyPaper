@@ -2,12 +2,15 @@ from typing import override
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from hmp_core.storage import SqlRunner
-from hmp_manager.identity.domain.models import User, UserUpdate
-from hmp_manager.identity.domain.ports import UserRepository
+from hmp_manager.identity.domain.models import User
+from hmp_manager.identity.domain.ports.outgoing import (
+    UserRepositoryPort,
+    UserUpdateCommand,
+)
 from hmp_manager.identity.domain.enums import AccessLevel
 
 
-class PostgresUserRepository(UserRepository):
+class PostgresUserRepositoryAdapter(UserRepositoryPort):
     def __init__(self, session: AsyncSession):
         self._session = session
         self._sql = SqlRunner(session)
@@ -70,7 +73,7 @@ class PostgresUserRepository(UserRepository):
         )
 
     @override
-    async def update(self, id: str, user_update: UserUpdate) -> User:
+    async def update(self, id: str, user_update: UserUpdateCommand) -> User:
         await (
             self._sql.query(
                 """

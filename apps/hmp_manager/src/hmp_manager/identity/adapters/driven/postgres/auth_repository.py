@@ -4,10 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from hmp_core.storage import SqlRunner
 from hmp_manager.identity.domain.enums import AccessLevel
 from hmp_manager.identity.domain.models import AuthUser
-from hmp_manager.identity.domain.ports import AuthRepository
+from hmp_manager.identity.domain.ports.outgoing import AuthRepositoryPort
 
 
-class PostgresAuthRepository(AuthRepository):
+class PostgresAuthRepositoryAdapter(AuthRepositoryPort):
     def __init__(self, session: AsyncSession):
         self._session = session
         self._sql = SqlRunner(session)

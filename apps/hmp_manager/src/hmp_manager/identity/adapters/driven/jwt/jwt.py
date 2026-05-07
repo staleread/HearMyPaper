@@ -3,11 +3,12 @@ import jwt
 from datetime import datetime, timedelta, timezone
 
 from hmp_manager.config import get_settings
-from hmp_manager.identity.domain.models import AuthUser, AuthToken
-from hmp_manager.identity.domain.ports import TokenProvider
+from hmp_manager.identity.domain.models import AuthUser
+from hmp_manager.identity.domain.ports.incoming import AuthToken
+from hmp_manager.identity.domain.ports.outgoing import TokenProviderPort
 
 
-class JwtTokenProvider(TokenProvider):
+class JwtTokenProviderAdapter(TokenProviderPort):
     @override
     def create_token(self, user: AuthUser) -> AuthToken:
         settings = get_settings().jwt
