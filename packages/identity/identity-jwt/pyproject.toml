@@ -1,0 +1,20 @@
+[project]
+name = "identity-jwt"
+version = "1.0.0"
+description = "JWT provider for HMP identity module"
+readme = "README.md"
+authors = [
+    { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "identity-core",
+    "pyjwt>=2.12.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+identity-core = { workspace = true }
