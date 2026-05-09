@@ -1,4 +1,4 @@
--- UP
+-- migrate:up
 CREATE TABLE users (
     id VARCHAR(75) PRIMARY KEY,
     name VARCHAR(75) NOT NULL,
@@ -11,5 +11,5 @@ CREATE TABLE users (
     CONSTRAINT unique_user_name UNIQUE (name, surname)
 );
 
--- DOWN
+-- migrate:down
 DROP TABLE IF EXISTS users;

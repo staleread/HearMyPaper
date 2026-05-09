@@ -1,16 +1,39 @@
-from collections.abc import AsyncGenerator
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
+
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 
-class PostgresEngine:
-    def __init__(self, connection_url: str):
-        self.engine = create_async_engine(connection_url)
-        self.session_factory = async_sessionmaker(self.engine, expire_on_commit=False)
+class PostgresClient:
+    def __init__(self, url: str, echo: bool = False) -> None:
+        self._engine: AsyncEngine = create_async_engine(url, echo=echo)
+        self._session_factory = async_sessionmaker(
+            self._engine,
+            expire_on_commit=False,
+            class_=AsyncSession,
+        )
 
-    async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
-        async with self.session_factory() as session:
+    async def dispose(self) -> None:
+        await self._engine.dispose()
+
+    @asynccontextmanager
+    async def session(self) -> AsyncIterator[AsyncSession]:
+        async with self._session_factory() as session:
+            try:
+                yield session
+            except Exception:
+                await session.rollback()
+                raise
+            finally:
+                await session.close()
+
+    @asynccontextmanager
+    async def transactional_session(self) -> AsyncIterator[AsyncSession]:
+        async with self.session() as session:
             async with session.begin():
                 yield session
-
-    async def disconnect(self):
-        await self.engine.dispose()

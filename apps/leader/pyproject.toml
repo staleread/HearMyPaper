@@ -1,0 +1,34 @@
+[project]
+name = "leader"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "blacksheep>=2.6.2",
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.1",
+    "uvicorn>=0.46.0",
+    "identity-api",
+    "identity-core",
+    "identity-postgres",
+    "identity-jwt",
+    "identity-redis",
+    "identity-id",
+    "identity-ch-gen",
+    "identity-signture",
+    "shared-kernel",
+    "rodi>=2.0.8",
+    "blacksheep-prometheus>=0.1.8",
+]
+
+[tool.uv.sources]
+identity-api = { workspace = true }
+identity-core = { workspace = true }
+identity-postgres = { workspace = true }
+identity-jwt = { workspace = true }
+identity-redis = { workspace = true }
+identity-id = { workspace = true }
+identity-ch-gen = { workspace = true }
+identity-signture = { workspace = true }
+shared-kernel = { workspace = true }

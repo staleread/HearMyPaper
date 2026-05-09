@@ -1,0 +1,20 @@
+[tools]
+dbmate = "latest"
+python = "3.14"
+
+[env]
+DATABASE_URL = "postgres://user:password@localhost:5432/hmp-postgres?sslmode=disable"
+APP_SHOW_ERROR_DETAILS = "True"
+
+[tasks."leader:migrate"]
+description = "Run migrations for identity modules"
+run = "./scripts/leader-migrate"
+
+[tasks."leader:init-user"]
+description = "Initialize initial admin user"
+run = "uv run --package leader mise-tasks/leader-init-user.py"
+
+[tasks."leader:dev"]
+description = "Start leader app in development mode"
+dir = "apps/leader"
+run = "uv run uvicorn main:app --reload"

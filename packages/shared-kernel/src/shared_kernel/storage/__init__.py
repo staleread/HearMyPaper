@@ -1,13 +1,10 @@
 from .object import ObjectStorageClient, ObjectStorageRunner
-from .sql import SqlRunner, TransactionalSqlRunner
-from .postgres import PostgresEngine
+from .postgres import PostgresClient
 from .redis import RedisClient
 
 __all__ = [
     "ObjectStorageClient",
     "ObjectStorageRunner",
-    "SqlRunner",
-    "TransactionalSqlRunner",
-    "PostgresEngine",
+    "PostgresClient",
     "RedisClient",
 ]

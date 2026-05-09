@@ -8,11 +8,21 @@ dependencies = []
 
 [tool.uv.workspace]
 members = [
-    "libs/hmp_core",
-    "apps/hmp_manager",
-    "apps/hmp_converter",
-    "apps/hmp_client",
-    "libs/hmp_contracts",
+    "packages/shared-kernel",
+    "packages/identity/identity-core",
+    "packages/identity/identity-api",
+    "packages/identity/identity-postgres",
+    "packages/identity/identity-redis",
+    "packages/identity/identity-id",
+    "packages/identity/identity-jwt",
+    "packages/identity/identity-ch-gen",
+    "packages/identity/identity-signture",
+    "packages/education/education-core",
+    "packages/education/education-fastapi",
+    "packages/education/education-postgres",
+    "packages/education/education-identity-acl",
+    "apps/leader",
+    "apps/worker",
 ]
 
 [dependency-groups]

@@ -1,7 +1,7 @@
 from typing import override
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared_kernel.storage import SqlRunner
 from identity_core.enums import AccessLevel
 from identity_core.models import AuthUser
 from identity_core.ports.outgoing.auth_repository import AuthRepositoryPort
@@ -10,21 +10,20 @@ from identity_core.ports.outgoing.auth_repository import AuthRepositoryPort
 class PostgresAuthRepositoryAdapter(AuthRepositoryPort):
     def __init__(self, session: AsyncSession):
         self._session = session
-        self._sql = SqlRunner(session)
 
     @override
     async def get_user_by_id(self, id: str) -> AuthUser | None:
-        row = (
-            await self._sql.query(
+        result = await self._session.execute(
+            text(
                 """
                 SELECT id, public_key, confidentiality_level, integrity_levels
-                FROM users
+                FROM identity.users
                 WHERE id = :id
                 """
-            )
-            .bind(id=id)
-            .first_row()
+            ),
+            {"id": id},
         )
+        row = result.mappings().first()
 
         if not row:
             return None

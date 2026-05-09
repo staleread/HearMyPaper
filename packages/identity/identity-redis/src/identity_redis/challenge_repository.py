@@ -1,11 +1,11 @@
-from typing import Any, override
+from typing import override
 import redis.asyncio as aioredis
 
 from identity_core.ports.outgoing.challenge_repository import ChallengeRepositoryPort
 
 
 class RedisChallengeRepositoryAdapter(ChallengeRepositoryPort):
-    def __init__(self, client: aioredis.Redis[Any]):
+    def __init__(self, client: aioredis.Redis):
         self._client = client
 
     @override

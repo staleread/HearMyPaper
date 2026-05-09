@@ -1,30 +1,18 @@
 services:
-  manager:
-    container_name: hmp-manager
+
+  leader:
+    container_name: hmp-leader
     build:
       context: .
-      dockerfile: apps/hmp_manager/Dockerfile
+      dockerfile: apps/leader/Dockerfile
       target: dev
-    env_file: .env.development
+    env_file: apps/leader/.env.development
     environment:
-      JWT_SECRET: 4jez3Ruh5sbVMChP
-      JWT_ALGORITHM: HS256
-      JWT_LIFETIME_SEC: 90000
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_USER: default
-      REDIS_PASSWORD: password
-      REDIS_DB: 0
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: hmp-postgres
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
-      MINIO_URL: http://minio:9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
-      # For dbmate migrations
+      REDIS__HOST: redis
+      POSTGRES__HOST: postgres
+      RABBITMQ__URL: amqp://guest:guest@rabbitmq:5672/
+      MINIO__URL: http://minio:9000
+      # For dbmate migrations inside container
       DATABASE_URL: postgres://user:password@postgres:5432/hmp-postgres?sslmode=disable
     ports:
       - "8000:8000"
@@ -39,31 +27,6 @@ services:
       rabbitmq:
         condition: service_started
       minio:
-        condition: service_started
-
-  converter:
-    container_name: hmp-converter
-    build:
-      context: .
-      dockerfile: apps/hmp_converter/Dockerfile
-      target: dev
-    env_file: .env.development
-    environment:
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
-      MINIO_URL: http://minio:9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
-      MANAGER_URL: http://manager:8000
-      SPIFFE_ENDPOINT_SOCKET: unix:///run/spire/sockets/agent.sock
-    volumes:
-      - .:/app
-      - /app/.venv
-    depends_on:
-      rabbitmq:
-        condition: service_started
-      minio:
-        condition: service_started
-      manager:
         condition: service_started
 
   postgres:

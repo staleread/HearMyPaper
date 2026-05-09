@@ -53,6 +53,9 @@ class AuthController(Controller):
 
     @post("/challenge")
     async def create_challenge(self, data: FromJSON[ChallengeRequest]):
+        """
+        Generate a cryptographic challenge for user authentication.
+        """
         req = data.value
         try:
             challenge_bytes = await self.init_login_port(req.id)
@@ -62,6 +65,9 @@ class AuthController(Controller):
 
     @post("/login")
     async def execute_login(self, data: FromJSON[LoginRequest]):
+        """
+        Finalize user authentication and issue an access token.
+        """
         req = data.value
         cmd = LoginCommand(
             id=req.id,
