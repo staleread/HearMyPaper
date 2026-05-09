@@ -8,6 +8,8 @@ dependencies = []
 
 [tool.uv.workspace]
 members = [
+    "apps/client",
+    "apps/leader",
     "packages/shared-kernel",
     "packages/identity/identity-core",
     "packages/identity/identity-api",
@@ -18,11 +20,14 @@ members = [
     "packages/identity/identity-ch-gen",
     "packages/identity/identity-signture",
     "packages/education/education-core",
-    "packages/education/education-fastapi",
+    "packages/education/education-api",
     "packages/education/education-postgres",
-    "packages/education/education-identity-acl",
-    "apps/leader",
-    "apps/worker",
+    "packages/education/education-identity-bridge",
+    "packages/submissions/submissions-core",
+    "packages/submissions/submissions-api",
+    "packages/submissions/submissions-postgres",
+    "packages/submissions/submissions-storage",
+    "packages/submissions/submissions-education-bridge",
 ]
 
 [dependency-groups]
