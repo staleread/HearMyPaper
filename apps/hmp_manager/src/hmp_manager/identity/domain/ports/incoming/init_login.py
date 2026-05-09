@@ -1,5 +1,0 @@
-from typing import Protocol
-
-
-class InitLoginPort(Protocol):
-    async def __call__(self, id: str) -> bytes: ...

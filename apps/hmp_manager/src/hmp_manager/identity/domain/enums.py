@@ -1,8 +1,0 @@
-from enum import StrEnum
-
-
-class AccessLevel(StrEnum):
-    UNCLASSIFIED = "UNCLASSIFIED"
-    CONTROLLED = "CONTROLLED"
-    RESTRICTED = "RESTRICTED"
-    CONFIDENTIAL = "CONFIDENTIAL"
