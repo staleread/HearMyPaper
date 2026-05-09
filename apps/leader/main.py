@@ -49,6 +49,37 @@ from identity_id import PseudonymIdentityProviderAdapter
 from identity_ch_gen import NativeChallengeGeneratorAdapter
 from identity_signture import SignatureVerifierAdapter
 
+import education_api  # noqa: F401
+from education_core.ports.incoming import (
+    GetUserProjectsPort,
+    GetProjectPort,
+    CreateProjectPort,
+    UpdateProjectPort,
+    GetProjectStudentsPort,
+    AssignStudentToProjectPort,
+    RemoveStudentFromProjectPort,
+)
+from education_core.use_cases import (
+    GetUserProjectsUseCase,
+    GetProjectUseCase,
+    CreateProjectUseCase,
+    UpdateProjectUseCase,
+    GetProjectStudentsUseCase,
+    AssignStudentToProjectUseCase,
+    RemoveStudentFromProjectUseCase,
+)
+from education_core.ports.outgoing.project_repository import ProjectRepositoryPort
+from education_core.ports.outgoing.project_student_repository import (
+    ProjectStudentRepositoryPort,
+)
+from education_core.ports.outgoing.identity_service import IdentityServicePort
+
+from education_postgres import (
+    PostgresProjectRepositoryAdapter,
+    PostgresProjectStudentRepositoryAdapter,
+)
+from education_identity_bridge import IdentityServiceAdapter
+
 from utils import use_postgres, use_redis
 
 
@@ -88,6 +119,18 @@ jwt_provider = JwtTokenProviderAdapter(
     .add_scoped(InitLoginPort, InitLoginUseCase)
     .add_scoped(FinalizeLoginPort, FinalizeLoginUseCase)
     .add_scoped(CreateInitialUserPort, CreateInitialUserUseCase)
+    # Outgoing education adapters
+    .add_scoped(ProjectRepositoryPort, PostgresProjectRepositoryAdapter)
+    .add_scoped(ProjectStudentRepositoryPort, PostgresProjectStudentRepositoryAdapter)
+    .add_scoped(IdentityServicePort, IdentityServiceAdapter)
+    # Education use cases
+    .add_scoped(GetUserProjectsPort, GetUserProjectsUseCase)
+    .add_scoped(GetProjectPort, GetProjectUseCase)
+    .add_scoped(CreateProjectPort, CreateProjectUseCase)
+    .add_scoped(UpdateProjectPort, UpdateProjectUseCase)
+    .add_scoped(GetProjectStudentsPort, GetProjectStudentsUseCase)
+    .add_scoped(AssignStudentToProjectPort, AssignStudentToProjectUseCase)
+    .add_scoped(RemoveStudentFromProjectPort, RemoveStudentFromProjectUseCase)
 )
 
 

@@ -20,6 +20,10 @@ dependencies = [
     "shared-kernel",
     "rodi>=2.0.8",
     "blacksheep-prometheus>=0.1.8",
+    "education-core",
+    "education-api",
+    "education-postgres",
+    "education-identity-bridge",
 ]
 
 [tool.uv.sources]
@@ -32,3 +36,7 @@ identity-id = { workspace = true }
 identity-ch-gen = { workspace = true }
 identity-signture = { workspace = true }
 shared-kernel = { workspace = true }
+education-core = { workspace = true }
+education-api = { workspace = true }
+education-postgres = { workspace = true }
+education-identity-bridge = { workspace = true }

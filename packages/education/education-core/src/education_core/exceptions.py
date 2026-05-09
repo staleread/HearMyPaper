@@ -2,6 +2,10 @@ class EducationError(Exception):
     pass
 
 
+class ProjectAlreadyExistsError(EducationError):
+    pass
+
+
 class ProjectNotFoundError(EducationError):
     pass
 
