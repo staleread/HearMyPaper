@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
-from pydantic import BaseModel
 
 
-class Project(BaseModel):
+@dataclass(frozen=True, slots=True)
+class Project:
     id: UUID
     title: str
     description: str

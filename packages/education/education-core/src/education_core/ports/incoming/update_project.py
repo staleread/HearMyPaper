@@ -1,11 +1,12 @@
+from dataclasses import dataclass
 from typing import Protocol
 from datetime import datetime
 from uuid import UUID
-from pydantic import BaseModel
 from education_core.models import Project
 
 
-class UpdateProjectCommand(BaseModel):
+@dataclass(frozen=True, slots=True)
+class UpdateProjectCommand:
     title: str
     description: str
     deadline: datetime

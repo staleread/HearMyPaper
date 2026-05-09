@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from typing import Protocol
 from uuid import UUID
-from pydantic import BaseModel
 
 
-class AssignStudentToProjectCommand(BaseModel):
+@dataclass(frozen=True, slots=True)
+class AssignStudentToProjectCommand:
     project_id: UUID
     student_id: str
 

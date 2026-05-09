@@ -94,7 +94,8 @@ class UsersController(Controller):
                     confidentiality_level=user.confidentiality_level,
                     integrity_levels=user.integrity_levels,
                     created_at=user.created_at,
-                )
+                ),
+                f"/users/{user.id}",
             )
         except (UserAlreadyExistsError, IdentityCollisionError) as e:
             return status_code(409, str(e))

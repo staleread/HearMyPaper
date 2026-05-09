@@ -1,10 +1,11 @@
+from dataclasses import dataclass
 from typing import Protocol
 from datetime import datetime
-from pydantic import BaseModel
 from education_core.models import Project
 
 
-class CreateProjectCommand(BaseModel):
+@dataclass(frozen=True, slots=True)
+class CreateProjectCommand:
     title: str
     description: str
     instructor_id: str
