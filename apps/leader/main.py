@@ -7,6 +7,7 @@ from blacksheep_prometheus import use_prometheus_metrics
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared_kernel.storage import PostgresClient
+from shared_kernel.storage.object import ObjectStorageClient
 from shared_kernel.marshal import from_b64
 from config import get_settings
 
@@ -80,6 +81,28 @@ from education_postgres import (
 )
 from education_identity_bridge import IdentityServiceAdapter
 
+import submissions_api  # noqa: F401
+from submissions_core.ports.incoming import (
+    RequestUploadUrlPort,
+    CommitSubmissionPort,
+    GetSubmissionPort,
+    ListProjectSubmissionsPort,
+)
+from submissions_core.use_cases import (
+    RequestUploadUrlUseCase,
+    CommitSubmissionUseCase,
+    GetSubmissionUseCase,
+    ListProjectSubmissionsUseCase,
+)
+from submissions_core.ports.outgoing import (
+    SubmissionRepositoryPort,
+    StoragePort,
+    EducationServicePort,
+)
+from submissions_postgres import PostgresSubmissionRepositoryAdapter
+from submissions_storage import S3StorageAdapter
+from submissions_education_bridge import EducationServiceAdapter
+
 from utils import use_postgres, use_redis
 
 
@@ -100,6 +123,11 @@ jwt_provider = JwtTokenProviderAdapter(
     algorithm=settings.jwt.algorithm,
 )
 
+storage_client = ObjectStorageClient(
+    endpoint_url=settings.minio.url,
+    access_key=settings.minio.access_key,
+    secret_key=settings.minio.secret_key,
+)
 
 (
     cast(Container, app.services)
@@ -131,6 +159,18 @@ jwt_provider = JwtTokenProviderAdapter(
     .add_scoped(GetProjectStudentsPort, GetProjectStudentsUseCase)
     .add_scoped(AssignStudentToProjectPort, AssignStudentToProjectUseCase)
     .add_scoped(RemoveStudentFromProjectPort, RemoveStudentFromProjectUseCase)
+    # Outgoing submissions adapters
+    .add_instance(
+        S3StorageAdapter(storage_client, bucket="submissions"),
+        StoragePort,
+    )
+    .add_scoped(SubmissionRepositoryPort, PostgresSubmissionRepositoryAdapter)
+    .add_scoped(EducationServicePort, EducationServiceAdapter)
+    # Submissions use cases
+    .add_scoped(RequestUploadUrlPort, RequestUploadUrlUseCase)
+    .add_scoped(CommitSubmissionPort, CommitSubmissionUseCase)
+    .add_scoped(GetSubmissionPort, GetSubmissionUseCase)
+    .add_scoped(ListProjectSubmissionsPort, ListProjectSubmissionsUseCase)
 )
 
 

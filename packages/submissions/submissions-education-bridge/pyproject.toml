@@ -1,0 +1,21 @@
+[project]
+name = "submissions-education-bridge"
+version = "1.0.0"
+description = "Submissions-Education anti-corruption layer"
+readme = "README.md"
+authors = [
+    { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "submissions-core",
+    "education-core",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+submissions-core = { workspace = true }
+education-core = { workspace = true }
