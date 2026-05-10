@@ -10,30 +10,16 @@ repos:
 
   - repo: local
     hooks:
-      - id: ty-core
-        name: "Typecheck: libs/hmp_core"
-        entry: uv run --package hmp-core ty check libs/hmp_core/
+      - id: ty-apps
+        name: "Typecheck: apps"
+        entry: uv run ty check --fix apps/leader
         language: system
         types: [python]
         pass_filenames: false
 
-      - id: ty-converter
-        name: "Typecheck: apps/hmp_converter"
-        entry: uv run --package hmp-converter ty check apps/hmp_converter/
+      - id: ty-packages
+        name: "Typecheck: packages"
+        entry: uv run ty check --fix packages/
         language: system
         types: [python]
         pass_filenames: false
-
-      - id: ty-manager
-        name: "Typecheck: apps/hmp_manager"
-        entry: uv run --package hmp-manager ty check apps/hmp_manager/
-        language: system
-        types: [python]
-        pass_filenames: false
-
-      # - id: ty-client
-      #   name: "Typecheck: apps/hmp_client"
-      #   entry: uv run --package hmp-client ty check apps/hmp_client/
-      #   language: system
-      #   types: [python]
-      #   pass_filenames: false
