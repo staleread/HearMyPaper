@@ -102,6 +102,7 @@ class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
                 UPDATE education.projects
                 SET title = :title,
                     description = :description,
+                    instructor_id = :instructor_id,
                     deadline = :deadline
                 WHERE id = :id
                 """
@@ -110,6 +111,7 @@ class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
                 "id": project.id,
                 "title": project.title,
                 "description": project.description,
+                "instructor_id": project.instructor_id,
                 "deadline": project.deadline,
             },
         )

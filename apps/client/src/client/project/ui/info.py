@@ -19,6 +19,7 @@ def project_info_screen(navigator, project_id):
                 "id": str(project.id),
                 "title": project.title,
                 "description": project.description,
+                "instructor_id": project.instructor_id,
                 "deadline": project.deadline.isoformat(),
             }
 

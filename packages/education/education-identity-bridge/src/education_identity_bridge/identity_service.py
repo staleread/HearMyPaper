@@ -12,3 +12,8 @@ class IdentityServiceAdapter(IdentityServicePort):
     async def verify_student_exists(self, student_id: str) -> bool:
         user = await self._users.get_by_id(student_id)
         return user is not None
+
+    @override
+    async def verify_instructor_exists(self, instructor_id: str) -> bool:
+        user = await self._users.get_by_id(instructor_id)
+        return user is not None

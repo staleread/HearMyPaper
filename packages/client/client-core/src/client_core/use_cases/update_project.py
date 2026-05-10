@@ -10,8 +10,13 @@ class UpdateProjectUseCase(UpdateProjectPort):
         self.education_port = education_port
 
     async def __call__(
-        self, project_id: UUID, title: str, description: str, deadline: datetime
+        self,
+        project_id: UUID,
+        title: str,
+        description: str,
+        instructor_id: str,
+        deadline: datetime,
     ) -> Project:
         return await self.education_port.update_project(
-            project_id, title, description, deadline
+            project_id, title, description, instructor_id, deadline
         )

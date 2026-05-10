@@ -9,6 +9,7 @@ from education_core.models import Project
 class UpdateProjectCommand:
     title: str
     description: str
+    instructor_id: str
     deadline: datetime
 
 

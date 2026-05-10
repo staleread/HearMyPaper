@@ -27,6 +27,7 @@ class Project:
     id: UUID
     title: str
     description: str
+    instructor_id: str
     deadline: datetime
 
 

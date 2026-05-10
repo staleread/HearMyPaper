@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from education_core.exceptions import (
     ProjectNotFoundError,
     ProjectAlreadyExistsError,
+    InstructorNotFoundError,
 )
 from education_core.ports.incoming import (
     GetProjectPort,
@@ -25,12 +26,14 @@ from education_core.ports.incoming import (
 class ProjectCreateRequest(BaseModel):
     title: str
     description: str
+    instructor_id: str
     deadline: datetime
 
 
 class ProjectUpdateRequest(BaseModel):
     title: str
     description: str
+    instructor_id: str
     deadline: datetime
 
 
@@ -117,7 +120,7 @@ class Projects(Controller):
         cmd = CreateProjectCommand(
             title=req.title,
             description=req.description,
-            instructor_id=user_id,
+            instructor_id=req.instructor_id,
             deadline=req.deadline,
         )
         try:
@@ -135,6 +138,8 @@ class Projects(Controller):
             )
         except ProjectAlreadyExistsError as e:
             return status_code(409, str(e))
+        except InstructorNotFoundError as e:
+            return not_found(str(e))
 
     @auth()
     @put("/{project_id}")
@@ -145,6 +150,7 @@ class Projects(Controller):
         cmd = UpdateProjectCommand(
             title=req.title,
             description=req.description,
+            instructor_id=req.instructor_id,
             deadline=req.deadline,
         )
         try:
@@ -159,7 +165,7 @@ class Projects(Controller):
                     created_at=p.created_at,
                 )
             )
-        except ProjectNotFoundError as e:
+        except (ProjectNotFoundError, InstructorNotFoundError) as e:
             return not_found(str(e))
         except ProjectAlreadyExistsError as e:
             return status_code(409, str(e))

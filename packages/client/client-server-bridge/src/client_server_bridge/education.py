@@ -21,6 +21,7 @@ class EducationPortAdapter(EducationPort):
                 id=UUID(p["id"]),
                 title=p["title"],
                 description=p.get("description", ""),
+                instructor_id=p["instructor_id"],
                 deadline=datetime.fromisoformat(p["deadline"]),
             )
             for p in data
@@ -36,6 +37,7 @@ class EducationPortAdapter(EducationPort):
             id=UUID(p["id"]),
             title=p["title"],
             description=p["description"],
+            instructor_id=p["instructor_id"],
             deadline=datetime.fromisoformat(p["deadline"]),
         )
 
@@ -50,6 +52,12 @@ class EducationPortAdapter(EducationPort):
         payload = {"student_id": student_id}
         response = await self.client.post(
             f"/projects/{project_id}/students", json=payload
+        )
+        response.raise_for_status()
+
+    async def remove_student(self, project_id: UUID, student_id: str) -> None:
+        response = await self.client.delete(
+            f"/projects/{project_id}/students/{student_id}"
         )
         response.raise_for_status()
 
@@ -100,11 +108,12 @@ class EducationPortAdapter(EducationPort):
         response.raise_for_status()
 
     async def create_project(
-        self, title: str, description: str, deadline: datetime
+        self, title: str, description: str, instructor_id: str, deadline: datetime
     ) -> Project:
         payload = {
             "title": title,
             "description": description,
+            "instructor_id": instructor_id,
             "deadline": deadline.isoformat(),
         }
         response = await self.client.post("/projects/", json=payload)
@@ -114,15 +123,22 @@ class EducationPortAdapter(EducationPort):
             id=UUID(p["id"]),
             title=p["title"],
             description=p["description"],
+            instructor_id=p["instructor_id"],
             deadline=datetime.fromisoformat(p["deadline"]),
         )
 
     async def update_project(
-        self, project_id: UUID, title: str, description: str, deadline: datetime
+        self,
+        project_id: UUID,
+        title: str,
+        description: str,
+        instructor_id: str,
+        deadline: datetime,
     ) -> Project:
         payload = {
             "title": title,
             "description": description,
+            "instructor_id": instructor_id,
             "deadline": deadline.isoformat(),
         }
         response = await self.client.put(f"/projects/{project_id}", json=payload)
@@ -132,5 +148,6 @@ class EducationPortAdapter(EducationPort):
             id=UUID(p["id"]),
             title=p["title"],
             description=p["description"],
+            instructor_id=p["instructor_id"],
             deadline=datetime.fromisoformat(p["deadline"]),
         )

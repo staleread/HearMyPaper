@@ -17,9 +17,14 @@ class EducationPort(Protocol):
     ) -> None: ...
 
     async def create_project(
-        self, title: str, description: str, deadline: datetime
+        self, title: str, description: str, instructor_id: str, deadline: datetime
     ) -> Project: ...
 
     async def update_project(
-        self, project_id: UUID, title: str, description: str, deadline: datetime
+        self,
+        project_id: UUID,
+        title: str,
+        description: str,
+        instructor_id: str,
+        deadline: datetime,
     ) -> Project: ...

@@ -9,6 +9,8 @@ class CreateProjectUseCase(CreateProjectPort):
         self.education_port = education_port
 
     async def __call__(
-        self, title: str, description: str, deadline: datetime
+        self, title: str, description: str, instructor_id: str, deadline: datetime
     ) -> Project:
-        return await self.education_port.create_project(title, description, deadline)
+        return await self.education_port.create_project(
+            title, description, instructor_id, deadline
+        )

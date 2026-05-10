@@ -45,22 +45,18 @@ def manage_students_form_screen(navigator, project_id):
 
     async def on_remove_student(widget):
         selection = student_list.selection
-        if not selection:
+        if selection is None or (isinstance(selection, list) and not selection):
             await navigator.main_window.dialog(
                 toga.InfoDialog("Info", "Please select a student to remove")
             )
             return
 
-        # If multi-select is off, selection is a single Row object.
-        # If on, it's a list. We assume single select here or take the first.
-        if isinstance(selection, list):
-            if not selection:
-                return
-            row = selection[0]
-        else:
-            row = selection
+        row = selection[0] if isinstance(selection, list) else selection
+        pseudonym = getattr(row, "pseudonym", None)
 
-        pseudonym = getattr(row, "pseudonym")
+        if not pseudonym:
+            return
+
         try:
             await navigator.manage_students_use_case.remove_student(
                 project_id, pseudonym

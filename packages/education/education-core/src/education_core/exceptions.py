@@ -22,6 +22,10 @@ class StudentNotFoundError(EducationError):
     pass
 
 
+class InstructorNotFoundError(EducationError):
+    pass
+
+
 class StudentAlreadyAssignedError(EducationError):
     pass
 

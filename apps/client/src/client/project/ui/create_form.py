@@ -18,12 +18,15 @@ def project_create_form_screen(navigator):
     description_input = toga.MultilineTextInput(
         placeholder="Detailed project description", style=Pack(height=150)
     )
+    instructor_id_input = toga.TextInput(placeholder="Instructor User ID")
 
     default_deadline = datetime.now() + timedelta(days=30)
     deadline_picker = DateTimePicker(initial_value=default_deadline)
 
     async def on_submit(widget):
-        if not all([title_input.value, description_input.value]):
+        if not all(
+            [title_input.value, description_input.value, instructor_id_input.value]
+        ):
             await navigator.main_window.dialog(
                 toga.ErrorDialog(
                     title="Error", message="Please fill in all required fields"
@@ -37,6 +40,7 @@ def project_create_form_screen(navigator):
             await navigator.create_project_use_case(
                 title=title_input.value,
                 description=description_input.value,
+                instructor_id=instructor_id_input.value,
                 deadline=deadline,
             )
 
@@ -62,6 +66,8 @@ def project_create_form_screen(navigator):
             title_input,
             toga.Label("Description:"),
             description_input,
+            toga.Label("Instructor ID:"),
+            instructor_id_input,
             toga.Label("Deadline:"),
             deadline_picker.widget,
             toga.Box(
