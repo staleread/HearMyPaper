@@ -21,7 +21,7 @@ def print_ui(msg: str = "", end: str = "\n"):
     print(msg, file=get_ui_stream(), end=end, flush=True)
 
 
-def ask(msg: str, default: str | None = None) -> str:
+def ask(msg: str, default: str | None = None) -> str | None:
     prompt_msg = f"{msg} [{default}]: " if default else f"{msg}: "
     print_ui(prompt_msg, end="")
     val = sys.stdin.readline().strip()
@@ -43,11 +43,19 @@ def main():
         surname = ask("Surname")
         email = ask("Email")
 
+        if not all([user_id, name, surname, email]):
+            raise RuntimeError(
+                "All user fields (ID, Name, Surname, Email) are required"
+            )
+
         password = getpass.getpass(
             "Password for private key encryption: ", stream=get_ui_stream()
         )
 
         key_path_str = ask("Path to save encrypted private key", default="admin.key")
+        if not key_path_str:
+            raise RuntimeError("Path to save encrypted private key is required")
+
         key_path = Path(key_path_str)
 
         private_key, public_key = generate_keypair()
