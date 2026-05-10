@@ -15,11 +15,12 @@ dependencies = [
     "toml>=0.10.2",
     "ipinfo>=5.2.1",
     "toga-gtk~=0.5.0",
+    "httpx>=0.28.1",
+    # Comment the following entries when running with briefcase
     "shared-kernel",
     "client-core",
     "client-server-bridge",
     "client-credentials",
-    "httpx",
 ]
 
 
@@ -31,7 +32,8 @@ dev = [
 [tool.briefcase]
 project_name = "HearMyPaper"
 bundle = "edu.chnu"
-license.file = "LICENSE"
+license = "MIT"
+license-files = ["LICENSE"]
 
 [tool.briefcase.app.client]
 formal_name = "HearMyPaper"
