@@ -512,15 +512,11 @@ version = "1.1.0"
 source = { virtual = "apps/client" }
 dependencies = [
     { name = "briefcase" },
-    { name = "client-core" },
-    { name = "client-credentials" },
-    { name = "client-server-bridge" },
     { name = "httpx" },
     { name = "ipinfo" },
     { name = "pydantic" },
     { name = "requests" },
     { name = "result" },
-    { name = "shared-kernel" },
     { name = "toga-gtk" },
     { name = "toml" },
 ]
@@ -533,15 +529,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "briefcase", specifier = ">=0.3.25" },
-    { name = "client-core", editable = "packages/client/client-core" },
-    { name = "client-credentials", editable = "packages/client/client-credentials" },
-    { name = "client-server-bridge", editable = "packages/client/client-server-bridge" },
-    { name = "httpx" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "ipinfo", specifier = ">=5.2.1" },
     { name = "pydantic", specifier = ">=2.11.9" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "result", specifier = ">=0.17.0" },
-    { name = "shared-kernel", editable = "packages/shared-kernel" },
     { name = "toga-gtk", specifier = "~=0.5.0" },
     { name = "toml", specifier = ">=0.10.2" },
 ]
@@ -1251,10 +1243,12 @@ source = { virtual = "apps/leader" }
 dependencies = [
     { name = "blacksheep" },
     { name = "blacksheep-prometheus" },
+    { name = "cryptography" },
     { name = "education-api" },
     { name = "education-core" },
     { name = "education-identity-bridge" },
     { name = "education-postgres" },
+    { name = "education-rabbitmq" },
     { name = "identity-api" },
     { name = "identity-ch-gen" },
     { name = "identity-core" },
@@ -1267,6 +1261,12 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "rodi" },
     { name = "shared-kernel" },
+    { name = "submissions-api" },
+    { name = "submissions-core" },
+    { name = "submissions-education-bridge" },
+    { name = "submissions-postgres" },
+    { name = "submissions-rabbitmq" },
+    { name = "submissions-storage" },
     { name = "uvicorn" },
 ]
 
@@ -1274,10 +1274,12 @@ dependencies = [
 requires-dist = [
     { name = "blacksheep", specifier = ">=2.6.2" },
     { name = "blacksheep-prometheus", specifier = ">=0.1.8" },
+    { name = "cryptography", specifier = ">=44.0.0" },
     { name = "education-api", editable = "packages/education/education-api" },
     { name = "education-core", editable = "packages/education/education-core" },
     { name = "education-identity-bridge", editable = "packages/education/education-identity-bridge" },
     { name = "education-postgres", editable = "packages/education/education-postgres" },
+    { name = "education-rabbitmq", editable = "packages/education/education-rabbitmq" },
     { name = "identity-api", editable = "packages/identity/identity-api" },
     { name = "identity-ch-gen", editable = "packages/identity/identity-ch-gen" },
     { name = "identity-core", editable = "packages/identity/identity-core" },
@@ -1290,6 +1292,12 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.14.1" },
     { name = "rodi", specifier = ">=2.0.8" },
     { name = "shared-kernel", editable = "packages/shared-kernel" },
+    { name = "submissions-api", editable = "packages/submissions/submissions-api" },
+    { name = "submissions-core", editable = "packages/submissions/submissions-core" },
+    { name = "submissions-education-bridge", editable = "packages/submissions/submissions-education-bridge" },
+    { name = "submissions-postgres", editable = "packages/submissions/submissions-postgres" },
+    { name = "submissions-rabbitmq", editable = "packages/submissions/submissions-rabbitmq" },
+    { name = "submissions-storage", editable = "packages/submissions/submissions-storage" },
     { name = "uvicorn", specifier = ">=0.46.0" },
 ]
 
