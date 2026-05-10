@@ -16,8 +16,24 @@ def user_search_screen(navigator):
     def on_back(widget):
         navigator.navigate("resource_catalog")
 
+    back_button = toga.Button(
+        "<",
+        on_press=on_back,
+        style=Pack(width=35, height=35, font_weight="bold"),
+    )
+
+    title_label = toga.Label(
+        "User Search", style=Pack(font_size=14, font_weight="bold", flex=1, margin_left=10)
+    )
+
+    header_box = toga.Box(
+        children=[back_button, title_label],
+        style=Pack(direction=ROW, margin=(0, 0, 10, 0), align_items="center"),
+    )
+
     container = toga.Box(
         children=[
+            header_box,
             toga.Box(
                 children=[
                     toga.Label("Search User by ID:", style=Pack(padding=5)),
@@ -30,13 +46,8 @@ def user_search_screen(navigator):
                 on_press=on_search,
                 style=Pack(padding=10),
             ),
-            toga.Button(
-                "Back",
-                on_press=on_back,
-                style=Pack(padding=10),
-            ),
         ],
-        style=Pack(direction=COLUMN),
+        style=Pack(direction=COLUMN, margin=20, gap=10),
     )
 
     return container
