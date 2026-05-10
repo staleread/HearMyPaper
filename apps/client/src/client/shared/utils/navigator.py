@@ -36,7 +36,7 @@ class SessionProvider(SessionProviderPort):
 
     def set_token(self, token: str) -> None:
         self._token = token
-        self._async_client.headers["Authorization"] = f"Bearer {token}"
+        self._async_client.headers["authorization"] = f"Bearer {token}"
 
 
 class Navigator:

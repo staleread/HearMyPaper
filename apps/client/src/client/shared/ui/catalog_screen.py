@@ -52,7 +52,7 @@ def catalog_screen(
         )
 
     table = toga.Table(
-        headings=headings,
+        columns=headings,
         data=data.unwrap(),
         style=Pack(flex=1),
     )
