@@ -42,7 +42,7 @@ class GradeAttemptRequest(BaseModel):
     feedback: str | None = None
 
 
-class AttemptsController(Controller):
+class Attempts(Controller):
     @classmethod
     @override
     def route(cls) -> str | None:

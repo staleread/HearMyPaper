@@ -30,7 +30,7 @@ class ProjectStudentsResponse(BaseModel):
     student_ids: list[str]
 
 
-class ProjectStudentsController(Controller):
+class Students(Controller):
     @classmethod
     @override
     def route(cls) -> str | None:

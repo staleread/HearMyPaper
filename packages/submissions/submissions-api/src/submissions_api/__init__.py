@@ -1,3 +1,3 @@
-from .submissions import SubmissionsController
+from .submissions import Submissions
 
-__all__ = ["SubmissionsController"]
+__all__ = ["Submissions"]

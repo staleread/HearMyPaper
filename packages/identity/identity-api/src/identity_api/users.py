@@ -54,7 +54,7 @@ class PublicKeyResponse(BaseModel):
     public_key_b64: str
 
 
-class UsersController(Controller):
+class Users(Controller):
     @classmethod
     @override
     def route(cls) -> str | None:

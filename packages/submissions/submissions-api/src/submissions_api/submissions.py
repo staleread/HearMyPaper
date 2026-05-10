@@ -47,7 +47,7 @@ class SubmissionListItemResponse(BaseModel):
     created_at: datetime
 
 
-class SubmissionsController(Controller):
+class Submissions(Controller):
     @classmethod
     @override
     def route(cls) -> str | None:

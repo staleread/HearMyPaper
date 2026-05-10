@@ -37,7 +37,7 @@ class LoginResponse(BaseModel):
     token: str
 
 
-class AuthController(Controller):
+class Auth(Controller):
     @classmethod
     @override
     def route(cls) -> str | None:

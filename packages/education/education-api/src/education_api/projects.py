@@ -49,7 +49,7 @@ class ProjectListItemResponse(BaseModel):
     deadline: datetime
 
 
-class ProjectsController(Controller):
+class Projects(Controller):
     @classmethod
     @override
     def route(cls) -> str | None:

@@ -1,4 +1,4 @@
-from .login import AuthController
-from .users import UsersController
+from .login import Auth
+from .users import Users
 
-__all__ = ["AuthController", "UsersController"]
+__all__ = ["Auth", "Users"]

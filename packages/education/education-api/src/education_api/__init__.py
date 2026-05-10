@@ -1,5 +1,5 @@
-from .projects import ProjectsController
-from .students import ProjectStudentsController
-from .attempts import AttemptsController
+from .projects import Projects
+from .students import Students
+from .attempts import Attempts
 
-__all__ = ["ProjectsController", "ProjectStudentsController", "AttemptsController"]
+__all__ = ["Projects", "Students", "Attempts"]
