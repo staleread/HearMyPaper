@@ -10,8 +10,11 @@ class IdentityPortAdapter(IdentityPort):
     def __init__(self, client: AsyncClient):
         self.client = client
 
-    async def get_user(self, user_id: str) -> User:
+    async def get_user(self, user_id: str) -> User | None:
         response = await self.client.get(f"/users/{user_id}")
+        if response.status_code == 404:
+            return None
+
         response.raise_for_status()
         data = response.json()
         return User(

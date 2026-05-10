@@ -8,5 +8,5 @@ class GetProjectUseCase(GetProjectPort):
     def __init__(self, education_port: EducationPort):
         self.education_port = education_port
 
-    async def __call__(self, project_id: UUID) -> Project:
+    async def __call__(self, project_id: UUID) -> Project | None:
         return await self.education_port.get_project(project_id)

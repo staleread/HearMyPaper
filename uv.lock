@@ -512,11 +512,15 @@ version = "1.1.0"
 source = { virtual = "apps/client" }
 dependencies = [
     { name = "briefcase" },
+    { name = "client-core" },
+    { name = "client-credentials" },
+    { name = "client-server-bridge" },
     { name = "httpx" },
     { name = "ipinfo" },
     { name = "pydantic" },
     { name = "requests" },
     { name = "result" },
+    { name = "shared-kernel" },
     { name = "toga-gtk" },
     { name = "toml" },
 ]
@@ -529,11 +533,15 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "briefcase", specifier = ">=0.3.25" },
+    { name = "client-core", editable = "packages/client/client-core" },
+    { name = "client-credentials", editable = "packages/client/client-credentials" },
+    { name = "client-server-bridge", editable = "packages/client/client-server-bridge" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "ipinfo", specifier = ">=5.2.1" },
     { name = "pydantic", specifier = ">=2.11.9" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "result", specifier = ">=0.17.0" },
+    { name = "shared-kernel", editable = "packages/shared-kernel" },
     { name = "toga-gtk", specifier = "~=0.5.0" },
     { name = "toml", specifier = ">=0.10.2" },
 ]
@@ -1238,7 +1246,7 @@ wheels = [
 
 [[package]]
 name = "leader"
-version = "0.1.0"
+version = "1.0.0"
 source = { virtual = "apps/leader" }
 dependencies = [
     { name = "blacksheep" },

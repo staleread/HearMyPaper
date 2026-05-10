@@ -15,6 +15,8 @@ def catalog_screen(
     actions: list[tuple[str, Any]] | None = None,
     on_back: Any | None = None,
     on_activate: Any | None = None,
+    on_refresh: Any | None = None,
+    empty_message: str = "No items found.",
 ):
     back_button = toga.Button(
         "<",
@@ -55,6 +57,18 @@ def catalog_screen(
         style=Pack(flex=1),
     )
 
+    empty_label = toga.Label(
+        empty_message,
+        style=Pack(text_align="center", margin=(20, 0), font_weight="bold"),
+    )
+
+    def update_visibility():
+        has_data = len(table.data) > 0
+        empty_label.style.visibility = "hidden" if has_data else "visible"
+        table.style.visibility = "visible" if has_data else "hidden"
+
+    update_visibility()
+
     def on_row_activate(widget: toga.Table, row: Any, **kwargs: Any):
         if on_activate:
             on_activate(row)
@@ -62,6 +76,20 @@ def catalog_screen(
     if on_activate:
         table.on_activate = on_row_activate
 
-    return toga.Box(
-        children=[header_box, table], style=Pack(direction=COLUMN, margin=20, gap=10)
+    container = toga.Box(
+        children=[header_box, table, empty_label],
+        style=Pack(direction=COLUMN, margin=20, gap=10),
     )
+
+    if on_refresh:
+
+        async def do_refresh():
+            new_data = await on_refresh()
+            table.data = new_data
+            update_visibility()
+
+        import asyncio
+
+        asyncio.create_task(do_refresh())
+
+    return container

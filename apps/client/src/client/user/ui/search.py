@@ -23,7 +23,8 @@ def user_search_screen(navigator):
     )
 
     title_label = toga.Label(
-        "User Search", style=Pack(font_size=14, font_weight="bold", flex=1, margin_left=10)
+        "User Search",
+        style=Pack(font_size=14, font_weight="bold", flex=1, margin_left=10),
     )
 
     header_box = toga.Box(

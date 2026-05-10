@@ -1,5 +1,7 @@
 import asyncio
 import toga
+from toga.style import Pack
+from toga.constants import COLUMN
 from result import Ok
 from ...shared.ui.item_info_screen import item_info_screen
 
@@ -10,6 +12,30 @@ def user_info_screen(navigator, user_id):
     async def load_user():
         try:
             user = await navigator.get_user_use_case(user_id)
+
+            if user is None:
+                # Remove the "Loading" label
+                for child in list(container.children):
+                    container.remove(child)
+
+                # Add the Not Found message
+                container.add(
+                    toga.Box(
+                        children=[
+                            toga.Label(
+                                f"User with ID '{user_id}' not found.",
+                                style=Pack(padding=20, font_weight="bold"),
+                            ),
+                            toga.Button(
+                                "Back to Search",
+                                on_press=lambda w: navigator.navigate("user_search"),
+                                style=Pack(padding=10),
+                            ),
+                        ],
+                        style=Pack(direction=COLUMN, align_items="center", flex=1),
+                    )
+                )
+                return
 
             user_data = {
                 "id": user.id,

@@ -12,6 +12,8 @@ class EducationPortAdapter(EducationPort):
 
     async def get_my_projects(self) -> list[Project]:
         response = await self.client.get("/projects/")
+        if response.status_code == 404:
+            return []
         response.raise_for_status()
         data = response.json()
         return [
@@ -24,8 +26,10 @@ class EducationPortAdapter(EducationPort):
             for p in data
         ]
 
-    async def get_project(self, project_id: UUID) -> Project:
+    async def get_project(self, project_id: UUID) -> Project | None:
         response = await self.client.get(f"/projects/{project_id}")
+        if response.status_code == 404:
+            return None
         response.raise_for_status()
         p = response.json()
         return Project(
@@ -37,6 +41,8 @@ class EducationPortAdapter(EducationPort):
 
     async def get_project_students(self, project_id: UUID) -> list[str]:
         response = await self.client.get(f"/projects/{project_id}/students")
+        if response.status_code == 404:
+            return []
         response.raise_for_status()
         return response.json()["student_ids"]
 
@@ -49,6 +55,8 @@ class EducationPortAdapter(EducationPort):
 
     async def get_project_attempts(self, project_id: UUID) -> list[LabAttempt]:
         response = await self.client.get(f"/attempts/projects/{project_id}/attempts")
+        if response.status_code == 404:
+            return []
         response.raise_for_status()
         data = response.json()
         return [
@@ -63,8 +71,10 @@ class EducationPortAdapter(EducationPort):
             for a in data
         ]
 
-    async def get_attempt(self, attempt_id: UUID) -> LabAttempt:
+    async def get_attempt(self, attempt_id: UUID) -> LabAttempt | None:
         response = await self.client.get(f"/attempts/{attempt_id}")
+        if response.status_code == 404:
+            return None
         response.raise_for_status()
         a = response.json()
         return LabAttempt(

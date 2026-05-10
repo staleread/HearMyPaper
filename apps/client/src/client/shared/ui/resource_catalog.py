@@ -6,7 +6,6 @@ def resource_catalog_screen(navigator):
     resources = [
         {"resource": "Search User"},
         {"resource": "Projects"},
-        {"resource": "Submissions"},
     ]
 
     def on_row_activate(row):
@@ -15,8 +14,6 @@ def resource_catalog_screen(navigator):
                 navigator.navigate("user_search")
             case "Projects":
                 navigator.navigate("projects_catalog")
-            case "Submissions":
-                navigator.navigate("submissions_catalog")
 
     return catalog_screen(
         title="Resources",
