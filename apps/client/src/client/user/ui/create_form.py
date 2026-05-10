@@ -86,7 +86,7 @@ def user_create_form_screen(navigator):
             confidentiality_level = AccessLevel(str(confidentiality_input.value))
             integrity_levels = get_selected_integrity_levels()
 
-            await navigator.create_user_use_case(
+            user = await navigator.create_user_use_case(
                 name=name_input.value,
                 surname=surname_input.value,
                 email=email_input.value,
@@ -97,9 +97,12 @@ def user_create_form_screen(navigator):
             )
 
             await navigator.main_window.dialog(
-                toga.InfoDialog(title="Success", message="User created successfully!")
+                toga.InfoDialog(
+                    title="Success",
+                    message=f"User created successfully! ID: {user.id}",
+                )
             )
-            navigator.navigate("user_search")
+            navigator.navigate("user_info", user.id)
 
         except Exception as e:
             await navigator.main_window.dialog(

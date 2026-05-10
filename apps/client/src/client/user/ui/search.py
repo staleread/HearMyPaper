@@ -27,8 +27,16 @@ def user_search_screen(navigator):
         style=Pack(font_size=14, font_weight="bold", flex=1, margin_left=10),
     )
 
+    def on_add_user(widget):
+        navigator.navigate("user_create_form")
+
+    add_button = toga.Button(
+        "Add User",
+        on_press=on_add_user,
+    )
+
     header_box = toga.Box(
-        children=[back_button, title_label],
+        children=[back_button, title_label, add_button],
         style=Pack(direction=ROW, margin=(0, 0, 10, 0), align_items="center"),
     )
 
