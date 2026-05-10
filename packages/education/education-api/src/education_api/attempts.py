@@ -46,7 +46,7 @@ class Attempts(Controller):
     @classmethod
     @override
     def route(cls) -> str | None:
-        return "/projects/{project_id}/attempts"
+        return "/attempts"
 
     def __init__(
         self,
@@ -59,7 +59,7 @@ class Attempts(Controller):
         self.grade_lab_attempt_port = grade_lab_attempt_port
 
     @auth()
-    @get("/")
+    @get("/projects/{project_id}/attemps")
     async def get_attempts(self, project_id: UUID):
         attempts = await self.get_project_attempts_port(project_id)
         return ok(
@@ -77,12 +77,10 @@ class Attempts(Controller):
 
     @auth()
     @get("/{submission_id}/download-url")
-    async def get_download_url(
-        self, request: Request, project_id: UUID, submission_id: UUID
-    ):
+    async def get_download_url(self, request: Request, submission_id: UUID):
         user_id = request.user.claims.get("sub")
         if not user_id:
-            return status_code(401, "User ID not token")
+            return status_code(401, "User ID not found in token")
 
         try:
             url = await self.view_submission_port(user_id, submission_id)
@@ -99,7 +97,6 @@ class Attempts(Controller):
     async def grade_attempt(
         self,
         request: Request,
-        project_id: UUID,
         attempt_id: UUID,
         data: FromJSON[GradeAttemptRequest],
     ):

@@ -4,7 +4,7 @@ from typing import Protocol
 
 @dataclass(frozen=True)
 class InitialUserCreateCommand:
-    id: str
+    user_id: str
     name: str
     surname: str
     email: str

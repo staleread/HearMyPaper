@@ -5,7 +5,7 @@ from typing import Protocol
 
 @dataclass(frozen=True)
 class LoginCommand:
-    id: str
+    user_id: str
     challenge: bytes
     signature: bytes
 

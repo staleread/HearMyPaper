@@ -34,12 +34,12 @@ class FinalizeLoginUseCase(FinalizeLoginPort):
 
     @override
     async def __call__(self, cmd: LoginCommand) -> AuthToken:
-        user = await self.users.get_user_by_id(cmd.id)
+        user = await self.users.get_user_by_id(cmd.user_id)
 
         if not user:
-            raise UserNotFoundError(f"No user with id {cmd.id}")
+            raise UserNotFoundError(f"No user with id {cmd.user_id}")
 
-        challenge = await self.challenges.get_challenge(cmd.id)
+        challenge = await self.challenges.get_challenge(cmd.user_id)
 
         if not challenge or challenge != cmd.challenge:
             raise InvalidChallengeError()
@@ -51,7 +51,7 @@ class FinalizeLoginUseCase(FinalizeLoginPort):
         if not is_valid_signature:
             raise AuthenticationFailedError()
 
-        await self.challenges.delete_challenge(cmd.id)
+        await self.challenges.delete_challenge(cmd.user_id)
 
         token = self.tokens.create_token(user)
 

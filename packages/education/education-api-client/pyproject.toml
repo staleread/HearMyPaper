@@ -1,0 +1,22 @@
+[project]
+name = "education-api-client"
+version = "1.0.0"
+description = "API client for HMP education module"
+readme = "README.md"
+authors = [
+    { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "education-core",
+    "httpx>=0.28.1",
+    "shared-kernel",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+education-core = { workspace = true }
+shared-kernel = { workspace = true }

@@ -22,7 +22,7 @@ class CreateInitialUserUseCase(CreateInitialUserPort):
             return False
 
         user = User(
-            id=cmd.id,
+            id=cmd.user_id,
             name=cmd.name,
             surname=cmd.surname,
             email=cmd.email,

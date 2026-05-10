@@ -1,3 +1,4 @@
+from datetime import datetime
 from shared_kernel.marshal import from_b64, to_b64
 from typing import override
 
@@ -28,13 +29,14 @@ class ChallengeResponse(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    id: str
+    user_id: str
     challenge_b64: str
     signature_b64: str
 
 
 class LoginResponse(BaseModel):
     token: str
+    expires_at: datetime
 
 
 class Auth(Controller):
@@ -70,14 +72,16 @@ class Auth(Controller):
         """
         req = data.value
         cmd = LoginCommand(
-            id=req.id,
+            user_id=req.user_id,
             challenge=from_b64(req.challenge_b64),
             signature=from_b64(req.signature_b64),
         )
 
         try:
             auth_token = await self.finalize_login_port(cmd)
-            return ok(LoginResponse(token=auth_token.token))
+            return ok(
+                LoginResponse(token=auth_token.token, expires_at=auth_token.expires_at)
+            )
         except UserNotFoundError as e:
             return not_found(str(e))
         except InvalidChallengeError, AuthenticationFailedError:

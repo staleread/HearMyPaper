@@ -23,13 +23,13 @@ class InitLoginUseCase(InitLoginPort):
         self.challenge_gen = challenge_gen
 
     @override
-    async def __call__(self, id: str) -> bytes:
-        user = await self.users.get_user_by_id(id)
+    async def __call__(self, user_id: str) -> bytes:
+        user = await self.users.get_user_by_id(user_id)
 
         if not user:
-            raise UserNotFoundError(f"No user with id {id}")
+            raise UserNotFoundError(f"No user with id {user_id}")
 
         challenge = self.challenge_gen.generate()
-        await self.challenges.save_challenge(id, challenge, ttl=300)
+        await self.challenges.save_challenge(user_id, challenge, ttl=300)
 
         return challenge

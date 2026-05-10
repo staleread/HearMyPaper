@@ -239,7 +239,7 @@ async def initialize(app: Application):
             user_id = settings.init_user.id
 
             cmd = InitialUserCreateCommand(
-                id=user_id,
+                user_id=user_id,
                 name=settings.init_user.name,
                 surname=settings.init_user.surname,
                 email=settings.init_user.email,
