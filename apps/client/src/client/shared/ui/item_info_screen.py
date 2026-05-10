@@ -56,9 +56,6 @@ def item_info_screen(
     details_box = toga.Box(style=Pack(direction=COLUMN, gap=10))
 
     for key, value in item_data.items():
-        if key.endswith("id"):
-            continue
-
         display_key = key.replace("_", " ").title()
 
         if isinstance(value, list):
