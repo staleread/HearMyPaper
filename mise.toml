@@ -6,6 +6,14 @@ python = "3.14"
 DATABASE_URL = "postgres://user:password@localhost:5432/hmp-postgres?sslmode=disable"
 APP_SHOW_ERROR_DETAILS = "True"
 
+[tasks."gen-session"]
+description = "Generate a JWT session token using an encrypted key file"
+usage = """
+arg "<key_path>"
+arg "[port]"
+"""
+run = "uv run --package client scripts/gen-session.py {{usage.key_path}} {{usage.port}}"
+
 [tasks."leader:migrate"]
 description = "Run migrations for identity modules"
 run = "./scripts/leader-migrate"
