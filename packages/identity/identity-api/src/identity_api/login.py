@@ -21,7 +21,7 @@ from identity_core.ports.incoming import (
 
 
 class ChallengeRequest(BaseModel):
-    id: str
+    user_id: str
 
 
 class ChallengeResponse(BaseModel):
@@ -60,7 +60,7 @@ class Auth(Controller):
         """
         req = data.value
         try:
-            challenge_bytes = await self.init_login_port(req.id)
+            challenge_bytes = await self.init_login_port(req.user_id)
             return ok(ChallengeResponse(challenge_b64=to_b64(challenge_bytes)))
         except UserNotFoundError as e:
             return not_found(str(e))
