@@ -43,6 +43,12 @@ class ProjectResponse(BaseModel):
     created_at: datetime
 
 
+class ProjectListItemResponse(BaseModel):
+    id: UUID
+    title: str
+    deadline: datetime
+
+
 class ProjectsController(Controller):
     @classmethod
     @override
@@ -71,13 +77,10 @@ class ProjectsController(Controller):
         projects = await self.get_user_projects_port(user_id)
         return ok(
             [
-                ProjectResponse(
+                ProjectListItemResponse(
                     id=p.id,
                     title=p.title,
-                    description=p.description,
-                    instructor_id=p.instructor_id,
                     deadline=p.deadline,
-                    created_at=p.created_at,
                 )
                 for p in projects
             ]

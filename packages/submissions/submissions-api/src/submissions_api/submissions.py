@@ -40,6 +40,13 @@ class SubmissionResponse(BaseModel):
     metadata: dict[str, str]
 
 
+class SubmissionListItemResponse(BaseModel):
+    submission_id: UUID
+    student_id: str
+    status: str
+    created_at: datetime
+
+
 class SubmissionsController(Controller):
     @classmethod
     @override
@@ -127,14 +134,11 @@ class SubmissionsController(Controller):
         submissions = await self.list_project_submissions_port(project_id)
         return ok(
             [
-                SubmissionResponse(
+                SubmissionListItemResponse(
                     submission_id=s.submission_id,
                     student_id=s.student_id,
-                    project_id=s.project_id,
-                    storage_path=s.storage_path,
                     status=s.status.value,
                     created_at=s.created_at,
-                    metadata=s.metadata,
                 )
                 for s in submissions
             ]

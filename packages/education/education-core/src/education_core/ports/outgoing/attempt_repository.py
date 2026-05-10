@@ -1,6 +1,6 @@
 from typing import Protocol
 from uuid import UUID
-from ...models import LabAttempt
+from ...models import LabAttempt, AttemptListItem
 
 
 class AttemptRepositoryPort(Protocol):
@@ -9,4 +9,4 @@ class AttemptRepositoryPort(Protocol):
         self, student_id: str, project_id: UUID
     ) -> LabAttempt | None: ...
     async def get_by_submission_id(self, submission_id: UUID) -> LabAttempt | None: ...
-    async def find_by_project(self, project_id: UUID) -> list[LabAttempt]: ...
+    async def find_by_project(self, project_id: UUID) -> list[AttemptListItem]: ...

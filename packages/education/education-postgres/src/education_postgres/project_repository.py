@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from education_core.models import Project
+from education_core.models import Project, ProjectListItem
 from education_core.ports.outgoing.project_repository import (
     ProjectRepositoryPort,
 )
@@ -14,11 +14,11 @@ class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
         self._session = session
 
     @override
-    async def get_projects_by_user_id(self, user_id: str) -> list[Project]:
+    async def get_projects_by_user_id(self, user_id: str) -> list[ProjectListItem]:
         result = await self._session.execute(
             text(
                 """
-                SELECT p.id, p.title, p.description, p.instructor_id, p.deadline, p.created_at
+                SELECT p.id, p.title, p.deadline
                 FROM education.projects p
                 LEFT JOIN education.project_students ps ON p.id = ps.project_id
                 WHERE p.instructor_id = :user_id OR ps.student_id = :user_id
@@ -30,13 +30,10 @@ class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
         rows = result.mappings().all()
 
         return [
-            Project(
+            ProjectListItem(
                 id=row["id"],
                 title=row["title"],
-                description=row["description"],
-                instructor_id=row["instructor_id"],
                 deadline=row["deadline"],
-                created_at=row["created_at"],
             )
             for row in rows
         ]

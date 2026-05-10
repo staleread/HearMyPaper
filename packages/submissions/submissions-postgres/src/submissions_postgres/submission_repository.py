@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from submissions_core.models import LabSubmission, SubmissionStatus
+from submissions_core.models import LabSubmission, SubmissionStatus, SubmissionListItem
 from submissions_core.ports.outgoing.submission_repository import (
     SubmissionRepositoryPort,
 )
@@ -96,11 +96,11 @@ class PostgresSubmissionRepositoryAdapter(SubmissionRepositoryPort):
         )
 
     @override
-    async def list_by_project(self, project_id: UUID) -> list[LabSubmission]:
+    async def list_by_project(self, project_id: UUID) -> list[SubmissionListItem]:
         result = await self._session.execute(
             text(
                 """
-                SELECT submission_id, student_id, project_id, storage_path, status, created_at, metadata
+                SELECT submission_id, student_id, status, created_at
                 FROM submissions.submissions
                 WHERE project_id = :project_id
                 ORDER BY created_at DESC
@@ -111,16 +111,11 @@ class PostgresSubmissionRepositoryAdapter(SubmissionRepositoryPort):
         rows = result.mappings().all()
 
         return [
-            LabSubmission(
+            SubmissionListItem(
                 submission_id=row["submission_id"],
                 student_id=row["student_id"],
-                project_id=row["project_id"],
-                storage_path=row["storage_path"],
                 status=SubmissionStatus(row["status"]),
                 created_at=row["created_at"],
-                metadata=row["metadata"]
-                if isinstance(row["metadata"], dict)
-                else json.loads(row["metadata"]),
             )
             for row in rows
         ]

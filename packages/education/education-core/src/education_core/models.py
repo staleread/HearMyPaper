@@ -14,6 +14,13 @@ class Project:
 
 
 @dataclass(frozen=True, slots=True)
+class ProjectListItem:
+    id: UUID
+    title: str
+    deadline: datetime
+
+
+@dataclass(frozen=True, slots=True)
 class LabAttempt:
     attempt_id: UUID
     student_id: str
@@ -23,3 +30,12 @@ class LabAttempt:
     is_on_time: bool
     grade: int | None = None
     instructor_feedback: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class AttemptListItem:
+    attempt_id: UUID
+    student_id: str
+    submitted_at: datetime
+    is_on_time: bool
+    grade: int | None = None

@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from education_core.models import LabAttempt
+from education_core.models import LabAttempt, AttemptListItem
 from education_core.ports.outgoing.attempt_repository import AttemptRepositoryPort
 
 
@@ -101,13 +101,12 @@ class PostgresAttemptRepositoryAdapter(AttemptRepositoryPort):
         )
 
     @override
-    async def find_by_project(self, project_id: UUID) -> list[LabAttempt]:
+    async def find_by_project(self, project_id: UUID) -> list[AttemptListItem]:
         result = await self._session.execute(
             text(
                 """
                 SELECT 
-                    attempt_id, student_id, project_id, submission_id, 
-                    submitted_at, is_on_time, grade, instructor_feedback
+                    attempt_id, student_id, submitted_at, is_on_time, grade
                 FROM education.lab_attempts
                 WHERE project_id = :project_id
                 ORDER BY submitted_at DESC
@@ -118,15 +117,12 @@ class PostgresAttemptRepositoryAdapter(AttemptRepositoryPort):
         rows = result.mappings().all()
 
         return [
-            LabAttempt(
+            AttemptListItem(
                 attempt_id=row["attempt_id"],
                 student_id=row["student_id"],
-                project_id=row["project_id"],
-                submission_id=row["submission_id"],
                 submitted_at=row["submitted_at"],
                 is_on_time=row["is_on_time"],
                 grade=row["grade"],
-                instructor_feedback=row["instructor_feedback"],
             )
             for row in rows
         ]

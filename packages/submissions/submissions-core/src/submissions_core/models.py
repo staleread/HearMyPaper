@@ -19,3 +19,11 @@ class LabSubmission:
     status: SubmissionStatus
     created_at: datetime
     metadata: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class SubmissionListItem:
+    submission_id: UUID
+    student_id: str
+    status: SubmissionStatus
+    created_at: datetime

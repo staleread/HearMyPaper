@@ -30,6 +30,14 @@ class AttemptResponse(BaseModel):
     instructor_feedback: Optional[str] = None
 
 
+class AttemptListItemResponse(BaseModel):
+    attempt_id: UUID
+    student_id: str
+    submitted_at: datetime
+    is_on_time: bool
+    grade: Optional[int] = None
+
+
 class AttemptsController(Controller):
     @classmethod
     @override
@@ -50,15 +58,12 @@ class AttemptsController(Controller):
         attempts = await self.get_project_attempts_port(project_id)
         return ok(
             [
-                AttemptResponse(
+                AttemptListItemResponse(
                     attempt_id=a.attempt_id,
                     student_id=a.student_id,
-                    project_id=a.project_id,
-                    submission_id=a.submission_id,
                     submitted_at=a.submitted_at,
                     is_on_time=a.is_on_time,
                     grade=a.grade,
-                    instructor_feedback=a.instructor_feedback,
                 )
                 for a in attempts
             ]
