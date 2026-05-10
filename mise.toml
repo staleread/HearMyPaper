@@ -12,7 +12,7 @@ run = "./scripts/leader-migrate"
 
 [tasks."leader:init-user"]
 description = "Initialize initial admin user"
-run = "uv run --package leader mise-tasks/leader-init-user.py"
+run = "uv run scripts/leader-init-user.py"
 
 [tasks."leader:dev"]
 description = "Start leader app in development mode"

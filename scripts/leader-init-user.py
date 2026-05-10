@@ -51,16 +51,16 @@ def main():
         key_path = Path(key_path_str)
 
         private_key, public_key = generate_keypair()
-        encrypted_private_key = encrypt_symmetric(
-            private_key, password=password.encode()
-        )
+        # Format: user_id,hex_private_key (matches client file_storage)
+        plaintext = f"{user_id},{private_key.hex()}".encode("utf-8")
+        encrypted_data = encrypt_symmetric(plaintext, password=password.encode())
 
         # Save the private key
         if key_path.parent:
             key_path.parent.mkdir(parents=True, exist_ok=True)
 
         with open(key_path, "wb") as f:
-            f.write(encrypted_private_key)
+            f.write(encrypted_data)
 
         print_ui(f"\n[SUCCESS] Private key saved to: {key_path.absolute()}")
         print_ui(
