@@ -22,4 +22,5 @@ def resource_catalog_screen(navigator):
         on_back=None,
         actions=None,
         on_activate=on_row_activate,
+        empty_message=None,
     )

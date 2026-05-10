@@ -16,7 +16,7 @@ def catalog_screen(
     on_back: Any | None = None,
     on_activate: Any | None = None,
     on_refresh: Any | None = None,
-    empty_message: str = "No items found.",
+    empty_message: str | None = "No items found.",
 ):
     back_button = toga.Button(
         "<",
@@ -57,14 +57,17 @@ def catalog_screen(
         style=Pack(flex=1),
     )
 
-    empty_label = toga.Label(
-        empty_message,
-        style=Pack(text_align="center", margin=(20, 0), font_weight="bold"),
-    )
+    empty_label = None
+    if empty_message:
+        empty_label = toga.Label(
+            empty_message,
+            style=Pack(text_align="center", margin=(20, 0), font_weight="bold"),
+        )
 
     def update_visibility():
         has_data = len(table.data) > 0
-        empty_label.style.visibility = "hidden" if has_data else "visible"
+        if empty_label:
+            empty_label.style.visibility = "hidden" if has_data else "visible"
         table.style.visibility = "visible" if has_data else "hidden"
 
     update_visibility()
@@ -76,8 +79,12 @@ def catalog_screen(
     if on_activate:
         table.on_activate = on_row_activate
 
+    children = [header_box, table]
+    if empty_label:
+        children.append(empty_label)
+
     container = toga.Box(
-        children=[header_box, table, empty_label],
+        children=children,
         style=Pack(direction=COLUMN, margin=20, gap=10),
     )
 
