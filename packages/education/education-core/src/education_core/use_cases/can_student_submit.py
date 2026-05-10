@@ -21,6 +21,10 @@ class CanStudentSubmitUseCase(CanStudentSubmitPort):
         if not project:
             return False
 
+        # 0. Instructors cannot submit for their own projects
+        if project.instructor_id == student_id:
+            return False
+
         # 1. Check if student is assigned to project
         if not await self._students.is_student_assigned(project_id, student_id):
             return False

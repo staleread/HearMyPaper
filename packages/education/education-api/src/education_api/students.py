@@ -3,7 +3,14 @@ from typing import override
 
 from blacksheep import FromJSON
 from blacksheep.server.controllers import Controller, get, post, delete
-from blacksheep.server.responses import ok, created, no_content, not_found, status_code
+from blacksheep.server.responses import (
+    ok,
+    created,
+    no_content,
+    not_found,
+    status_code,
+    forbidden,
+)
 from blacksheep.server.authorization import auth
 from pydantic import BaseModel
 
@@ -12,6 +19,7 @@ from education_core.exceptions import (
     StudentNotFoundError,
     StudentAlreadyAssignedError,
     StudentNotAssignedError,
+    AccessDeniedError,
 )
 from education_core.ports.incoming import (
     GetProjectStudentsPort,
@@ -69,6 +77,8 @@ class Students(Controller):
             return created()
         except (ProjectNotFoundError, StudentNotFoundError) as e:
             return not_found(str(e))
+        except AccessDeniedError as e:
+            return forbidden(str(e))
         except StudentAlreadyAssignedError as e:
             return status_code(409, str(e))
 

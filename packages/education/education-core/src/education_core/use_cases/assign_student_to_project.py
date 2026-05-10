@@ -35,6 +35,14 @@ class AssignStudentToProjectUseCase(AssignStudentToProjectPort):
         if not project:
             raise ProjectNotFoundError(f"Project with id {cmd.project_id} not found")
 
+        # 0. Instructors cannot be assigned as students to their own projects
+        if project.instructor_id == cmd.student_id:
+            from ..exceptions import AccessDeniedError
+
+            raise AccessDeniedError(
+                f"Instructor {cmd.student_id} cannot be assigned as a student to their own project {cmd.project_id}"
+            )
+
         # Verify student exists in identity
         if not await self._identity.verify_student_exists(cmd.student_id):
             raise StudentNotFoundError(f"Student with id {cmd.student_id} not found")

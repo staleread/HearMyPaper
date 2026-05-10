@@ -71,9 +71,10 @@ class CreateProjectAdapter(CreateProjectPort):
         payload = {
             "title": cmd.title,
             "description": cmd.description,
+            "instructor_id": cmd.instructor_id,
             "deadline": cmd.deadline.isoformat(),
         }
-        response = await self.client.post("/projects/", json=payload)
+        response = await self.client.post("/projects", json=payload)
         response.raise_for_status()
         p = response.json()
         return Project(
@@ -95,6 +96,7 @@ class UpdateProjectAdapter(UpdateProjectPort):
         payload = {
             "title": cmd.title,
             "description": cmd.description,
+            "instructor_id": cmd.instructor_id,
             "deadline": cmd.deadline.isoformat(),
         }
         response = await self.client.put(f"/projects/{project_id}", json=payload)
@@ -116,7 +118,7 @@ class GetProjectAttemptsAdapter(GetProjectAttemptsPort):
 
     @override
     async def __call__(self, project_id: UUID) -> list[AttemptListItem]:
-        response = await self.client.get(f"/projects/{project_id}/attempts/")
+        response = await self.client.get(f"/projects/{project_id}/attempts")
         response.raise_for_status()
         data = response.json()
         return [
