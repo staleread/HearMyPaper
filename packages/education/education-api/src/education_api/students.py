@@ -4,6 +4,7 @@ from typing import override
 from blacksheep import FromJSON
 from blacksheep.server.controllers import Controller, get, post, delete
 from blacksheep.server.responses import ok, created, no_content, not_found, status_code
+from blacksheep.server.authorization import auth
 from pydantic import BaseModel
 
 from education_core.exceptions import (
@@ -45,6 +46,7 @@ class ProjectStudentsController(Controller):
         self.assign_student_to_project = assign_student_to_project
         self.remove_student_from_project = remove_student_from_project
 
+    @auth()
     @get("/{project_id}/students")
     async def get_project_students(self, project_id: UUID):
         try:
@@ -53,6 +55,7 @@ class ProjectStudentsController(Controller):
         except ProjectNotFoundError as e:
             return not_found(str(e))
 
+    @auth()
     @post("/{project_id}/students")
     async def add_student_to_project(
         self, project_id: UUID, data: FromJSON[StudentAssignmentRequest]
@@ -69,6 +72,7 @@ class ProjectStudentsController(Controller):
         except StudentAlreadyAssignedError as e:
             return status_code(409, str(e))
 
+    @auth()
     @delete("/{project_id}/students/{student_id}")
     async def remove_student_from_project(self, project_id: UUID, student_id: str):
         cmd = RemoveStudentFromProjectCommand(

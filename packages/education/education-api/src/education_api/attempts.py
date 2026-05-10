@@ -2,8 +2,10 @@ from uuid import UUID
 from datetime import datetime
 from typing import override, Optional
 
+from blacksheep import Request
 from blacksheep.server.controllers import Controller, get
-from blacksheep.server.responses import ok, not_found, forbidden
+from blacksheep.server.responses import ok, not_found, forbidden, status_code
+from blacksheep.server.authorization import auth
 from pydantic import BaseModel
 
 from education_core.exceptions import (
@@ -42,6 +44,7 @@ class AttemptsController(Controller):
         self.get_project_attempts_port = get_project_attempts_port
         self.view_submission_port = view_submission_port
 
+    @auth()
     @get("/")
     async def get_attempts(self, project_id: UUID):
         attempts = await self.get_project_attempts_port(project_id)
@@ -61,10 +64,15 @@ class AttemptsController(Controller):
             ]
         )
 
+    @auth()
     @get("/{submission_id}/download-url")
     async def get_download_url(
-        self, project_id: UUID, submission_id: UUID, user_id: str
+        self, request: Request, project_id: UUID, submission_id: UUID
     ):
+        user_id = request.user.claims.get("sub")
+        if not user_id:
+            return status_code(401, "User ID not found in token")
+
         try:
             url = await self.view_submission_port(user_id, submission_id)
             return ok({"download_url": url})

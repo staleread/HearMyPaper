@@ -7,10 +7,19 @@ from identity_core.ports.outgoing.token_provider import TokenProviderPort, AuthT
 
 
 class JwtTokenProviderAdapter(TokenProviderPort):
-    def __init__(self, secret: str, lifetime_sec: int, algorithm: str | None = None):
+    def __init__(
+        self,
+        secret: str,
+        lifetime_sec: int,
+        audience: str,
+        issuer: str,
+        algorithm: str | None = None,
+    ):
         self.secret = secret
         self.lifetime_sec = lifetime_sec
-        self.algorithm = algorithm
+        self.audience = audience
+        self.issuer = issuer
+        self.algorithm = algorithm or "HS256"
 
     @override
     def create_token(self, user: AuthUser) -> AuthToken:
@@ -18,6 +27,8 @@ class JwtTokenProviderAdapter(TokenProviderPort):
 
         payload = {
             "sub": user.id,
+            "iss": self.issuer,
+            "aud": self.audience,
             "confidentiality_level": user.confidentiality_level.value,
             "integrity_levels": [level.value for level in user.integrity_levels],
             "exp": expires_at,

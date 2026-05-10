@@ -4,7 +4,9 @@ from openapidocs.v3 import Info
 from rodi import Container
 from blacksheep import Application
 from blacksheep.server.openapi.v3 import OpenAPIHandler
+from blacksheep.server.authentication.jwt import JWTBearerAuthentication
 from blacksheep_prometheus import use_prometheus_metrics
+from essentials.secrets import Secret
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared_kernel.storage import PostgresClient
@@ -136,11 +138,24 @@ use_prometheus_metrics(app)
 use_postgres(app, settings.postgres.url)
 use_redis(app, settings.redis.url)
 
+app.use_authentication().add(
+    JWTBearerAuthentication(
+        secret_key=Secret(settings.jwt.secret, direct_value=True),
+        algorithms=[settings.jwt.algorithm],
+        valid_audiences=[settings.jwt.audience],
+        valid_issuers=[settings.jwt.issuer],
+    )
+)
+app.use_authorization()
+
 jwt_provider = JwtTokenProviderAdapter(
     secret=settings.jwt.secret,
     lifetime_sec=settings.jwt.lifetime_sec,
+    audience=settings.jwt.audience,
+    issuer=settings.jwt.issuer,
     algorithm=settings.jwt.algorithm,
 )
+
 
 storage_client = ObjectStorageClient(
     endpoint_url=settings.minio.url,

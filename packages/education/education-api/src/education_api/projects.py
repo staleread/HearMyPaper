@@ -2,9 +2,10 @@ from datetime import datetime
 from uuid import UUID
 from typing import override
 
-from blacksheep import FromJSON
+from blacksheep import FromJSON, Request
 from blacksheep.server.controllers import Controller, get, post, put
 from blacksheep.server.responses import ok, created, not_found, status_code
+from blacksheep.server.authorization import auth
 from pydantic import BaseModel
 
 from education_core.exceptions import (
@@ -60,8 +61,13 @@ class ProjectsController(Controller):
         self.create_project_port = create_project_port
         self.update_project_port = update_project_port
 
+    @auth()
     @get("/")
-    async def get_projects(self, user_id: str):
+    async def get_projects(self, request: Request):
+        user_id = request.user.claims.get("sub")
+        if not user_id:
+            return status_code(401, "User ID not found in token")
+
         projects = await self.get_user_projects_port(user_id)
         return ok(
             [
@@ -77,6 +83,7 @@ class ProjectsController(Controller):
             ]
         )
 
+    @auth()
     @get("/{project_id}")
     async def get_project(self, project_id: UUID):
         try:
@@ -94,8 +101,15 @@ class ProjectsController(Controller):
         except ProjectNotFoundError as e:
             return not_found(str(e))
 
+    @auth()
     @post("/")
-    async def create_project(self, user_id: str, data: FromJSON[ProjectCreateRequest]):
+    async def create_project(
+        self, request: Request, data: FromJSON[ProjectCreateRequest]
+    ):
+        user_id = request.user.claims.get("sub")
+        if not user_id:
+            return status_code(401, "User ID not found in token")
+
         req = data.value
         cmd = CreateProjectCommand(
             title=req.title,
@@ -119,6 +133,7 @@ class ProjectsController(Controller):
         except ProjectAlreadyExistsError as e:
             return status_code(409, str(e))
 
+    @auth()
     @put("/{project_id}")
     async def update_project(
         self, project_id: UUID, data: FromJSON[ProjectUpdateRequest]

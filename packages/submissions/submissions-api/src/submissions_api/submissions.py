@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import override
 from uuid import UUID
 
-from blacksheep import FromJSON
+from blacksheep import FromJSON, Request
 from blacksheep.server.controllers import Controller, get, post
 from blacksheep.server.responses import ok, not_found, status_code, forbidden
+from blacksheep.server.authorization import auth
 from pydantic import BaseModel
 
 from submissions_core.exceptions import (
@@ -57,10 +58,15 @@ class SubmissionsController(Controller):
         self.get_submission_port = get_submission_port
         self.list_project_submissions_port = list_project_submissions_port
 
+    @auth()
     @post("/upload-url")
     async def request_upload_url(
-        self, user_id: str, data: FromJSON[RequestUploadUrlRequest]
+        self, request: Request, data: FromJSON[RequestUploadUrlRequest]
     ):
+        user_id = request.user.claims.get("sub")
+        if not user_id:
+            return status_code(401, "User ID not found in token")
+
         req = data.value
         cmd = RequestSubmissionUploadCommand(
             student_id=user_id,
@@ -75,8 +81,13 @@ class SubmissionsController(Controller):
         except SubmissionAlreadyExistsError as e:
             return status_code(409, str(e))
 
+    @auth()
     @post("/{submission_id}/commit")
-    async def commit_submission(self, submission_id: UUID, user_id: str):
+    async def commit_submission(self, request: Request, submission_id: UUID):
+        user_id = request.user.claims.get("sub")
+        if not user_id:
+            return status_code(401, "User ID not found in token")
+
         cmd = CommitSubmissionCommand(
             submission_id=submission_id,
             student_id=user_id,
@@ -91,6 +102,7 @@ class SubmissionsController(Controller):
         except InvalidSubmissionStatusError as e:
             return status_code(400, str(e))
 
+    @auth()
     @get("/{submission_id}")
     async def get_submission(self, submission_id: UUID):
         try:
@@ -109,6 +121,7 @@ class SubmissionsController(Controller):
         except SubmissionNotFoundError as e:
             return not_found(str(e))
 
+    @auth()
     @get("/project/{project_id}")
     async def list_submissions(self, project_id: UUID):
         submissions = await self.list_project_submissions_port(project_id)

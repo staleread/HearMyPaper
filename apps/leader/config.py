@@ -38,6 +38,8 @@ class JWTSettings(BaseSettings):
     secret: str = "secret"
     algorithm: str = "HS256"
     lifetime_sec: int = 90000
+    audience: str = "hearmypaper"
+    issuer: str = "hearmypaper-leader"
 
 
 class MinioSettings(BaseSettings):
