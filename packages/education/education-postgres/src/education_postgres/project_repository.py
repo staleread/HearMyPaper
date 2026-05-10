@@ -79,8 +79,8 @@ class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
         await self._session.execute(
             text(
                 """
-                INSERT INTO education.projects (id, title, description, instructor_id, deadline, created_at)
-                VALUES (:id, :title, :description, :instructor_id, :deadline, :created_at)
+                INSERT INTO education.projects (id, title, description, instructor_id, deadline, created_at, max_grade)
+                VALUES (:id, :title, :description, :instructor_id, :deadline, :created_at, :max_grade)
                 """
             ),
             {
@@ -90,6 +90,7 @@ class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
                 "instructor_id": project.instructor_id,
                 "deadline": project.deadline,
                 "created_at": project.created_at,
+                "max_grade": project.max_grade,
             },
         )
 

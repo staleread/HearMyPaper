@@ -15,6 +15,7 @@ from .can_student_submit import CanStudentSubmitPort
 from .register_attempt import RegisterAttemptPort, RegisterAttemptCommand
 from .view_submission import ViewSubmissionPort
 from .get_project_attempts import GetProjectAttemptsPort
+from .grade_lab_attempt import GradeLabAttemptPort, GradeLabAttemptCommand
 
 __all__ = [
     "GetUserProjectsPort",
@@ -33,4 +34,6 @@ __all__ = [
     "RegisterAttemptCommand",
     "ViewSubmissionPort",
     "GetProjectAttemptsPort",
+    "GradeLabAttemptPort",
+    "GradeLabAttemptCommand",
 ]

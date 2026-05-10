@@ -9,6 +9,7 @@ from .can_student_submit import CanStudentSubmitUseCase
 from .register_attempt import RegisterAttemptUseCase
 from .view_submission import ViewSubmissionUseCase
 from .get_project_attempts import GetProjectAttemptsUseCase
+from .grade_lab_attempt import GradeLabAttemptUseCase
 
 __all__ = [
     "GetUserProjectsUseCase",
@@ -22,4 +23,5 @@ __all__ = [
     "RegisterAttemptUseCase",
     "ViewSubmissionUseCase",
     "GetProjectAttemptsUseCase",
+    "GradeLabAttemptUseCase",
 ]

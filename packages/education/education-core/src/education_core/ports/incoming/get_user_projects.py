@@ -1,5 +1,5 @@
 from typing import Protocol
-from ...models import ProjectListItem
+from education_core.models import ProjectListItem
 
 
 class GetUserProjectsPort(Protocol):

@@ -28,3 +28,11 @@ class StudentAlreadyAssignedError(EducationError):
 
 class StudentNotAssignedError(EducationError):
     pass
+
+
+class AttemptAlreadyGradedError(EducationError):
+    pass
+
+
+class InvalidGradeError(EducationError):
+    pass

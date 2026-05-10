@@ -101,6 +101,36 @@ class PostgresAttemptRepositoryAdapter(AttemptRepositoryPort):
         )
 
     @override
+    async def get_by_id(self, attempt_id: UUID) -> LabAttempt | None:
+        result = await self._session.execute(
+            text(
+                """
+                SELECT 
+                    attempt_id, student_id, project_id, submission_id, 
+                    submitted_at, is_on_time, grade, instructor_feedback
+                FROM education.lab_attempts
+                WHERE attempt_id = :id
+                """
+            ),
+            {"id": attempt_id},
+        )
+        row = result.mappings().first()
+
+        if not row:
+            return None
+
+        return LabAttempt(
+            attempt_id=row["attempt_id"],
+            student_id=row["student_id"],
+            project_id=row["project_id"],
+            submission_id=row["submission_id"],
+            submitted_at=row["submitted_at"],
+            is_on_time=row["is_on_time"],
+            grade=row["grade"],
+            instructor_feedback=row["instructor_feedback"],
+        )
+
+    @override
     async def find_by_project(self, project_id: UUID) -> list[AttemptListItem]:
         result = await self._session.execute(
             text(
@@ -126,3 +156,19 @@ class PostgresAttemptRepositoryAdapter(AttemptRepositoryPort):
             )
             for row in rows
         ]
+
+    @override
+    async def update_grading(
+        self, attempt_id: UUID, grade: int, feedback: str | None
+    ) -> None:
+        await self._session.execute(
+            text(
+                """
+                UPDATE education.lab_attempts
+                SET grade = :grade,
+                    instructor_feedback = :feedback
+                WHERE attempt_id = :id
+                """
+            ),
+            {"id": attempt_id, "grade": grade, "feedback": feedback},
+        )

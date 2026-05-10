@@ -11,6 +11,7 @@ class Project:
     instructor_id: str
     deadline: datetime
     created_at: datetime
+    max_grade: int = 100
 
 
 @dataclass(frozen=True, slots=True)
