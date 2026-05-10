@@ -12,8 +12,7 @@ from submissions_core.exceptions import (
     SubmissionAlreadyExistsError,
     InvalidSubmissionStatusError,
     UnauthorizedSubmissionError,
-    ProjectNotFoundError,
-    StudentNotFoundError,
+    AccessDeniedError,
 )
 from submissions_core.ports.incoming import (
     RequestUploadUrlPort,
@@ -71,8 +70,8 @@ class SubmissionsController(Controller):
         try:
             url = await self.request_upload_url_port(cmd)
             return ok({"upload_url": url})
-        except (ProjectNotFoundError, StudentNotFoundError) as e:
-            return not_found(str(e))
+        except AccessDeniedError as e:
+            return forbidden(str(e))
         except SubmissionAlreadyExistsError as e:
             return status_code(409, str(e))
 

@@ -99,3 +99,34 @@ class PostgresAttemptRepositoryAdapter(AttemptRepositoryPort):
             grade=row["grade"],
             instructor_feedback=row["instructor_feedback"],
         )
+
+    @override
+    async def find_by_project(self, project_id: UUID) -> list[LabAttempt]:
+        result = await self._session.execute(
+            text(
+                """
+                SELECT 
+                    attempt_id, student_id, project_id, submission_id, 
+                    submitted_at, is_on_time, grade, instructor_feedback
+                FROM education.lab_attempts
+                WHERE project_id = :project_id
+                ORDER BY submitted_at DESC
+                """
+            ),
+            {"project_id": project_id},
+        )
+        rows = result.mappings().all()
+
+        return [
+            LabAttempt(
+                attempt_id=row["attempt_id"],
+                student_id=row["student_id"],
+                project_id=row["project_id"],
+                submission_id=row["submission_id"],
+                submitted_at=row["submitted_at"],
+                is_on_time=row["is_on_time"],
+                grade=row["grade"],
+                instructor_feedback=row["instructor_feedback"],
+            )
+            for row in rows
+        ]

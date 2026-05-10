@@ -8,6 +8,7 @@ from .remove_student_from_project import RemoveStudentFromProjectUseCase
 from .can_student_submit import CanStudentSubmitUseCase
 from .register_attempt import RegisterAttemptUseCase
 from .view_submission import ViewSubmissionUseCase
+from .get_project_attempts import GetProjectAttemptsUseCase
 
 __all__ = [
     "GetUserProjectsUseCase",
@@ -20,4 +21,5 @@ __all__ = [
     "CanStudentSubmitUseCase",
     "RegisterAttemptUseCase",
     "ViewSubmissionUseCase",
+    "GetProjectAttemptsUseCase",
 ]

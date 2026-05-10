@@ -64,6 +64,7 @@ from education_core.ports.incoming import (
     CanStudentSubmitPort,
     RegisterAttemptPort,
     ViewSubmissionPort,
+    GetProjectAttemptsPort,
 )
 from education_core.use_cases import (
     GetUserProjectsUseCase,
@@ -76,6 +77,7 @@ from education_core.use_cases import (
     CanStudentSubmitUseCase,
     RegisterAttemptUseCase,
     ViewSubmissionUseCase,
+    GetProjectAttemptsUseCase,
 )
 from education_core.ports.outgoing.project_repository import ProjectRepositoryPort
 from education_core.ports.outgoing.project_student_repository import (
@@ -182,6 +184,7 @@ storage_client = ObjectStorageClient(
     .add_scoped(CanStudentSubmitPort, CanStudentSubmitUseCase)
     .add_scoped(RegisterAttemptPort, RegisterAttemptUseCase)
     .add_scoped(ViewSubmissionPort, ViewSubmissionUseCase)
+    .add_scoped(GetProjectAttemptsPort, GetProjectAttemptsUseCase)
     # Outgoing submissions adapters
     .add_instance(
         S3StorageAdapter(storage_client, bucket="submissions"),

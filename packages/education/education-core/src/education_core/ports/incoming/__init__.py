@@ -14,6 +14,7 @@ from .remove_student_from_project import (
 from .can_student_submit import CanStudentSubmitPort
 from .register_attempt import RegisterAttemptPort, RegisterAttemptCommand
 from .view_submission import ViewSubmissionPort
+from .get_project_attempts import GetProjectAttemptsPort
 
 __all__ = [
     "GetUserProjectsPort",
@@ -31,4 +32,5 @@ __all__ = [
     "RegisterAttemptPort",
     "RegisterAttemptCommand",
     "ViewSubmissionPort",
+    "GetProjectAttemptsPort",
 ]
