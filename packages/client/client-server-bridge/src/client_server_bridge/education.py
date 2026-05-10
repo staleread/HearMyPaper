@@ -11,7 +11,7 @@ class EducationPortAdapter(EducationPort):
         self.client = client
 
     async def get_my_projects(self) -> list[Project]:
-        response = await self.client.get("/projects/")
+        response = await self.client.get("/projects")
         if response.status_code == 404:
             return []
         response.raise_for_status()

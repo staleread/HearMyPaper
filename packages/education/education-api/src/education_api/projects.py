@@ -49,6 +49,7 @@ class ProjectResponse(BaseModel):
 class ProjectListItemResponse(BaseModel):
     id: UUID
     title: str
+    instructor_id: str
     deadline: datetime
 
 
@@ -83,6 +84,7 @@ class Projects(Controller):
                 ProjectListItemResponse(
                     id=p.id,
                     title=p.title,
+                    instructor_id=p.instructor_id,
                     deadline=p.deadline,
                 )
                 for p in projects

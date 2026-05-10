@@ -18,6 +18,7 @@ class Project:
 class ProjectListItem:
     id: UUID
     title: str
+    instructor_id: str
     deadline: datetime
 
 

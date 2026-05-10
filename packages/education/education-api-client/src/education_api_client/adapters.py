@@ -29,13 +29,14 @@ class GetUserProjectsAdapter(GetUserProjectsPort):
 
     @override
     async def __call__(self, user_id: str) -> list[ProjectListItem]:
-        response = await self.client.get("/projects/")
+        response = await self.client.get("/projects")
         response.raise_for_status()
         data = response.json()
         return [
             ProjectListItem(
                 id=UUID(p["id"]),
                 title=p["title"],
+                instructor_id=p["instructor_id"],
                 deadline=datetime.fromisoformat(p["deadline"]),
             )
             for p in data

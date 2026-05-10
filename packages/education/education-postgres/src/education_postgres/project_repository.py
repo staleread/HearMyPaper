@@ -18,7 +18,7 @@ class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
         result = await self._session.execute(
             text(
                 """
-                SELECT p.id, p.title, p.deadline
+                SELECT p.id, p.title, p.instructor_id, p.deadline
                 FROM education.projects p
                 LEFT JOIN education.project_students ps ON p.id = ps.project_id
                 WHERE p.instructor_id = :user_id OR ps.student_id = :user_id
@@ -33,6 +33,7 @@ class PostgresProjectRepositoryAdapter(ProjectRepositoryPort):
             ProjectListItem(
                 id=row["id"],
                 title=row["title"],
+                instructor_id=row["instructor_id"],
                 deadline=row["deadline"],
             )
             for row in rows
