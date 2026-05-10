@@ -10,6 +10,14 @@ class ProjectNotFoundError(EducationError):
     pass
 
 
+class AttemptNotFoundError(EducationError):
+    pass
+
+
+class AccessDeniedError(EducationError):
+    pass
+
+
 class StudentNotFoundError(EducationError):
     pass
 

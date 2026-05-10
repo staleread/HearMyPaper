@@ -1,3 +1,4 @@
+from dataclasses import replace
 from uuid import UUID
 from ..models import Project
 from ..exceptions import ProjectNotFoundError, ProjectAlreadyExistsError
@@ -25,9 +26,12 @@ class UpdateProjectUseCase(UpdateProjectPort):
                     f"Project with title '{cmd.title}' already exists"
                 )
 
-        project.title = cmd.title
-        project.description = cmd.description
-        project.deadline = cmd.deadline
+        updated_project = replace(
+            project,
+            title=cmd.title,
+            description=cmd.description,
+            deadline=cmd.deadline,
+        )
 
-        await self._projects.update(project)
-        return project
+        await self._projects.update(updated_project)
+        return updated_project

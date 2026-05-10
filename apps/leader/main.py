@@ -1,3 +1,4 @@
+import asyncio
 from typing import cast
 from openapidocs.v3 import Info
 from rodi import Container
@@ -9,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared_kernel.storage import PostgresClient
 from shared_kernel.storage.object import ObjectStorageClient
 from shared_kernel.marshal import from_b64
+from shared_kernel.events import RabbitMQClient
 from config import get_settings
 
 
@@ -59,6 +61,9 @@ from education_core.ports.incoming import (
     GetProjectStudentsPort,
     AssignStudentToProjectPort,
     RemoveStudentFromProjectPort,
+    CanStudentSubmitPort,
+    RegisterAttemptPort,
+    ViewSubmissionPort,
 )
 from education_core.use_cases import (
     GetUserProjectsUseCase,
@@ -68,18 +73,25 @@ from education_core.use_cases import (
     GetProjectStudentsUseCase,
     AssignStudentToProjectUseCase,
     RemoveStudentFromProjectUseCase,
+    CanStudentSubmitUseCase,
+    RegisterAttemptUseCase,
+    ViewSubmissionUseCase,
 )
 from education_core.ports.outgoing.project_repository import ProjectRepositoryPort
 from education_core.ports.outgoing.project_student_repository import (
     ProjectStudentRepositoryPort,
 )
 from education_core.ports.outgoing.identity_service import IdentityServicePort
+from education_core.ports.outgoing.attempt_repository import AttemptRepositoryPort
+from education_core.ports.outgoing.download_url_provider import DownloadUrlProviderPort
 
 from education_postgres import (
     PostgresProjectRepositoryAdapter,
     PostgresProjectStudentRepositoryAdapter,
+    PostgresAttemptRepositoryAdapter,
 )
 from education_identity_bridge import IdentityServiceAdapter
+from education_rabbitmq import RabbitMQEventConsumer
 
 import submissions_api  # noqa: F401
 from submissions_core.ports.incoming import (
@@ -97,11 +109,16 @@ from submissions_core.use_cases import (
 from submissions_core.ports.outgoing import (
     SubmissionRepositoryPort,
     StoragePort,
-    EducationServicePort,
+    SubmissionEligibilityPort,
+    EventPublisherPort,
 )
 from submissions_postgres import PostgresSubmissionRepositoryAdapter
 from submissions_storage import S3StorageAdapter
-from submissions_education_bridge import EducationServiceAdapter
+from submissions_education_bridge import (
+    EducationServiceAdapter,
+    DownloadUrlProviderAdapter,
+)
+from submissions_rabbitmq import RabbitMQEventPublisherAdapter
 
 from utils import use_postgres, use_redis
 
@@ -131,6 +148,7 @@ storage_client = ObjectStorageClient(
 
 (
     cast(Container, app.services)
+    .add_instance(RabbitMQClient(settings.rabbitmq.url), RabbitMQClient)
     # Outgoing identity adapters
     .add_instance(jwt_provider, TokenProviderPort)
     .add_singleton(IdentityProviderPort, PseudonymIdentityProviderAdapter)
@@ -151,6 +169,8 @@ storage_client = ObjectStorageClient(
     .add_scoped(ProjectRepositoryPort, PostgresProjectRepositoryAdapter)
     .add_scoped(ProjectStudentRepositoryPort, PostgresProjectStudentRepositoryAdapter)
     .add_scoped(IdentityServicePort, IdentityServiceAdapter)
+    .add_scoped(AttemptRepositoryPort, PostgresAttemptRepositoryAdapter)
+    .add_scoped(DownloadUrlProviderPort, DownloadUrlProviderAdapter)
     # Education use cases
     .add_scoped(GetUserProjectsPort, GetUserProjectsUseCase)
     .add_scoped(GetProjectPort, GetProjectUseCase)
@@ -159,13 +179,17 @@ storage_client = ObjectStorageClient(
     .add_scoped(GetProjectStudentsPort, GetProjectStudentsUseCase)
     .add_scoped(AssignStudentToProjectPort, AssignStudentToProjectUseCase)
     .add_scoped(RemoveStudentFromProjectPort, RemoveStudentFromProjectUseCase)
+    .add_scoped(CanStudentSubmitPort, CanStudentSubmitUseCase)
+    .add_scoped(RegisterAttemptPort, RegisterAttemptUseCase)
+    .add_scoped(ViewSubmissionPort, ViewSubmissionUseCase)
     # Outgoing submissions adapters
     .add_instance(
         S3StorageAdapter(storage_client, bucket="submissions"),
         StoragePort,
     )
     .add_scoped(SubmissionRepositoryPort, PostgresSubmissionRepositoryAdapter)
-    .add_scoped(EducationServicePort, EducationServiceAdapter)
+    .add_scoped(SubmissionEligibilityPort, EducationServiceAdapter)
+    .add_scoped(EventPublisherPort, RabbitMQEventPublisherAdapter)
     # Submissions use cases
     .add_scoped(RequestUploadUrlPort, RequestUploadUrlUseCase)
     .add_scoped(CommitSubmissionPort, CommitSubmissionUseCase)
@@ -176,10 +200,15 @@ storage_client = ObjectStorageClient(
 
 @app.lifespan
 async def initialize(app: Application):
-    services = cast(Container, app.services).provider
-    postgres_client = services.get(PostgresClient)
+    services = cast(Container, app.services)
+    postgres_client = services.provider.get(PostgresClient)
+    rabbitmq_client = services.provider.get(RabbitMQClient)
 
-    with services.create_scope() as scope:
+    # Start RabbitMQ Consumer
+    consumer = RabbitMQEventConsumer(rabbitmq_client, services, postgres_client)
+    consumer_task = asyncio.create_task(consumer.start_consuming())
+
+    with services.provider.create_scope() as scope:
         async with postgres_client.transactional_session() as session:
             # Seed the session into the lifespan's scope
             scope.scoped_services[AsyncSession] = session
@@ -204,3 +233,11 @@ async def initialize(app: Application):
                 print(f"[ERROR] Failed to create initial user: {e}")
 
     yield
+
+    # Cleanup
+    consumer_task.cancel()
+    try:
+        await consumer_task
+    except asyncio.CancelledError:
+        pass
+    await rabbitmq_client.close()

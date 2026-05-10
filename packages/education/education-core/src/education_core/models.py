@@ -11,3 +11,15 @@ class Project:
     instructor_id: str
     deadline: datetime
     created_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class LabAttempt:
+    attempt_id: UUID
+    student_id: str
+    project_id: UUID
+    submission_id: UUID
+    submitted_at: datetime
+    is_on_time: bool
+    grade: int | None = None
+    instructor_feedback: str | None = None

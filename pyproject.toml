@@ -22,11 +22,13 @@ members = [
     "packages/education/education-core",
     "packages/education/education-api",
     "packages/education/education-postgres",
+    "packages/education/education-rabbitmq",
     "packages/education/education-identity-bridge",
     "packages/submissions/submissions-core",
     "packages/submissions/submissions-api",
     "packages/submissions/submissions-postgres",
     "packages/submissions/submissions-storage",
+    "packages/submissions/submissions-rabbitmq",
     "packages/submissions/submissions-education-bridge",
 ]
 

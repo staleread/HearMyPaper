@@ -5,6 +5,9 @@ from .update_project import UpdateProjectUseCase
 from .get_project_students import GetProjectStudentsUseCase
 from .assign_student_to_project import AssignStudentToProjectUseCase
 from .remove_student_from_project import RemoveStudentFromProjectUseCase
+from .can_student_submit import CanStudentSubmitUseCase
+from .register_attempt import RegisterAttemptUseCase
+from .view_submission import ViewSubmissionUseCase
 
 __all__ = [
     "GetUserProjectsUseCase",
@@ -14,4 +17,7 @@ __all__ = [
     "GetProjectStudentsUseCase",
     "AssignStudentToProjectUseCase",
     "RemoveStudentFromProjectUseCase",
+    "CanStudentSubmitUseCase",
+    "RegisterAttemptUseCase",
+    "ViewSubmissionUseCase",
 ]

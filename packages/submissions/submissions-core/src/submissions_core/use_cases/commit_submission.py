@@ -1,3 +1,5 @@
+from datetime import datetime, UTC
+from shared_kernel.events import SubmissionCommittedEvent
 from ..models import SubmissionStatus
 from ..exceptions import (
     SubmissionNotFoundError,
@@ -9,11 +11,15 @@ from ..ports.incoming.commit_submission import (
     CommitSubmissionCommand,
 )
 from ..ports.outgoing.submission_repository import SubmissionRepositoryPort
+from ..ports.outgoing.event_publisher import EventPublisherPort
 
 
 class CommitSubmissionUseCase(CommitSubmissionPort):
-    def __init__(self, submissions: SubmissionRepositoryPort):
+    def __init__(
+        self, submissions: SubmissionRepositoryPort, publisher: EventPublisherPort
+    ):
         self._submissions = submissions
+        self._publisher = publisher
 
     async def __call__(self, cmd: CommitSubmissionCommand) -> None:
         submission = await self._submissions.find_by_id(cmd.submission_id)
@@ -33,3 +39,11 @@ class CommitSubmissionUseCase(CommitSubmissionPort):
         await self._submissions.update_status(
             cmd.submission_id, SubmissionStatus.COMMITTED
         )
+
+        event = SubmissionCommittedEvent(
+            submission_id=submission.submission_id,
+            student_id=submission.student_id,
+            project_id=submission.project_id,
+            timestamp=datetime.now(UTC),
+        )
+        await self._publisher.publish_submission_committed(event)

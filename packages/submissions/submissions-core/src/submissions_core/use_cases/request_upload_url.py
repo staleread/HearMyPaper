@@ -2,9 +2,7 @@ from uuid import uuid4
 from datetime import datetime, UTC
 from ..models import LabSubmission, SubmissionStatus
 from ..exceptions import (
-    ProjectNotFoundError,
-    StudentNotFoundError,
-    SubmissionAlreadyExistsError,
+    AccessDeniedError,
 )
 from ..ports.incoming.request_upload_url import (
     RequestUploadUrlPort,
@@ -12,7 +10,7 @@ from ..ports.incoming.request_upload_url import (
 )
 from ..ports.outgoing.submission_repository import SubmissionRepositoryPort
 from ..ports.outgoing.storage import StoragePort
-from ..ports.outgoing.education_service import EducationServicePort
+from ..ports.outgoing.submission_eligibility import SubmissionEligibilityPort
 
 
 class RequestUploadUrlUseCase(RequestUploadUrlPort):
@@ -20,29 +18,18 @@ class RequestUploadUrlUseCase(RequestUploadUrlPort):
         self,
         submissions: SubmissionRepositoryPort,
         storage: StoragePort,
-        education: EducationServicePort,
+        eligibility: SubmissionEligibilityPort,
     ):
         self._submissions = submissions
         self._storage = storage
-        self._education = education
+        self._eligibility = eligibility
 
     async def __call__(self, cmd: RequestSubmissionUploadCommand) -> str:
-        if not await self._education.verify_project_exists(cmd.project_id):
-            raise ProjectNotFoundError(f"Project {cmd.project_id} not found")
-
-        if not await self._education.verify_student_belongs_to_project(
+        if not await self._eligibility.can_student_submit(
             cmd.student_id, cmd.project_id
         ):
-            raise StudentNotFoundError(
-                f"Student {cmd.student_id} is not assigned to project {cmd.project_id}"
-            )
-
-        existing = await self._submissions.find_by_student_and_project(
-            cmd.student_id, cmd.project_id
-        )
-        if existing and existing.status == SubmissionStatus.COMMITTED:
-            raise SubmissionAlreadyExistsError(
-                f"Student {cmd.student_id} already submitted for project {cmd.project_id}"
+            raise AccessDeniedError(
+                f"Student {cmd.student_id} is not allowed to submit for project {cmd.project_id}"
             )
 
         submission_id = uuid4()

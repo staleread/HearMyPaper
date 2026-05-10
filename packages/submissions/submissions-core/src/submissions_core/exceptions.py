@@ -18,6 +18,10 @@ class UnauthorizedSubmissionError(SubmissionsError):
     pass
 
 
+class AccessDeniedError(SubmissionsError):
+    pass
+
+
 class ProjectNotFoundError(SubmissionsError):
     pass
 
