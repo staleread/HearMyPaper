@@ -1,36 +1,54 @@
+import asyncio
+import toga
 from result import Ok
+from uuid import UUID
 from ...shared.ui.item_info_screen import item_info_screen
-from .. import service
 
 
-def submission_info_screen(navigator, submission_id):
-    result = service.list_submissions(navigator.session)
+def submission_info_screen(navigator, attempt_id):
+    if isinstance(attempt_id, str):
+        attempt_id = UUID(attempt_id)
 
-    if result.is_err():
-        data = result
-    else:
-        submissions = result.unwrap()
-        submission = next((s for s in submissions if s.id == submission_id), None)
+    container = toga.Box(children=[toga.Label("Loading attempt details...")])
 
-        if submission:
-            data = Ok(submission.model_dump())
-        else:
-            data = result.map_err(lambda _: "Submission not found")
+    async def load_attempt():
+        try:
+            attempt = await navigator.get_attempt_use_case(attempt_id)
 
-    def on_open():
-        navigator.navigate("submission_open_form", submission_id=submission_id)
+            attempt_data = {
+                "id": str(attempt.id),
+                "student_id": attempt.student_id,
+                "submitted_at": attempt.submitted_at.isoformat(),
+                "on_time": "Yes" if attempt.is_on_time else "No",
+                "grade": str(attempt.grade)
+                if attempt.grade is not None
+                else "Not graded",
+                "feedback": attempt.feedback or "No feedback",
+            }
 
-    def on_pdf_to_audio():
-        navigator.navigate("submission_convert_form", submission_id=submission_id)
+            def on_grade():
+                navigator.navigate("submission_grade_form", attempt_data)
 
-    actions = [
-        ("Open", on_open),
-        ("PDF to Audio", on_pdf_to_audio),
-    ]
+            def on_pdf_to_audio():
+                navigator.navigate("submission_convert_form", attempt_id=attempt_id)
 
-    return item_info_screen(
-        title="Submission Details",
-        data=data,
-        on_back=lambda w: navigator.navigate("submissions_catalog"),
-        actions=actions,
-    )
+            actions = [
+                ("Grade", on_grade),
+                ("PDF to Audio", on_pdf_to_audio),
+            ]
+
+            info_screen = item_info_screen(
+                title="Attempt Details",
+                data=Ok(attempt_data),
+                on_back=lambda w: navigator.navigate("resource_catalog"),
+                actions=actions,
+            )
+            navigator.main_window.content = info_screen
+        except Exception as e:
+            await navigator.main_window.dialog(
+                toga.ErrorDialog("Error", f"Failed to load attempt: {e}")
+            )
+            navigator.navigate("resource_catalog")
+
+    asyncio.create_task(load_attempt())
+    return container

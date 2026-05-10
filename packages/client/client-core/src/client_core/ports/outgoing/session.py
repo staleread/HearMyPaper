@@ -1,0 +1,6 @@
+from typing import Protocol
+
+
+class SessionProviderPort(Protocol):
+    def get_token(self) -> str | None: ...
+    def set_token(self, token: str) -> None: ...

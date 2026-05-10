@@ -7,6 +7,7 @@ from ..exceptions import (
 from ..ports.incoming.request_upload_url import (
     RequestUploadUrlPort,
     RequestSubmissionUploadCommand,
+    UploadUrlResponse,
 )
 from ..ports.outgoing.submission_repository import SubmissionRepositoryPort
 from ..ports.outgoing.storage import StoragePort
@@ -24,7 +25,7 @@ class RequestUploadUrlUseCase(RequestUploadUrlPort):
         self._storage = storage
         self._eligibility = eligibility
 
-    async def __call__(self, cmd: RequestSubmissionUploadCommand) -> str:
+    async def __call__(self, cmd: RequestSubmissionUploadCommand) -> UploadUrlResponse:
         if not await self._eligibility.can_student_submit(
             cmd.student_id, cmd.project_id
         ):
@@ -52,4 +53,7 @@ class RequestUploadUrlUseCase(RequestUploadUrlPort):
 
         await self._submissions.save(submission)
 
-        return upload_url
+        return UploadUrlResponse(
+            upload_url=upload_url,
+            submission_id=submission_id,
+        )

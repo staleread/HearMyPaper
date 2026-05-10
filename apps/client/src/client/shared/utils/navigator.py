@@ -1,9 +1,42 @@
 import toml
 import toga
+import httpx
 from toga.paths import Paths
 from typing import Callable, Any
 
-from .session import ApiSession
+from client_core.ports.outgoing.session import SessionProviderPort
+from client_server_bridge import (
+    IdentityPortAdapter,
+    EducationPortAdapter,
+    SubmissionsPortAdapter,
+)
+from client_credentials import FileCredentialsStorageAdapter
+from client_core.use_cases.login import LoginUseCase
+from client_core.use_cases.get_user import GetUserUseCase
+from client_core.use_cases.create_user import CreateUserUseCase
+from client_core.use_cases.update_user import UpdateUserUseCase
+from client_core.use_cases.get_project import GetProjectUseCase
+from client_core.use_cases.create_project import CreateProjectUseCase
+from client_core.use_cases.update_project import UpdateProjectUseCase
+from client_core.use_cases.get_project_attempts import GetProjectAttemptsUseCase
+from client_core.use_cases.get_attempt import GetAttemptUseCase
+from client_core.use_cases.grade_attempt import GradeAttemptUseCase
+from client_core.use_cases.get_my_projects import GetMyProjectsUseCase
+from client_core.use_cases.manage_students import ManageStudentsUseCase
+from client_core.use_cases.upload_submission import UploadSubmissionUseCase
+
+
+class SessionProvider(SessionProviderPort):
+    def __init__(self, async_client: httpx.AsyncClient):
+        self._token: str | None = None
+        self._async_client = async_client
+
+    def get_token(self) -> str | None:
+        return self._token
+
+    def set_token(self, token: str) -> None:
+        self._token = token
+        self._async_client.headers["Authorization"] = f"Bearer {token}"
 
 
 class Navigator:
@@ -20,7 +53,54 @@ class Navigator:
         self.api_base_url = config.get("api", {}).get(
             "base_url", "http://localhost:8000"
         )
-        self.session = ApiSession(base_url=self.api_base_url)
+        self.async_client = httpx.AsyncClient(base_url=self.api_base_url)
+
+        # Adapters
+        self.session_provider = SessionProvider(self.async_client)
+        self.identity_port = IdentityPortAdapter(self.async_client)
+        self.education_port = EducationPortAdapter(self.async_client)
+        self.submissions_port = SubmissionsPortAdapter(self.async_client)
+        self.credentials_port = FileCredentialsStorageAdapter()
+
+        # Use Cases
+        self.login_use_case = LoginUseCase(
+            identity_port=self.identity_port,
+            credentials_port=self.credentials_port,
+            session_provider=self.session_provider,
+        )
+        self.get_user_use_case = GetUserUseCase(identity_port=self.identity_port)
+        self.create_user_use_case = CreateUserUseCase(
+            identity_port=self.identity_port, credentials_port=self.credentials_port
+        )
+        self.update_user_use_case = UpdateUserUseCase(identity_port=self.identity_port)
+        self.get_project_use_case = GetProjectUseCase(
+            education_port=self.education_port
+        )
+        self.create_project_use_case = CreateProjectUseCase(
+            education_port=self.education_port
+        )
+        self.update_project_use_case = UpdateProjectUseCase(
+            education_port=self.education_port
+        )
+        self.get_project_attempts_use_case = GetProjectAttemptsUseCase(
+            education_port=self.education_port
+        )
+        self.get_attempt_use_case = GetAttemptUseCase(
+            education_port=self.education_port
+        )
+        self.grade_attempt_use_case = GradeAttemptUseCase(
+            education_port=self.education_port
+        )
+        self.get_my_projects_use_case = GetMyProjectsUseCase(
+            education_port=self.education_port
+        )
+        self.manage_students_use_case = ManageStudentsUseCase(
+            education_port=self.education_port
+        )
+        self.upload_submission_use_case = UploadSubmissionUseCase(
+            submissions_port=self.submissions_port
+        )
+
         self.credentials_path: str | None = None
 
     def register_screen(self, name, screen_factory):

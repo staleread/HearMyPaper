@@ -1,5 +1,6 @@
 from .get_user_projects import GetUserProjectsUseCase
 from .get_project import GetProjectUseCase
+from .get_lab_attempt import GetLabAttemptUseCase
 from .create_project import CreateProjectUseCase
 from .update_project import UpdateProjectUseCase
 from .get_project_students import GetProjectStudentsUseCase
@@ -14,6 +15,7 @@ from .grade_lab_attempt import GradeLabAttemptUseCase
 __all__ = [
     "GetUserProjectsUseCase",
     "GetProjectUseCase",
+    "GetLabAttemptUseCase",
     "CreateProjectUseCase",
     "UpdateProjectUseCase",
     "GetProjectStudentsUseCase",

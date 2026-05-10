@@ -1,107 +1,106 @@
+import asyncio
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
-
-from ..service import assign_students, get_project_students
-from ..dto import StudentAssignmentDto
+from uuid import UUID
 
 
 def manage_students_form_screen(navigator, project_id):
-    children = [
-        toga.Label(
-            "Manage Students",
-            style=Pack(
-                font_size=18, font_weight="bold", margin=(0, 0, 10, 0)
-            ),
-        ),
-        toga.Label(
-            "Enter student emails, one per line:",
-            style=Pack(margin=(0, 0, 5, 0)),
-        ),
-    ]
+    if isinstance(project_id, str):
+        project_id = UUID(project_id)
 
-    # Fetch existing student emails
-    existing_emails_result = get_project_students(navigator.session, project_id)
-    initial_value = ""
-    if existing_emails_result.is_ok():
-        existing_emails = existing_emails_result.unwrap()
-        initial_value = "\n".join(existing_emails)
-
-    emails_input = toga.MultilineTextInput(
-        placeholder="student1@example.com\nstudent2@example.com",
-        value=initial_value,
-        style=Pack(height=200),
+    student_list = toga.Table(
+        headings=["Pseudonym"],
+        style=Pack(flex=1, height=300),
     )
 
-    async def on_submit(widget):
-        if not emails_input.value or not emails_input.value.strip():
-            dialog = toga.ErrorDialog(
-                title="Error", message="Please enter at least one email address"
+    new_student_input = toga.TextInput(
+        placeholder="Enter student pseudonym", style=Pack(flex=1)
+    )
+
+    async def load_students():
+        try:
+            students = await navigator.manage_students_use_case.get_students(project_id)
+            student_list.data = [{"pseudonym": s} for s in students]
+        except Exception as e:
+            await navigator.main_window.dialog(
+                toga.ErrorDialog("Error", f"Failed to load students: {e}")
             )
-            await navigator.main_window.dialog(dialog)
+
+    async def on_add_student(widget):
+        pseudonym = new_student_input.value.strip()
+        if not pseudonym:
             return
-
-        email_lines = [
-            line.strip()
-            for line in emails_input.value.strip().split("\n")
-            if line.strip()
-        ]
-
-        invalid_emails = [
-            email for email in email_lines if "@" not in email or "." not in email
-        ]
-        if invalid_emails:
-            dialog = toga.ErrorDialog(
-                title="Error",
-                message=f"Invalid email addresses:\n{', '.join(invalid_emails)}",
-            )
-            await navigator.main_window.dialog(dialog)
-            return
-
-        assignment_dto = StudentAssignmentDto(student_emails=email_lines)
 
         try:
-            result = assign_students(navigator.session, project_id, assignment_dto)
-
-            if result.is_ok():
-                success_dialog = toga.InfoDialog(
-                    title="Success",
-                    message="Students assigned successfully!",
-                )
-                await navigator.main_window.dialog(success_dialog)
-                navigator.navigate("project_info", project_id)
-            else:
-                error_dialog = toga.ErrorDialog(
-                    title="Error",
-                    message=f"Failed to assign students: {result.unwrap_err()}",
-                )
-                await navigator.main_window.dialog(error_dialog)
+            await navigator.manage_students_use_case.assign_student(
+                project_id, pseudonym
+            )
+            new_student_input.value = ""
+            await load_students()
         except Exception as e:
-            dialog = toga.ErrorDialog(title="Error", message=f"Invalid input: {e}")
-            await navigator.main_window.dialog(dialog)
+            await navigator.main_window.dialog(
+                toga.ErrorDialog("Error", f"Failed to add student: {e}")
+            )
 
-    def on_cancel(widget):
-        navigator.navigate("project_info", project_id)
+    async def on_remove_student(widget):
+        selection = student_list.selection
+        if not selection:
+            await navigator.main_window.dialog(
+                toga.InfoDialog("Info", "Please select a student to remove")
+            )
+            return
 
-    children.extend(
-        [
-            emails_input,
+        # If multi-select is off, selection is a single Row object.
+        # If on, it's a list. We assume single select here or take the first.
+        if isinstance(selection, list):
+            if not selection:
+                return
+            row = selection[0]
+        else:
+            row = selection
+
+        pseudonym = getattr(row, "pseudonym")
+        try:
+            await navigator.manage_students_use_case.remove_student(
+                project_id, pseudonym
+            )
+            await load_students()
+        except Exception as e:
+            await navigator.main_window.dialog(
+                toga.ErrorDialog("Error", f"Failed to remove student: {e}")
+            )
+
+    container = toga.Box(
+        children=[
+            toga.Label(
+                "Manage Project Students",
+                style=Pack(font_size=14, font_weight="bold", margin_bottom=10),
+            ),
             toga.Box(
                 children=[
-                    toga.Button("Save", on_press=on_submit),
-                    toga.Button("Cancel", on_press=on_cancel),
+                    new_student_input,
+                    toga.Button("Add", on_press=on_add_student),
                 ],
-                style=Pack(
-                    direction=ROW, margin=(10, 0, 0, 0)
-                ),
+                style=Pack(direction=ROW, gap=5, margin_bottom=10),
             ),
-        ]
+            student_list,
+            toga.Box(
+                children=[
+                    toga.Button("Remove Selected", on_press=on_remove_student),
+                    toga.Button(
+                        "Back",
+                        on_press=lambda w: navigator.navigate(
+                            "project_info", project_id
+                        ),
+                    ),
+                ],
+                style=Pack(direction=ROW, gap=5, margin_top=10),
+            ),
+        ],
+        style=Pack(direction=COLUMN, margin=20),
     )
 
-    return toga.ScrollContainer(
-        horizontal=False,
-        content=toga.Box(
-            children=children,
-            style=Pack(direction=COLUMN, margin=20, gap=10),
-        ),
-    )
+    asyncio.create_task(load_students())
+
+    return container

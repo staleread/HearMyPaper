@@ -30,6 +30,11 @@ class RequestUploadUrlRequest(BaseModel):
     file_extension: str
 
 
+class RequestUploadUrlResponse(BaseModel):
+    upload_url: str
+    submission_id: UUID
+
+
 class SubmissionResponse(BaseModel):
     submission_id: UUID
     student_id: str
@@ -81,8 +86,13 @@ class Submissions(Controller):
             file_extension=req.file_extension,
         )
         try:
-            url = await self.request_upload_url_port(cmd)
-            return ok({"upload_url": url})
+            resp = await self.request_upload_url_port(cmd)
+            return ok(
+                RequestUploadUrlResponse(
+                    upload_url=resp.upload_url,
+                    submission_id=resp.submission_id,
+                )
+            )
         except AccessDeniedError as e:
             return forbidden(str(e))
         except SubmissionAlreadyExistsError as e:

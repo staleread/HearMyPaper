@@ -10,5 +10,13 @@ class RequestSubmissionUploadCommand:
     file_extension: str
 
 
+@dataclass(frozen=True)
+class UploadUrlResponse:
+    upload_url: str
+    submission_id: UUID
+
+
 class RequestUploadUrlPort(Protocol):
-    async def __call__(self, cmd: RequestSubmissionUploadCommand) -> str: ...
+    async def __call__(
+        self, cmd: RequestSubmissionUploadCommand
+    ) -> UploadUrlResponse: ...

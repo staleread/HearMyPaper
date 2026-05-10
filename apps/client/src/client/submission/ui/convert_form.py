@@ -3,9 +3,6 @@ import asyncio
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 
-from ..service import convert_submission_to_audio, download_submission
-from ...auth.utils import get_user_credentials
-
 
 def submission_convert_form_screen(navigator, submission_id: int):
     """
@@ -73,77 +70,14 @@ def submission_convert_form_screen(navigator, submission_id: int):
             await show_error(f"File selection error: {e}")
 
     async def on_convert(widget):
-        if not navigator.credentials_path:
-            await show_error("Credentials not found. Please login again.")
-            navigator.navigate("login")
-            return
-
-        if not token_password_input.value:
-            await show_error("Please enter token password")
-            return
-
-        if not output_file_input.value:
-            await show_error("Please select output file location")
-            return
-
-        widget.enabled = False
-        status_label.text = "⏳ Starting conversion..."
-
-        try:
-            _, user_private_key_bytes = get_user_credentials(
-                navigator.credentials_path, token_password_input.value
+        await navigator.main_window.dialog(
+            toga.InfoDialog(
+                "Audio Conversion",
+                "Submission to audio conversion is not yet supported in this version. "
+                "Please check for updates later.",
             )
-
-            status_label.text = "⏳ Verifying submission file..."
-            file_result = download_submission(
-                navigator.session,
-                navigator.app_paths,
-                submission_id,
-                user_private_key_bytes,
-            )
-
-            if file_result.is_err():
-                error_msg = file_result.unwrap_err()
-                await show_error(
-                    f"Failed to access submission file: {error_msg}\n\n"
-                    "The file may not be present or the hash doesn't match. "
-                    "Returning to submission overview."
-                )
-                navigator.navigate("submission_info", submission_id=submission_id)
-                return
-
-            status_label.text = (
-                "⏳ Requesting conversion slot (may take up to 5 min)..."
-            )
-
-            result = convert_submission_to_audio(
-                navigator.session,
-                navigator.app_paths,
-                submission_id,
-                user_private_key_bytes,
-                speed=int(speed_slider.value),
-            )
-
-            if result.is_ok():
-                status_label.text = "✓ Conversion complete! Saving file..."
-                audio_bytes = result.unwrap()
-
-                # Save audio to file
-                with open(output_file_input.value, "wb") as f:
-                    f.write(audio_bytes)
-
-                status_label.text = ""
-                await show_info(
-                    f"Audio file saved successfully!\n{output_file_input.value}"
-                )
-            else:
-                status_label.text = ""
-                await show_error(f"Failed to convert PDF: {result.unwrap_err()}")
-        except Exception as e:
-            status_label.text = ""
-            await show_error(f"Conversion error: {e}")
-        finally:
-            widget.enabled = True
+        )
+        navigator.navigate("submission_info", submission_id=submission_id)
 
     def on_cancel(widget):
         navigator.navigate("submission_info", submission_id=submission_id)

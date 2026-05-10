@@ -1,5 +1,6 @@
 from .get_user_projects import GetUserProjectsPort
 from .get_project import GetProjectPort
+from .get_lab_attempt import GetLabAttemptPort
 from .create_project import CreateProjectPort, CreateProjectCommand
 from .update_project import UpdateProjectPort, UpdateProjectCommand
 from .get_project_students import GetProjectStudentsPort
@@ -20,6 +21,7 @@ from .grade_lab_attempt import GradeLabAttemptPort, GradeLabAttemptCommand
 __all__ = [
     "GetUserProjectsPort",
     "GetProjectPort",
+    "GetLabAttemptPort",
     "CreateProjectPort",
     "CreateProjectCommand",
     "UpdateProjectPort",

@@ -3,9 +3,6 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 
-from ...auth.utils import get_user_credentials
-from .. import service
-
 
 def submission_open_form_screen(navigator, submission_id):
     """
@@ -35,35 +32,16 @@ def submission_open_form_screen(navigator, submission_id):
         await navigator.main_window.dialog(dialog)
 
     async def on_open(widget):
-        if not navigator.credentials_path:
-            await show_error("Credentials not found. Please login again.")
-            navigator.navigate("login")
-            return
-
-        if not token_password_input.value:
-            await show_error("Please enter token password")
-            return
-
-        try:
-            # Get private key from credentials
-            _, private_key_bytes = get_user_credentials(
-                navigator.credentials_path, token_password_input.value
+        await navigator.main_window.dialog(
+            toga.InfoDialog(
+                "Open Submission",
+                "Submission viewing is not yet supported in this version.",
             )
-
-            result = service.open_submission(
-                navigator.session, navigator.app_paths, submission_id, private_key_bytes
-            )
-
-            if result.is_ok():
-                await show_info("Submission opened successfully!")
-                navigator.navigate("submission_info", submission_id=submission_id)
-            else:
-                await show_error(result.unwrap_err())
-        except Exception as e:
-            await show_error(f"Failed to open: {e}")
+        )
+        navigator.navigate("submission_info", attempt_id=submission_id)
 
     def on_cancel(widget):
-        navigator.navigate("submission_info", submission_id=submission_id)
+        navigator.navigate("submission_info", attempt_id=submission_id)
 
     children.extend(
         [

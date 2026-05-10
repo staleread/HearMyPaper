@@ -1,0 +1,28 @@
+[project]
+name = "client-server-bridge"
+version = "1.0.0"
+description = "Client-server anti-corruption layer"
+readme = "README.md"
+authors = [
+    { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "client-core",
+    "httpx>=0.28.1",
+    "identity-core",
+    "education-core",
+    "submissions-core",
+    "shared-kernel",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+client-core = { workspace = true }
+identity-core = { workspace = true }
+education-core = { workspace = true }
+submissions-core = { workspace = true }
+shared-kernel = { workspace = true }

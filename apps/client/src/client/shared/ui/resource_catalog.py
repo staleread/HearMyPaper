@@ -4,20 +4,17 @@ from ...shared.ui.catalog_screen import catalog_screen
 
 def resource_catalog_screen(navigator):
     resources = [
-        {"resource": "Users"},
+        {"resource": "Search User"},
         {"resource": "Projects"},
-        {"resource": "Audit"},
         {"resource": "Submissions"},
     ]
 
     def on_row_activate(row):
-        match row.resource:
-            case "Users":
-                navigator.navigate("users_catalog")
+        match getattr(row, "resource"):
+            case "Search User":
+                navigator.navigate("user_search")
             case "Projects":
                 navigator.navigate("projects_catalog")
-            case "Audit":
-                navigator.navigate("audit_catalog")
             case "Submissions":
                 navigator.navigate("submissions_catalog")
 

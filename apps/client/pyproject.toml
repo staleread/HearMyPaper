@@ -16,7 +16,12 @@ dependencies = [
     "ipinfo>=5.2.1",
     "toga-gtk~=0.5.0",
     "shared-kernel",
+    "client-core",
+    "client-server-bridge",
+    "client-credentials",
+    "httpx",
 ]
+
 
 [dependency-groups]
 dev = [
@@ -35,7 +40,13 @@ Only instructors can unlock and access the real content.
 """
 sources = [
     "src/client",
-    "../../packages/shared_kernel/src/shared_kernel",
+    "../../packages/shared-kernel/src/shared_kernel",
+    "../../packages/client/client-core/src/client_core",
+    "../../packages/client/client-server-bridge/src/client_server_bridge",
+    "../../packages/client/client-credentials/src/client_credentials",
+    "../../packages/identity/identity-core/src/identity_core",
+    "../../packages/education/education-core/src/education_core",
+    "../../packages/submissions/submissions-core/src/submissions_core",
 ]
 test_sources = [
     "tests",
@@ -60,3 +71,9 @@ requires = [
 
 [tool.uv.sources]
 shared-kernel = { workspace = true }
+client-core = { workspace = true }
+client-server-bridge = { workspace = true }
+client-credentials = { workspace = true }
+identity-core = { workspace = true }
+education-core = { workspace = true }
+submissions-core = { workspace = true }

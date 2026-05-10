@@ -131,7 +131,7 @@ class DateTimePicker:
                 hour=int(self.hour_input.value or 0),
                 minute=int(self.minute_input.value or 0),
             )
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return self.initial_dt
 
     def set_value(self, dt):

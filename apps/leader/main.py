@@ -68,6 +68,7 @@ from education_core.ports.incoming import (
     RegisterAttemptPort,
     ViewSubmissionPort,
     GetProjectAttemptsPort,
+    GetLabAttemptPort,
 )
 from education_core.use_cases import (
     GetUserProjectsUseCase,
@@ -82,6 +83,7 @@ from education_core.use_cases import (
     RegisterAttemptUseCase,
     ViewSubmissionUseCase,
     GetProjectAttemptsUseCase,
+    GetLabAttemptUseCase,
 )
 from education_core.ports.outgoing.project_repository import ProjectRepositoryPort
 from education_core.ports.outgoing.project_student_repository import (
@@ -202,6 +204,7 @@ storage_client = ObjectStorageClient(
     .add_scoped(RegisterAttemptPort, RegisterAttemptUseCase)
     .add_scoped(ViewSubmissionPort, ViewSubmissionUseCase)
     .add_scoped(GetProjectAttemptsPort, GetProjectAttemptsUseCase)
+    .add_scoped(GetLabAttemptPort, GetLabAttemptUseCase)
     .add_scoped(GradeLabAttemptPort, GradeLabAttemptUseCase)
     # Outgoing submissions adapters
     .add_instance(

@@ -1,6 +1,5 @@
 from uuid import UUID
 from datetime import datetime
-from typing import override
 
 from blacksheep import Request, FromJSON
 from blacksheep.server.controllers import Controller, get, post
@@ -26,6 +25,7 @@ from education_core.ports.incoming import (
     ViewSubmissionPort,
     GradeLabAttemptPort,
     GradeLabAttemptCommand,
+    GetLabAttemptPort,
 )
 
 
@@ -42,24 +42,52 @@ class GradeAttemptRequest(BaseModel):
     feedback: str | None = None
 
 
-class Attempts(Controller):
-    @classmethod
-    @override
-    def route(cls) -> str | None:
-        return "/attempts"
+class AttemptResponse(BaseModel):
+    attempt_id: UUID
+    student_id: str
+    project_id: UUID
+    submission_id: UUID
+    submitted_at: datetime
+    is_on_time: bool
+    grade: int | None = None
+    instructor_feedback: str | None = None
 
+
+class Attempts(Controller):
     def __init__(
         self,
         get_project_attempts_port: GetProjectAttemptsPort,
         view_submission_port: ViewSubmissionPort,
         grade_lab_attempt_port: GradeLabAttemptPort,
+        get_lab_attempt_port: GetLabAttemptPort,
     ) -> None:
         self.get_project_attempts_port = get_project_attempts_port
         self.view_submission_port = view_submission_port
         self.grade_lab_attempt_port = grade_lab_attempt_port
+        self.get_lab_attempt_port = get_lab_attempt_port
 
     @auth()
-    @get("/projects/{project_id}/attemps")
+    @get("/{attempt_id}")
+    async def get_attempt(self, attempt_id: UUID):
+        try:
+            a = await self.get_lab_attempt_port(attempt_id)
+            return ok(
+                AttemptResponse(
+                    attempt_id=a.attempt_id,
+                    student_id=a.student_id,
+                    project_id=a.project_id,
+                    submission_id=a.submission_id,
+                    submitted_at=a.submitted_at,
+                    is_on_time=a.is_on_time,
+                    grade=a.grade,
+                    instructor_feedback=a.instructor_feedback,
+                )
+            )
+        except AttemptNotFoundError as e:
+            return not_found(str(e))
+
+    @auth()
+    @get("/projects/{project_id}/attempts")
     async def get_attempts(self, project_id: UUID):
         attempts = await self.get_project_attempts_port(project_id)
         return ok(
@@ -76,7 +104,7 @@ class Attempts(Controller):
         )
 
     @auth()
-    @get("/{submission_id}/download-url")
+    @get("attempts/{submission_id}/download-url")
     async def get_download_url(self, request: Request, submission_id: UUID):
         user_id = request.user.claims.get("sub")
         if not user_id:
@@ -93,7 +121,7 @@ class Attempts(Controller):
             return forbidden(str(e))
 
     @auth()
-    @post("/{attempt_id}/grade")
+    @post("attempts/{attempt_id}/grade")
     async def grade_attempt(
         self,
         request: Request,

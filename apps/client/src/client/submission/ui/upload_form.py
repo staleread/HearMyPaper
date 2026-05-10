@@ -2,11 +2,13 @@ import asyncio
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
+from uuid import UUID
 
-from .. import service
 
+def submission_upload_form_screen(navigator, project_id):
+    if isinstance(project_id, str):
+        project_id = UUID(project_id)
 
-def submission_upload_form_screen(navigator, project_id: int):
     children = [
         toga.Label(
             "Upload Submission",
@@ -18,24 +20,11 @@ def submission_upload_form_screen(navigator, project_id: int):
         ),
     ]
 
-    title_input = toga.TextInput(
-        placeholder="Title",
-        style=Pack(flex=1),
-    )
-
     file_input = toga.TextInput(
         placeholder="Path to file",
         readonly=True,
         style=Pack(flex=1),
     )
-
-    async def show_error(message: str):
-        dialog = toga.ErrorDialog(title="Error", message=message)
-        await navigator.main_window.dialog(dialog)
-
-    async def show_info(message: str):
-        dialog = toga.InfoDialog(title="Success", message=message)
-        await navigator.main_window.dialog(dialog)
 
     async def on_select_file(widget):
         try:
@@ -45,34 +34,38 @@ def submission_upload_form_screen(navigator, project_id: int):
             if file_path:
                 file_input.value = str(file_path)
         except Exception as e:
-            await show_error(f"File selection error: {e}")
+            await navigator.main_window.dialog(
+                toga.ErrorDialog("Error", f"File selection error: {e}")
+            )
 
     async def on_submit(widget):
-        if not title_input.value.strip():
-            await show_error("Title is required!")
-            return
-
         if not file_input.value:
-            await show_error("Please choose a file to submit!")
+            await navigator.main_window.dialog(
+                toga.ErrorDialog("Error", "Please choose a file to submit!")
+            )
             return
 
-        result = service.upload_submission(
-            navigator.session, project_id, title_input.value, file_input.value
-        )
-
-        if result.is_ok():
-            await show_info("Submission uploaded successfully!")
-            navigator.navigate("submissions_catalog")
-        else:
-            await show_error(result.unwrap_err())
+        widget.enabled = False
+        try:
+            await navigator.upload_submission_use_case(
+                project_id=project_id, file_path=file_input.value
+            )
+            await navigator.main_window.dialog(
+                toga.InfoDialog("Success", "Submission uploaded successfully!")
+            )
+            navigator.navigate("project_info", project_id)
+        except Exception as e:
+            await navigator.main_window.dialog(
+                toga.ErrorDialog("Error", f"Upload failed: {e}")
+            )
+        finally:
+            widget.enabled = True
 
     def on_cancel(widget):
-        navigator.navigate("submissions_catalog")
+        navigator.navigate("project_info", project_id)
 
     children.extend(
         [
-            toga.Label("Title:"),
-            title_input,
             toga.Label("Submission File:"),
             toga.Box(
                 children=[

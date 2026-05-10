@@ -6,6 +6,7 @@ from typing import override
 from submissions_core.models import LabSubmission, SubmissionListItem, SubmissionStatus
 from submissions_core.ports.incoming import (
     RequestUploadUrlPort,
+    UploadUrlResponse,
     CommitSubmissionPort,
     GetSubmissionPort,
     ListProjectSubmissionsPort,
@@ -19,14 +20,18 @@ class RequestUploadUrlAdapter(RequestUploadUrlPort):
         self.client = client
 
     @override
-    async def __call__(self, cmd: RequestSubmissionUploadCommand) -> str:
+    async def __call__(self, cmd: RequestSubmissionUploadCommand) -> UploadUrlResponse:
         payload = {
             "project_id": str(cmd.project_id),
             "file_extension": cmd.file_extension,
         }
         response = await self.client.post("/submissions/upload-url", json=payload)
         response.raise_for_status()
-        return response.json()["upload_url"]
+        data = response.json()
+        return UploadUrlResponse(
+            upload_url=data["upload_url"],
+            submission_id=UUID(data["submission_id"]),
+        )
 
 
 class CommitSubmissionAdapter(CommitSubmissionPort):

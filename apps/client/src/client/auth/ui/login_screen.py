@@ -2,8 +2,6 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 
-from ..service import login
-
 
 def login_screen(navigator):
     title_label = toga.Label(
@@ -52,16 +50,14 @@ def login_screen(navigator):
             await navigator.main_window.dialog(dialog)
             return
 
-        result = login(navigator.session, token_path_input.value, password.value)
-
-        if result.is_ok():
+        try:
+            await navigator.login_use_case(token_path_input.value, password.value)
             # Store credentials path in navigator
             navigator.credentials_path = token_path_input.value
             navigator.navigate("resource_catalog")
-            return
-
-        dialog = toga.ErrorDialog(title="Login Failed", message=result.unwrap_err())
-        await navigator.main_window.dialog(dialog)
+        except Exception as e:
+            dialog = toga.ErrorDialog(title="Login Failed", message=str(e))
+            await navigator.main_window.dialog(dialog)
 
     return toga.Box(
         children=[

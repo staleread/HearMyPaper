@@ -1,0 +1,126 @@
+from httpx import AsyncClient
+from datetime import datetime
+from uuid import UUID
+
+from client_core.models import Project, LabAttempt
+from client_core.ports.outgoing.education import EducationPort
+
+
+class EducationPortAdapter(EducationPort):
+    def __init__(self, client: AsyncClient):
+        self.client = client
+
+    async def get_my_projects(self) -> list[Project]:
+        response = await self.client.get("/projects/")
+        response.raise_for_status()
+        data = response.json()
+        return [
+            Project(
+                id=UUID(p["id"]),
+                title=p["title"],
+                description=p.get("description", ""),
+                deadline=datetime.fromisoformat(p["deadline"]),
+            )
+            for p in data
+        ]
+
+    async def get_project(self, project_id: UUID) -> Project:
+        response = await self.client.get(f"/projects/{project_id}")
+        response.raise_for_status()
+        p = response.json()
+        return Project(
+            id=UUID(p["id"]),
+            title=p["title"],
+            description=p["description"],
+            deadline=datetime.fromisoformat(p["deadline"]),
+        )
+
+    async def get_project_students(self, project_id: UUID) -> list[str]:
+        response = await self.client.get(f"/projects/{project_id}/students")
+        response.raise_for_status()
+        return response.json()["student_ids"]
+
+    async def assign_student(self, project_id: UUID, student_id: str) -> None:
+        payload = {"student_id": student_id}
+        response = await self.client.post(
+            f"/projects/{project_id}/students", json=payload
+        )
+        response.raise_for_status()
+
+    async def get_project_attempts(self, project_id: UUID) -> list[LabAttempt]:
+        response = await self.client.get(f"/attempts/projects/{project_id}/attempts")
+        response.raise_for_status()
+        data = response.json()
+        return [
+            LabAttempt(
+                id=UUID(a["attempt_id"]),
+                student_id=a["student_id"],
+                submitted_at=datetime.fromisoformat(a["submitted_at"]),
+                is_on_time=a["is_on_time"],
+                grade=a.get("grade"),
+                feedback=a.get("instructor_feedback"),
+            )
+            for a in data
+        ]
+
+    async def get_attempt(self, attempt_id: UUID) -> LabAttempt:
+        response = await self.client.get(f"/attempts/{attempt_id}")
+        response.raise_for_status()
+        a = response.json()
+        return LabAttempt(
+            id=UUID(a["attempt_id"]),
+            student_id=a["student_id"],
+            submitted_at=datetime.fromisoformat(a["submitted_at"]),
+            is_on_time=a["is_on_time"],
+            grade=a.get("grade"),
+            feedback=a.get("instructor_feedback"),
+        )
+
+    async def grade_attempt(
+        self, attempt_id: UUID, grade: int, feedback: str | None
+    ) -> None:
+        payload = {
+            "grade": grade,
+            "feedback": feedback,
+        }
+        response = await self.client.post(
+            f"/attempts/{attempt_id}/grade",
+            json=payload,
+        )
+        response.raise_for_status()
+
+    async def create_project(
+        self, title: str, description: str, deadline: datetime
+    ) -> Project:
+        payload = {
+            "title": title,
+            "description": description,
+            "deadline": deadline.isoformat(),
+        }
+        response = await self.client.post("/projects/", json=payload)
+        response.raise_for_status()
+        p = response.json()
+        return Project(
+            id=UUID(p["id"]),
+            title=p["title"],
+            description=p["description"],
+            deadline=datetime.fromisoformat(p["deadline"]),
+        )
+
+    async def update_project(
+        self, project_id: UUID, title: str, description: str, deadline: datetime
+    ) -> Project:
+        payload = {
+            "title": title,
+            "description": description,
+            "deadline": deadline.isoformat(),
+        }
+        response = await self.client.put(f"/projects/{project_id}", json=payload)
+        response.raise_for_status()
+        p = response.json()
+        return Project(
+            id=UUID(p["id"]),
+            title=p["title"],
+            description=p["description"],
+            deadline=datetime.fromisoformat(p["deadline"]),
+        )

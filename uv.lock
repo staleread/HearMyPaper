@@ -9,6 +9,9 @@ resolution-markers = [
 [manifest]
 members = [
     "client",
+    "client-core",
+    "client-credentials",
+    "client-server-bridge",
     "education-api",
     "education-api-client",
     "education-core",
@@ -509,6 +512,10 @@ version = "1.1.0"
 source = { virtual = "apps/client" }
 dependencies = [
     { name = "briefcase" },
+    { name = "client-core" },
+    { name = "client-credentials" },
+    { name = "client-server-bridge" },
+    { name = "httpx" },
     { name = "ipinfo" },
     { name = "pydantic" },
     { name = "requests" },
@@ -526,6 +533,10 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "briefcase", specifier = ">=0.3.25" },
+    { name = "client-core", editable = "packages/client/client-core" },
+    { name = "client-credentials", editable = "packages/client/client-credentials" },
+    { name = "client-server-bridge", editable = "packages/client/client-server-bridge" },
+    { name = "httpx" },
     { name = "ipinfo", specifier = ">=5.2.1" },
     { name = "pydantic", specifier = ">=2.11.9" },
     { name = "requests", specifier = ">=2.32.5" },
@@ -537,6 +548,61 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=9.0.3" }]
+
+[[package]]
+name = "client-core"
+version = "1.0.0"
+source = { editable = "packages/client/client-core" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "result" },
+    { name = "shared-kernel" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pydantic", specifier = ">=2.11.9" },
+    { name = "result", specifier = ">=0.17.0" },
+    { name = "shared-kernel", editable = "packages/shared-kernel" },
+]
+
+[[package]]
+name = "client-credentials"
+version = "1.0.0"
+source = { editable = "packages/client/client-credentials" }
+dependencies = [
+    { name = "client-core" },
+    { name = "shared-kernel" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "client-core", editable = "packages/client/client-core" },
+    { name = "shared-kernel", editable = "packages/shared-kernel" },
+]
+
+[[package]]
+name = "client-server-bridge"
+version = "1.0.0"
+source = { editable = "packages/client/client-server-bridge" }
+dependencies = [
+    { name = "client-core" },
+    { name = "education-core" },
+    { name = "httpx" },
+    { name = "identity-core" },
+    { name = "shared-kernel" },
+    { name = "submissions-core" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "client-core", editable = "packages/client/client-core" },
+    { name = "education-core", editable = "packages/education/education-core" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "identity-core", editable = "packages/identity/identity-core" },
+    { name = "shared-kernel", editable = "packages/shared-kernel" },
+    { name = "submissions-core", editable = "packages/submissions/submissions-core" },
+]
 
 [[package]]
 name = "colorama"
@@ -1799,6 +1865,7 @@ dependencies = [
     { name = "aio-pika" },
     { name = "aioboto3" },
     { name = "pynacl" },
+    { name = "redis" },
     { name = "sqlalchemy" },
 ]
 
@@ -1812,6 +1879,7 @@ requires-dist = [
     { name = "aio-pika", specifier = ">=9.6.2" },
     { name = "aioboto3", specifier = ">=15.5.0" },
     { name = "pynacl", specifier = ">=1.6.2" },
+    { name = "redis", specifier = ">=7.4.0" },
     { name = "sqlalchemy", specifier = ">=2.0.49" },
 ]
 
