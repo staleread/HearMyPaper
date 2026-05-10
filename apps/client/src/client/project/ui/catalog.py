@@ -1,3 +1,4 @@
+import toga
 from ...shared.ui.catalog_screen import catalog_screen
 from result import Ok
 
@@ -12,7 +13,7 @@ def projects_catalog_screen(navigator):
             return [{"id": p.id, "title": p.title} for p in projects]
         except Exception as e:
             await navigator.main_window.dialog(
-                navigator.toga.ErrorDialog("Error", f"Failed to load projects: {e}")
+                toga.ErrorDialog("Error", f"Failed to load projects: {e}")
             )
             return []
 
