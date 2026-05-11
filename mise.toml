@@ -26,3 +26,8 @@ run = "uv run scripts/leader-init-user.py"
 description = "Start leader app in development mode"
 dir = "apps/leader"
 run = "uv run uvicorn main:app --reload"
+
+[tasks."client:dev"]
+description = "Start client app in development mode"
+dir = "apps/client"
+run = "uv run briefcase dev"
