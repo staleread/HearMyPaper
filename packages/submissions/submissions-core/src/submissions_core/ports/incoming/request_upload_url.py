@@ -7,13 +7,16 @@ from uuid import UUID
 class RequestSubmissionUploadCommand:
     student_id: str
     project_id: UUID
-    file_extension: str
+    filename: str
+    extension: str
 
 
 @dataclass(frozen=True)
 class UploadUrlResponse:
     upload_url: str
     submission_id: UUID
+    filename: str
+    extension: str
 
 
 class RequestUploadUrlPort(Protocol):

@@ -102,6 +102,7 @@ def user_create_form_screen(navigator):
                     message=f"User created successfully! ID: {user.id}",
                 )
             )
+            navigator.credentials_path = credentials_path
             navigator.navigate("user_info", user.id)
 
         except Exception as e:

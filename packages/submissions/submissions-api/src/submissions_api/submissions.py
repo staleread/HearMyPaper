@@ -27,12 +27,15 @@ from submissions_core.ports.incoming import (
 
 class RequestUploadUrlRequest(BaseModel):
     project_id: UUID
-    file_extension: str
+    filename: str
+    extension: str
 
 
 class RequestUploadUrlResponse(BaseModel):
     upload_url: str
     submission_id: UUID
+    filename: str
+    extension: str
 
 
 class SubmissionResponse(BaseModel):
@@ -42,6 +45,8 @@ class SubmissionResponse(BaseModel):
     storage_path: str
     status: str
     created_at: datetime
+    filename: str
+    extension: str
     metadata: dict[str, str]
 
 
@@ -83,7 +88,8 @@ class Submissions(Controller):
         cmd = RequestSubmissionUploadCommand(
             student_id=user_id,
             project_id=req.project_id,
-            file_extension=req.file_extension,
+            filename=req.filename,
+            extension=req.extension,
         )
         try:
             resp = await self.request_upload_url_port(cmd)
@@ -91,6 +97,8 @@ class Submissions(Controller):
                 RequestUploadUrlResponse(
                     upload_url=resp.upload_url,
                     submission_id=resp.submission_id,
+                    filename=resp.filename,
+                    extension=resp.extension,
                 )
             )
         except AccessDeniedError as e:
@@ -132,6 +140,8 @@ class Submissions(Controller):
                     storage_path=s.storage_path,
                     status=s.status.value,
                     created_at=s.created_at,
+                    filename=s.filename,
+                    extension=s.extension,
                     metadata=s.metadata,
                 )
             )

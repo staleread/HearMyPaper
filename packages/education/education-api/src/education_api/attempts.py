@@ -120,8 +120,14 @@ class Attempts(Controller):
             return status_code(401, "User ID not found in token")
 
         try:
-            url = await self.view_submission_port(user_id, attempt_id)
-            return ok({"download_url": url})
+            info = await self.view_submission_port(user_id, attempt_id)
+            return ok(
+                {
+                    "download_url": info.url,
+                    "filename": info.filename,
+                    "extension": info.extension,
+                }
+            )
         except AttemptNotFoundError as e:
             return not_found(str(e))
         except ProjectNotFoundError as e:

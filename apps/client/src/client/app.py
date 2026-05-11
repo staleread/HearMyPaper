@@ -16,6 +16,7 @@ from .project.ui.manage_students_form import manage_students_form_screen
 from .submission.ui.catalog import submissions_catalog_screen
 from .submission.ui.upload_form import submission_upload_form_screen
 from .submission.ui.info import submission_info_screen
+from .submission.ui.unseal_form import submission_unseal_form_screen
 from .submission.ui.open_form import submission_open_form_screen
 from .submission.ui.convert_form import submission_convert_form_screen
 from .submission.ui.grade_form import submission_grade_form_screen
@@ -39,6 +40,9 @@ class HearMyPaper(toga.App):
             "submission_upload_form", submission_upload_form_screen
         )
         self.navigator.register_screen("submission_info", submission_info_screen)
+        self.navigator.register_screen(
+            "submission_unseal_form", submission_unseal_form_screen
+        )
         self.navigator.register_screen(
             "submission_open_form", submission_open_form_screen
         )

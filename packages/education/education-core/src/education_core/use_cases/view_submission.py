@@ -1,6 +1,6 @@
 from uuid import UUID
 from ..ports.incoming.view_submission import ViewSubmissionPort
-from ..ports.outgoing.download_url_provider import DownloadUrlProviderPort
+from ..ports.outgoing.download_url_provider import DownloadUrlProviderPort, DownloadInfo
 from ..ports.outgoing.attempt_repository import AttemptRepositoryPort
 from ..ports.outgoing.project_repository import ProjectRepositoryPort
 from ..exceptions import AccessDeniedError, AttemptNotFoundError, ProjectNotFoundError
@@ -17,7 +17,7 @@ class ViewSubmissionUseCase(ViewSubmissionPort):
         self._projects = projects
         self._download_url_provider = download_url_provider
 
-    async def __call__(self, instructor_id: str, attempt_id: UUID) -> str:
+    async def __call__(self, instructor_id: str, attempt_id: UUID) -> DownloadInfo:
         attempt = await self._attempts.get_by_id(attempt_id)
         if not attempt:
             raise AttemptNotFoundError(f"Attempt {attempt_id} not found")

@@ -20,9 +20,9 @@ class PostgresSubmissionRepositoryAdapter(SubmissionRepositoryPort):
             text(
                 """
                 INSERT INTO submissions.submissions (
-                    submission_id, student_id, project_id, storage_path, status, created_at, metadata
+                    submission_id, student_id, project_id, storage_path, status, created_at, filename, extension, metadata
                 ) VALUES (
-                    :submission_id, :student_id, :project_id, :storage_path, :status, :created_at, :metadata
+                    :submission_id, :student_id, :project_id, :storage_path, :status, :created_at, :filename, :extension, :metadata
                 )
                 """
             ),
@@ -33,6 +33,8 @@ class PostgresSubmissionRepositoryAdapter(SubmissionRepositoryPort):
                 "storage_path": submission.storage_path,
                 "status": submission.status.value,
                 "created_at": submission.created_at,
+                "filename": submission.filename,
+                "extension": submission.extension,
                 "metadata": json.dumps(submission.metadata),
             },
         )
@@ -42,7 +44,7 @@ class PostgresSubmissionRepositoryAdapter(SubmissionRepositoryPort):
         result = await self._session.execute(
             text(
                 """
-                SELECT submission_id, student_id, project_id, storage_path, status, created_at, metadata
+                SELECT submission_id, student_id, project_id, storage_path, status, created_at, filename, extension, metadata
                 FROM submissions.submissions
                 WHERE submission_id = :submission_id
                 """
@@ -60,6 +62,8 @@ class PostgresSubmissionRepositoryAdapter(SubmissionRepositoryPort):
             storage_path=row["storage_path"],
             status=SubmissionStatus(row["status"]),
             created_at=row["created_at"],
+            filename=row["filename"],
+            extension=row["extension"],
             metadata=row["metadata"]
             if isinstance(row["metadata"], dict)
             else json.loads(row["metadata"]),
@@ -72,7 +76,7 @@ class PostgresSubmissionRepositoryAdapter(SubmissionRepositoryPort):
         result = await self._session.execute(
             text(
                 """
-                SELECT submission_id, student_id, project_id, storage_path, status, created_at, metadata
+                SELECT submission_id, student_id, project_id, storage_path, status, created_at, filename, extension, metadata
                 FROM submissions.submissions
                 WHERE student_id = :student_id AND project_id = :project_id
                 """
@@ -90,6 +94,8 @@ class PostgresSubmissionRepositoryAdapter(SubmissionRepositoryPort):
             storage_path=row["storage_path"],
             status=SubmissionStatus(row["status"]),
             created_at=row["created_at"],
+            filename=row["filename"],
+            extension=row["extension"],
             metadata=row["metadata"]
             if isinstance(row["metadata"], dict)
             else json.loads(row["metadata"]),

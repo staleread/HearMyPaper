@@ -3,6 +3,6 @@ from uuid import UUID
 
 
 class DownloadAttemptPort(Protocol):
-    async def __call__(self, attempt_id: UUID, download_folder: str) -> str:
-        """Downloads the lab attempt to the specified folder and returns the local file path."""
+    async def __call__(self, attempt_id: UUID, password: str) -> str:
+        """Downloads the lab attempt, unseals it with the provided password, and returns the local file path."""
         ...

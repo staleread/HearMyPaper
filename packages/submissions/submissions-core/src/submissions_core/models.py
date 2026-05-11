@@ -18,6 +18,8 @@ class LabSubmission:
     storage_path: str
     status: SubmissionStatus
     created_at: datetime
+    filename: str
+    extension: str
     metadata: dict[str, str] = field(default_factory=dict)
 
 

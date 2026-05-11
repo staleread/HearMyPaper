@@ -1,11 +1,11 @@
 from typing import override
 from uuid import UUID
 
-from education_core.ports.outgoing.download_url_provider import DownloadUrlProviderPort
-from submissions_core.ports.outgoing.submission_repository import (
-    SubmissionRepositoryPort,
+from education_core.ports.outgoing.download_url_provider import (
+    DownloadUrlProviderPort,
+    DownloadInfo,
 )
-from submissions_core.ports.outgoing.storage import StoragePort
+from submissions_core.ports.outgoing import SubmissionRepositoryPort, StoragePort
 
 
 class DownloadUrlProviderAdapter(DownloadUrlProviderPort):
@@ -14,9 +14,14 @@ class DownloadUrlProviderAdapter(DownloadUrlProviderPort):
         self._storage = storage
 
     @override
-    async def get_download_url(self, submission_id: UUID) -> str:
+    async def get_download_url(self, submission_id: UUID) -> DownloadInfo:
         submission = await self._submissions.find_by_id(submission_id)
         if not submission:
             raise RuntimeError(f"Submission {submission_id} not found")
 
-        return await self._storage.generate_download_url(submission.storage_path)
+        url = await self._storage.generate_download_url(submission.storage_path)
+        return DownloadInfo(
+            url=url,
+            filename=submission.filename,
+            extension=submission.extension,
+        )

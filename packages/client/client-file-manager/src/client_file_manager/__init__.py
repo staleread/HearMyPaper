@@ -1,3 +1,4 @@
-from .http_file_manager import HttpFileManagerAdapter
+from .cloud_storage import CloudStorageAdapter
+from .local_storage import LocalStorageAdapter
 
-__all__ = ["HttpFileManagerAdapter"]
+__all__ = ["CloudStorageAdapter", "LocalStorageAdapter"]

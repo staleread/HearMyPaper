@@ -3,7 +3,7 @@ from datetime import datetime
 from uuid import UUID
 
 from client_core.models import Project, LabAttempt
-from client_core.ports.outgoing.education import EducationPort
+from client_core.ports.outgoing.education import EducationPort, AttemptDownloadInfo
 
 
 class EducationPortAdapter(EducationPort):
@@ -98,10 +98,15 @@ class EducationPortAdapter(EducationPort):
             feedback=a.get("instructor_feedback"),
         )
 
-    async def get_attempt_download_url(self, attempt_id: UUID) -> str:
+    async def get_attempt_download_url(self, attempt_id: UUID) -> AttemptDownloadInfo:
         response = await self.client.get(f"/attempts/{attempt_id}/download-url")
         response.raise_for_status()
-        return response.json()["download_url"]
+        data = response.json()
+        return AttemptDownloadInfo(
+            url=data["download_url"],
+            filename=data["filename"],
+            extension=data["extension"],
+        )
 
     async def grade_attempt(
         self, attempt_id: UUID, grade: int, feedback: str | None

@@ -34,8 +34,9 @@ class RequestUploadUrlUseCase(RequestUploadUrlPort):
             )
 
         submission_id = uuid4()
-        extension = cmd.file_extension.lstrip(".")
-        path = f"{cmd.project_id}/{cmd.student_id}/{submission_id}.{extension}"
+        extension = cmd.extension.lstrip(".")
+        # Files on cloud storage always have .bin extension
+        path = f"{cmd.project_id}/{cmd.student_id}/{submission_id}.bin"
 
         upload_url = await self._storage.generate_upload_url(
             path, content_type="application/octet-stream"
@@ -48,7 +49,9 @@ class RequestUploadUrlUseCase(RequestUploadUrlPort):
             storage_path=path,
             status=SubmissionStatus.PENDING_UPLOAD,
             created_at=datetime.now(UTC),
-            metadata={"file_extension": extension},
+            filename=cmd.filename,
+            extension=extension,
+            metadata={},
         )
 
         await self._submissions.save(submission)
@@ -56,4 +59,6 @@ class RequestUploadUrlUseCase(RequestUploadUrlPort):
         return UploadUrlResponse(
             upload_url=upload_url,
             submission_id=submission_id,
+            filename=cmd.filename,
+            extension=extension,
         )

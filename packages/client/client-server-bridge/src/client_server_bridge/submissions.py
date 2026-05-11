@@ -1,7 +1,7 @@
 from httpx import AsyncClient
 from uuid import UUID
 
-from client_core.ports.outgoing.submissions import SubmissionsPort
+from client_core.ports.outgoing.submissions import SubmissionsPort, SubmissionUploadInfo
 
 
 class SubmissionsPortAdapter(SubmissionsPort):
@@ -9,16 +9,22 @@ class SubmissionsPortAdapter(SubmissionsPort):
         self.client = client
 
     async def request_upload_url(
-        self, project_id: UUID, file_extension: str
-    ) -> tuple[str, UUID]:
+        self, project_id: UUID, filename: str, extension: str
+    ) -> SubmissionUploadInfo:
         payload = {
             "project_id": str(project_id),
-            "file_extension": file_extension,
+            "filename": filename,
+            "extension": extension,
         }
         response = await self.client.post("/submissions/upload-url", json=payload)
         response.raise_for_status()
         data = response.json()
-        return data["upload_url"], UUID(data["submission_id"])
+        return SubmissionUploadInfo(
+            url=data["upload_url"],
+            submission_id=UUID(data["submission_id"]),
+            filename=data["filename"],
+            extension=data["extension"],
+        )
 
     async def commit_submission(self, submission_id: UUID) -> None:
         response = await self.client.post(f"/submissions/{submission_id}/commit")

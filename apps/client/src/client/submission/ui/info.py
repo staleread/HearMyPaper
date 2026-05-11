@@ -40,17 +40,7 @@ def submission_info_screen(navigator, attempt_id):
                 navigator.navigate("submission_convert_form", attempt_id=attempt_id)
 
             async def on_download():
-                try:
-                    local_path = await navigator.download_attempt_use_case(
-                        attempt_id, navigator.download_path
-                    )
-                    await navigator.main_window.dialog(
-                        toga.InfoDialog("Success", f"File downloaded to: {local_path}")
-                    )
-                except Exception as e:
-                    await navigator.main_window.dialog(
-                        toga.ErrorDialog("Error", f"Download failed: {e}")
-                    )
+                navigator.navigate("submission_unseal_form", attempt_id=attempt_id)
 
             actions = [
                 ("Download", lambda w: asyncio.create_task(on_download())),

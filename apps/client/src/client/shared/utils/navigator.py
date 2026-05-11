@@ -25,7 +25,7 @@ from client_core.use_cases.get_my_projects import GetMyProjectsUseCase
 from client_core.use_cases.manage_students import ManageStudentsUseCase
 from client_core.use_cases.upload_submission import UploadSubmissionUseCase
 from client_core.use_cases.download_attempt import DownloadAttemptUseCase
-from client_file_manager import HttpFileManagerAdapter
+from client_file_manager import LocalStorageAdapter, CloudStorageAdapter
 from client_crypto import CryptoAdapter
 
 
@@ -44,6 +44,7 @@ class SessionProvider(SessionProviderPort):
 
 class Navigator:
     def __init__(self, main_window: toga.MainWindow, app_paths: Paths):
+        self._credentials_path: str | None = None
         self.main_window = main_window
         self.app_paths = app_paths
         self.screens: dict[str, Callable[[Any], toga.Widget]] = {}
@@ -67,7 +68,8 @@ class Navigator:
         self.education_port = EducationPortAdapter(self.async_client)
         self.submissions_port = SubmissionsPortAdapter(self.async_client)
         self.credentials_port = FileCredentialsStorageAdapter()
-        self.file_manager_port = HttpFileManagerAdapter()
+        self.local_storage_port = LocalStorageAdapter(self.download_path)
+        self.cloud_storage_port = CloudStorageAdapter()
         self.crypto_port = CryptoAdapter()
 
         # Use Cases
@@ -104,14 +106,31 @@ class Navigator:
         )
         self.upload_submission_use_case = UploadSubmissionUseCase(
             submissions=self.submissions_port,
-            file_manager=self.file_manager_port,
+            education=self.education_port,
+            identity=self.identity_port,
+            crypto=self.crypto_port,
+            local_storage=self.local_storage_port,
+            cloud_storage=self.cloud_storage_port,
         )
         self.download_attempt_use_case = DownloadAttemptUseCase(
             education=self.education_port,
-            file_manager=self.file_manager_port,
+            local_storage=self.local_storage_port,
+            cloud_storage=self.cloud_storage_port,
+            credentials=self.credentials_port,
+            crypto=self.crypto_port,
+            credentials_path=self.credentials_path
+            or "",  # Will be set after login/creation
         )
 
-        self.credentials_path: str | None = None
+    @property
+    def credentials_path(self) -> str | None:
+        return self._credentials_path
+
+    @credentials_path.setter
+    def credentials_path(self, value: str | None):
+        self._credentials_path = value
+        if hasattr(self, "download_attempt_use_case"):
+            self.download_attempt_use_case.credentials_path = value or ""
 
     def register_screen(self, name, screen_factory):
         self.screens[name] = screen_factory

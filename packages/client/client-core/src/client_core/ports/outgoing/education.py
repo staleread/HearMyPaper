@@ -1,7 +1,15 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol
 from uuid import UUID
 from ...models import Project, LabAttempt
+
+
+@dataclass(frozen=True)
+class AttemptDownloadInfo:
+    url: str
+    filename: str
+    extension: str
 
 
 class EducationPort(Protocol):
@@ -16,7 +24,9 @@ class EducationPort(Protocol):
         self, attempt_id: UUID, grade: int, feedback: str | None
     ) -> None: ...
 
-    async def get_attempt_download_url(self, attempt_id: UUID) -> str: ...
+    async def get_attempt_download_url(
+        self, attempt_id: UUID
+    ) -> AttemptDownloadInfo: ...
 
     async def create_project(
         self, title: str, description: str, instructor_id: str, deadline: datetime
