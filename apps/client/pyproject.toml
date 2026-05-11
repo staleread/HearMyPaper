@@ -45,6 +45,7 @@ sources = [
     "src/client",
     "../../packages/shared-kernel/src/shared_kernel",
     "../../packages/client/client-core/src/client_core",
+    "../../packages/client/client-crypto/src/client_crypto",
     "../../packages/client/client-server-bridge/src/client_server_bridge",
     "../../packages/client/client-credentials/src/client_credentials",
     "../../packages/client/client-file-manager/src/client_file_manager",
