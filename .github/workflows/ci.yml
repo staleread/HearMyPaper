@@ -17,6 +17,11 @@ jobs:
           python-version: "3.14"
           enable-cache: true
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgirepository1.0-dev libcairo2-dev pkg-config
+
       - name: Lint and Format (ruff)
         run: |
           uv run ruff format --check .
