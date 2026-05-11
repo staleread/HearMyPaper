@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: apps/leader/Dockerfile
       target: dev
+    profiles:
+      - app
     env_file: apps/leader/.env.development
     environment:
       REDIS__HOST: redis
@@ -32,6 +34,8 @@ services:
   postgres:
     container_name: hmp-postgres
     image: postgres:18-alpine
+    profiles:
+      - infra
     volumes:
       - postgres-volume:/var/lib/postgresql
     ports:
@@ -50,6 +54,8 @@ services:
   redis:
     container_name: hmp-redis
     image: redis:8-alpine
+    profiles:
+      - infra
     ports:
       - "6379:6379"
     command: redis-server --requirepass password
@@ -62,6 +68,8 @@ services:
   minio:
     container_name: hmp-minio
     image: minio/minio:latest
+    profiles:
+      - infra
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -75,6 +83,8 @@ services:
   rabbitmq:
     container_name: hmp-rabbitmq
     image: rabbitmq:3-management
+    profiles:
+      - infra
     ports:
       - "5672:5672"
       - "15672:15672"
