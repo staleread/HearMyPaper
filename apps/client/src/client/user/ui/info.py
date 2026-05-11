@@ -47,7 +47,7 @@ def user_info_screen(navigator, user_id):
                 "created_at": user.created_at.isoformat(),
             }
 
-            def on_edit_user():
+            def on_edit_user(w):
                 navigator.navigate("user_edit_form", user_data)
 
             actions = [("Edit", on_edit_user)]

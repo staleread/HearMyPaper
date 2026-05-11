@@ -33,10 +33,10 @@ def submission_info_screen(navigator, attempt_id):
                 "feedback": attempt.feedback or "No feedback",
             }
 
-            def on_grade():
+            def on_grade(w):
                 navigator.navigate("submission_grade_form", attempt_data)
 
-            def on_pdf_to_audio():
+            def on_pdf_to_audio(w):
                 navigator.navigate("submission_convert_form", attempt_id=attempt_id)
 
             async def on_download():

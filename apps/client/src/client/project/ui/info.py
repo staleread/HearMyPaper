@@ -23,16 +23,16 @@ def project_info_screen(navigator, project_id):
                 "deadline": project.deadline.isoformat(),
             }
 
-            def on_edit_project():
+            def on_edit_project(w):
                 navigator.navigate("project_edit_form", project_data)
 
-            def on_manage_students():
+            def on_manage_students(w):
                 navigator.navigate("manage_students_form", project_id)
 
-            def on_upload_submission():
+            def on_upload_submission(w):
                 navigator.navigate("submission_upload_form", project_id=project_id)
 
-            def on_view_attempts():
+            def on_view_attempts(w):
                 navigator.navigate("submissions_catalog", project_id=project_id)
 
             actions = [

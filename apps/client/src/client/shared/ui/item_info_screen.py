@@ -24,12 +24,7 @@ def item_info_screen(
     )
 
     action_buttons = (
-        [
-            toga.Button(
-                label, on_press=lambda widget, handler=handler, **kwargs: handler()
-            )
-            for label, handler in actions
-        ]
+        [toga.Button(label, on_press=handler) for label, handler in actions]
         if actions
         else []
     )
