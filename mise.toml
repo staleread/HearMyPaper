@@ -1,0 +1,33 @@
+[tools]
+dbmate = "latest"
+python = "3.14"
+
+[env]
+DATABASE_URL = "postgres://user:password@localhost:5432/hmp-postgres?sslmode=disable"
+APP_SHOW_ERROR_DETAILS = "True"
+
+[tasks."gen-session"]
+description = "Generate a JWT session token using an encrypted key file"
+usage = """
+arg "<key_path>"
+arg "[port]"
+"""
+run = "uv run --package client scripts/gen-session.py {{usage.key_path}} {{usage.port}}"
+
+[tasks."leader:migrate"]
+description = "Run migrations for identity modules"
+run = "./scripts/leader-migrate"
+
+[tasks."leader:init-user"]
+description = "Initialize initial admin user"
+run = "uv run scripts/leader-init-user.py"
+
+[tasks."leader:dev"]
+description = "Start leader app in development mode"
+dir = "apps/leader"
+run = "uv run uvicorn main:app --reload"
+
+[tasks."client:dev"]
+description = "Start client app in development mode"
+dir = "apps/client"
+run = "uv run briefcase dev"

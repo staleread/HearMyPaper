@@ -1,2 +1,5 @@
 [api]
 base_url = "{{BASE_URL}}"
+
+[storage]
+download_path = "{{DOWNLOAD_PATH}}"

@@ -63,3 +63,11 @@ logs/
 
 # Docs website assets
 site/
+
+# Environment variables
+.env
+.env.*
+!.env.development
+
+# Private keys
+keys/

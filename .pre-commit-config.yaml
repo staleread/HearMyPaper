@@ -1,13 +1,25 @@
 repos:
- - repo: https://github.com/astral-sh/ruff-pre-commit
-   rev: v0.13.1                                                                  
-   hooks:                                                                        
-     - id: ruff-check                                                            
-       args: ["--fix"]
-     - id: ruff-format
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.12
+    hooks:
+      - id: ruff
+        name: "Ruff Check"
+        args: ["--fix"]
+      - id: ruff-format
+        name: "Ruff Format"
 
- - repo: https://github.com/pre-commit/mirrors-mypy          
-   rev: v1.18.2                                                                  
-   hooks:                                                                        
-     - id: mypy                
-       additional_dependencies: ["types-requests>=2.32.4.20250913", "types-toml>=0.10.8.20240310"]
+  - repo: local
+    hooks:
+      - id: ty-apps
+        name: "Typecheck: apps"
+        entry: uv run ty check --fix apps/leader
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: ty-packages
+        name: "Typecheck: packages"
+        entry: uv run ty check --fix packages/
+        language: system
+        types: [python]
+        pass_filenames: false

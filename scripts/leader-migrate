@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+# Use DATABASE_URL from environment or fallback to a default for local dev
+# Note: mise can also provide this via [env] or env_file
+URL="${DATABASE_URL:-postgres://user:password@localhost:5432/hmp-postgres?sslmode=disable}"
+
+MODULES=("identity" "education" "submissions")
+
+for module in "${MODULES[@]}"; do
+  echo "--- Migrating Module: $module ---"
+  dbmate --migrations-dir "packages/$module/$module-postgres/migrations" \
+         --migrations-table "schema_migrations_$module" \
+         --url "$URL&search_path=$module" \
+         --no-dump-schema \
+         up
+done

@@ -1,0 +1,22 @@
+from datetime import datetime
+from uuid import UUID
+from ..ports.incoming.update_project import UpdateProjectPort
+from ..ports.outgoing.education import EducationPort
+from ..models import Project
+
+
+class UpdateProjectUseCase(UpdateProjectPort):
+    def __init__(self, education: EducationPort):
+        self.education = education
+
+    async def __call__(
+        self,
+        project_id: UUID,
+        title: str,
+        description: str,
+        instructor_id: str,
+        deadline: datetime,
+    ) -> Project:
+        return await self.education.update_project(
+            project_id, title, description, instructor_id, deadline
+        )

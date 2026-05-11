@@ -1,0 +1,19 @@
+[project]
+name = "identity-ch-gen"
+version = "1.0.0"
+description = "Challenge generator for HMP identity module"
+readme = "README.md"
+authors = [
+    { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "identity-core",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+identity-core = { workspace = true }

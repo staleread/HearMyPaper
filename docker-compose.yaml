@@ -1,0 +1,95 @@
+services:
+
+  leader:
+    container_name: hmp-leader
+    build:
+      context: .
+      dockerfile: apps/leader/Dockerfile
+      target: dev
+    profiles:
+      - app
+    env_file: apps/leader/.env.development
+    environment:
+      REDIS__HOST: redis
+      POSTGRES__HOST: postgres
+      RABBITMQ__URL: amqp://guest:guest@rabbitmq:5672/
+      MINIO__URL: http://minio:9000
+      # For dbmate migrations inside container
+      DATABASE_URL: postgres://user:password@postgres:5432/hmp-postgres?sslmode=disable
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /app/.venv
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      minio:
+        condition: service_started
+
+  postgres:
+    container_name: hmp-postgres
+    image: postgres:18-alpine
+    profiles:
+      - infra
+    volumes:
+      - postgres-volume:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hmp-postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d hmp-postgres"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  redis:
+    container_name: hmp-redis
+    image: redis:8-alpine
+    profiles:
+      - infra
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass password
+    volumes:
+      - redis-volume:/data
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: password
+
+  minio:
+    container_name: hmp-minio
+    image: minio/minio:latest
+    profiles:
+      - infra
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-volume:/data
+  
+  rabbitmq:
+    container_name: hmp-rabbitmq
+    image: rabbitmq:3-management
+    profiles:
+      - infra
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  postgres-volume:
+  redis-volume:
+  minio-volume:

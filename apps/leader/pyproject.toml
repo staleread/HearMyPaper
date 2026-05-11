@@ -1,0 +1,57 @@
+[project]
+name = "leader"
+version = "1.0.0"
+description = "HMP leader modular monolith app"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "blacksheep>=2.6.2",
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.1",
+    "uvicorn>=0.46.0",
+    "rodi>=2.0.8",
+    "blacksheep-prometheus>=0.1.8",
+    "cryptography>=44.0.0",
+    "shared-kernel",
+    "identity-api",
+    "identity-core",
+    "identity-postgres",
+    "identity-jwt",
+    "identity-redis",
+    "identity-id",
+    "identity-ch-gen",
+    "identity-signture",
+    "education-core",
+    "education-api",
+    "education-postgres",
+    "education-identity-bridge",
+    "education-rabbitmq",
+    "submissions-api",
+    "submissions-core",
+    "submissions-education-bridge",
+    "submissions-postgres",
+    "submissions-rabbitmq",
+    "submissions-storage",
+]
+
+[tool.uv.sources]
+shared-kernel = { workspace = true }
+identity-api = { workspace = true }
+identity-ch-gen = { workspace = true }
+identity-core = { workspace = true }
+identity-id = { workspace = true }
+identity-jwt = { workspace = true }
+identity-postgres = { workspace = true }
+identity-redis = { workspace = true }
+identity-signture = { workspace = true }
+education-api = { workspace = true }
+education-core = { workspace = true }
+education-identity-bridge = { workspace = true }
+education-postgres = { workspace = true }
+education-rabbitmq = { workspace = true }
+submissions-api = { workspace = true }
+submissions-core = { workspace = true }
+submissions-education-bridge = { workspace = true }
+submissions-postgres = { workspace = true }
+submissions-rabbitmq = { workspace = true }
+submissions-storage = { workspace = true }

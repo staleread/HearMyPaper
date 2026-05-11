@@ -1,0 +1,42 @@
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Protocol
+from uuid import UUID
+from ...models import Project, LabAttempt
+
+
+@dataclass(frozen=True)
+class AttemptDownloadInfo:
+    url: str
+    filename: str
+    extension: str
+
+
+class EducationPort(Protocol):
+    async def get_my_projects(self) -> list[Project]: ...
+    async def get_project(self, project_id: UUID) -> Project | None: ...
+    async def get_project_students(self, project_id: UUID) -> list[str]: ...
+    async def assign_student(self, project_id: UUID, student_id: str) -> None: ...
+    async def remove_student(self, project_id: UUID, student_id: str) -> None: ...
+    async def get_project_attempts(self, project_id: UUID) -> list[LabAttempt]: ...
+    async def get_attempt(self, attempt_id: UUID) -> LabAttempt | None: ...
+    async def grade_attempt(
+        self, attempt_id: UUID, grade: int, feedback: str | None
+    ) -> None: ...
+
+    async def get_attempt_download_url(
+        self, attempt_id: UUID
+    ) -> AttemptDownloadInfo: ...
+
+    async def create_project(
+        self, title: str, description: str, instructor_id: str, deadline: datetime
+    ) -> Project: ...
+
+    async def update_project(
+        self,
+        project_id: UUID,
+        title: str,
+        description: str,
+        instructor_id: str,
+        deadline: datetime,
+    ) -> Project: ...

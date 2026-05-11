@@ -2,66 +2,86 @@
 
 **Secure your course project, and only let the instructor listen!**
 
-HearMyPaper is a cross-platform desktop application that lets students protect
-their academic work with military-grade cryptography. Submit your projects with
-confidence knowing only authorized instructors can access and listen to your
-submissions.
+HearMyPaper is a modular monolith application designed to protect academic work using end-to-end encryption. Students seal their submissions with the instructor's public key, ensuring that only the intended recipient can access the content.
 
-The backend source code lives here 👉 [hmp-server](https://github.com/staleread/hmp-server)
+## 🛠 Development Setup
 
-## Development
+This project uses a modern Python stack with `uv` for dependency management, `mise` for task orchestration, and `Docker` for infrastructure.
 
-Create and activate virtual environment
+### 1. Prerequisites
 
+- [uv](https://docs.astral.sh/uv/) - Python package manager
+- [mise](https://mise.jdx.dev/) - Universal task runner and tool manager
+- [Docker & Docker Compose](https://docs.docker.com/get-docker/)
+
+### 2. Infrastructure
+
+You can spin up the required infrastructure (Postgres, Redis, MinIO, RabbitMQ) using Docker Compose profiles.
+
+**Start only infrastructure:**
 ```bash
-python -m venv .venv
-. .venv/bin/activate
+docker compose --profile infra up -d
 ```
 
-Install dev dependencies
-
+**Start the full stack (Infra + Leader API):**
 ```bash
-pip install .[dev]
+docker compose --profile infra --profile app up -d
 ```
 
-Run the app in development mode
+### 3. Local Development (outside Docker)
 
-```bash
-briefcase dev
-```
+If you prefer running the applications locally while using Docker only for the database and services:
+
+1. **Setup environment:**
+   ```bash
+   uv sync
+   ```
+
+2. **Run migrations:**
+   ```bash
+   mise run leader:migrate
+   ```
+
+3. **Launch applications:**
+   We use `mise` to simplify common development tasks. You can run:
+   - `mise run leader:dev`: Starts the Leader API (BlackSheep) with hot-reload.
+   - `mise run client:dev`: Launches the BeeWare Toga desktop client in development mode.
+
+> [!IMPORTANT]
+> **Briefcase & uv Integration**: Briefcase does not currently support `uv` workspace dependencies. Before running any `briefcase` command (including `mise run client:dev`), you must manually comment out the workspace-based dependencies in `apps/client/pyproject.toml` (e.g., `shared-kernel`, `client-core`, etc.). The project is configured to include these sources directly via Briefcase's `sources` configuration.
+
+### 4. Mise Tasks
+
+`mise` acts as a powerful task runner. You can explore all available tasks by running `mise tasks`. Key tasks include:
+- `leader:init-user`: Creates an initial admin user in the system.
+- `gen-session`: Generates a JWT session token for client authentication.
+
+## 📝 Technical Notes
+
+### OpenAPI Documentation (`/docs`)
+
+The Leader API provides an OpenAPI UI at `/docs`. However, please note several architectural limitations:
+
+- **Response Documentation**: `blacksheep` does not support automatic response type discovery via generics. Explicitly documenting responses requires access to the `OpenAPIHandler` instance within API adapters.
+- **Architectural Constraint**: In our modular monolith design, API adapters are decoupled from the documentation engine. Since there is no clean way to inject the `OpenAPIHandler` into these isolated modules, response models are currently not visible in the UI.
+- **UI Limitation**: OpenAPI v3 hides undocumented responses. Consequently, the `/docs` UI may not show the expected data structures.
+- **Workaround**: We recommend using **Browser Developer Tools (Network Tab)** or external tools like Postman/Insomnia to inspect actual API responses.
+
+### Authentication
+
+For manual API testing, use the `mise run gen-session` script. It generates a valid JWT that you can use in the `Authorization: Bearer <token>` header.
 
 ---
 
-## 📦 Supported Platforms
+## 📦 Supported Platforms (Client)
 
-HearMyPaper runs on all major desktop operating systems:
+The HearMyPaper client is a native desktop application built with BeeWare:
 
 | Platform | Status | Format |
 |----------|--------|--------|
 | **Windows** | ✅ Supported | `.msi` Installer |
 | **Linux** (Ubuntu/Debian) | ✅ Supported | `.deb` Package |
-| **Linux** (Arch) | ✅ Supported | Arch package |
-
----
-
-## 🚀 Installation
-
-### Windows
-1. Download the `.msi` installer from [HearMyPaper Releases](https://github.com/staleread/hearmypaper/releases)
-2. Run the installer and follow the setup wizard
-3. Launch HearMyPaper from your Start Menu
-
-### Linux (Ubuntu/Debian)
-```bash
-sudo apt install ./hearmypaper_1.0.x_amd64.deb
-hearmypaper  # Launch from terminal or application menu
-```
-
-### Linux (Arch)
-```bash
-sudo pacman -U hearmypaper-1.0.x-x86_64.pkg.tar.zst
-hearmypaper  # Launch from application menu
-```
+| **macOS** | ✅ Supported | `.app` Bundle |
 
 ---
 
@@ -79,5 +99,6 @@ HearMyPaper is licensed under the MIT License. See the [LICENSE](LICENSE) file f
 
 **Built with:**
 - [BeeWare Toga](https://beeware.org/) - Native GUI framework
-- [Briefcase](https://briefcase.readthedocs.io/) - Cross-platform packaging
-- [cryptography](https://cryptography.io/) - Encryption library
+- [uv](https://astral.sh/uv) - Fast Python package management
+- [BlackSheep](https://www.blacksheepframework.com/) - Fast ASGI web framework
+- [PyNaCl](https://pynacl.readthedocs.io/) - Networking and Cryptography library
