@@ -1,4 +1,4 @@
-name: CI (mypy + ruff)
+name: CI (ty + ruff)
 
 on: [push]
 
@@ -11,15 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.13"
-          cache: "pip"
+          python-version: "3.14"
+          enable-cache: true
 
-      - run: pip install .[dev]
+      - name: Lint and Format (ruff)
+        run: |
+          uv run ruff format --check .
+          uv run ruff check .
 
-      - name: Lint
-        run: ruff check .
-
-      - name: Type-check
-        run: mypy --follow-untyped-imports .
+      - name: Type-check (ty)
+        run: uv run ty check
