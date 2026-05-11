@@ -2,15 +2,11 @@
 
 **Secure your course project, and only let the instructor listen!**
 
-HearMyPaper is a modular monolith application designed to protect academic work
-using end-to-end encryption. Students seal their submissions with the
-instructor's public key, ensuring that only the intended recipient can access
-the content.
+HearMyPaper is a modular monolith application designed to protect academic work using end-to-end encryption. Students seal their submissions with the instructor's public key, ensuring that only the intended recipient can access the content.
 
 ## 🛠 Development Setup
 
-This project uses a modern Python stack with `uv` for dependency management,
-`mise` for task orchestration, and `Docker` for infrastructure.
+This project uses a modern Python stack with `uv` for dependency management, `mise` for task orchestration, and `Docker` for infrastructure.
 
 ### 1. Prerequisites
 
@@ -20,8 +16,7 @@ This project uses a modern Python stack with `uv` for dependency management,
 
 ### 2. Infrastructure
 
-You can spin up the required infrastructure (Postgres, Redis, MinIO, RabbitMQ)
-using Docker Compose profiles.
+You can spin up the required infrastructure (Postgres, Redis, MinIO, RabbitMQ) using Docker Compose profiles.
 
 **Start only infrastructure:**
 ```bash
@@ -35,8 +30,7 @@ docker compose --profile infra --profile app up -d
 
 ### 3. Local Development (outside Docker)
 
-If you prefer running the applications locally while using Docker only for the
-database and services:
+If you prefer running the applications locally while using Docker only for the database and services:
 
 1. **Setup environment:**
    ```bash
@@ -50,22 +44,44 @@ database and services:
 
 3. **Launch applications:**
    We use `mise` to simplify common development tasks. You can run:
-   - `mise run leader:dev`: Starts the Leader API (FastAPI) with hot-reload.
+   - `mise run leader:dev`: Starts the Leader API (BlackSheep) with hot-reload.
    - `mise run client:dev`: Launches the BeeWare Toga desktop client in development mode.
 
-> [!IMPORTANT] **Briefcase & uv Integration**: Briefcase does not currently
-> support `uv` workspace dependencies. Before running any `briefcase` command
-> (including `mise run client:dev`), you must manually comment out the
-> workspace-based dependencies in `apps/client/pyproject.toml` (e.g.,
-> `shared-kernel`, `client-core`, etc.). The project is configured to include
-> these sources directly via Briefcase's `sources` configuration.
+> [!IMPORTANT]
+> **Briefcase & uv Integration**: Briefcase does not currently support `uv` workspace dependencies. Before running any `briefcase` command (including `mise run client:dev`), you must manually comment out the workspace-based dependencies in `apps/client/pyproject.toml` (e.g., `shared-kernel`, `client-core`, etc.). The project is configured to include these sources directly via Briefcase's `sources` configuration.
 
 ### 4. Mise Tasks
 
-`mise` acts as a powerful task runner. You can explore all available tasks by
-running `mise tasks`. Key tasks include:
+`mise` acts as a powerful task runner. You can explore all available tasks by running `mise tasks`. Key tasks include:
 - `leader:init-user`: Creates an initial admin user in the system.
 - `gen-session`: Generates a JWT session token for client authentication.
+
+## 📝 Technical Notes
+
+### OpenAPI Documentation (`/docs`)
+
+The Leader API provides an OpenAPI UI at `/docs`. However, please note several architectural limitations:
+
+- **Response Documentation**: `blacksheep` does not support automatic response type discovery via generics. Explicitly documenting responses requires access to the `OpenAPIHandler` instance within API adapters.
+- **Architectural Constraint**: In our modular monolith design, API adapters are decoupled from the documentation engine. Since there is no clean way to inject the `OpenAPIHandler` into these isolated modules, response models are currently not visible in the UI.
+- **UI Limitation**: OpenAPI v3 hides undocumented responses. Consequently, the `/docs` UI may not show the expected data structures.
+- **Workaround**: We recommend using **Browser Developer Tools (Network Tab)** or external tools like Postman/Insomnia to inspect actual API responses.
+
+### Authentication
+
+For manual API testing, use the `mise run gen-session` script. It generates a valid JWT that you can use in the `Authorization: Bearer <token>` header.
+
+---
+
+## 📦 Supported Platforms (Client)
+
+The HearMyPaper client is a native desktop application built with BeeWare:
+
+| Platform | Status | Format |
+|----------|--------|--------|
+| **Windows** | ✅ Supported | `.msi` Installer |
+| **Linux** (Ubuntu/Debian) | ✅ Supported | `.deb` Package |
+| **macOS** | ✅ Supported | `.app` Bundle |
 
 ---
 
