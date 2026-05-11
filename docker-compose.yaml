@@ -69,6 +69,8 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
+    volumes:
+      - minio-volume:/data
   
   rabbitmq:
     container_name: hmp-rabbitmq
@@ -80,3 +82,4 @@ services:
 volumes:
   postgres-volume:
   redis-volume:
+  minio-volume:
