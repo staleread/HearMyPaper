@@ -22,5 +22,8 @@ jobs:
           uv run ruff format --check .
           uv run ruff check .
 
+      - name: Sync dependencies
+        run: uv sync --all-packages
+
       - name: Type-check (ty)
         run: uv run ty check
