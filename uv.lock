@@ -13,14 +13,12 @@ members = [
     "client-credentials",
     "client-server-bridge",
     "education-api",
-    "education-api-client",
     "education-core",
     "education-identity-bridge",
     "education-postgres",
     "education-rabbitmq",
     "hmp-mono",
     "identity-api",
-    "identity-api-client",
     "identity-ch-gen",
     "identity-core",
     "identity-id",
@@ -31,7 +29,6 @@ members = [
     "leader",
     "shared-kernel",
     "submissions-api",
-    "submissions-api-client",
     "submissions-core",
     "submissions-education-bridge",
     "submissions-postgres",
@@ -739,23 +736,6 @@ requires-dist = [
 ]
 
 [[package]]
-name = "education-api-client"
-version = "1.0.0"
-source = { editable = "packages/education/education-api-client" }
-dependencies = [
-    { name = "education-core" },
-    { name = "httpx" },
-    { name = "shared-kernel" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "education-core", editable = "packages/education/education-core" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "shared-kernel", editable = "packages/shared-kernel" },
-]
-
-[[package]]
 name = "education-core"
 version = "1.0.0"
 source = { editable = "packages/education/education-core" }
@@ -1065,23 +1045,6 @@ requires-dist = [
     { name = "blacksheep", specifier = ">=2.6.2" },
     { name = "identity-core", editable = "packages/identity/identity-core" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.13.4" },
-    { name = "shared-kernel", editable = "packages/shared-kernel" },
-]
-
-[[package]]
-name = "identity-api-client"
-version = "1.0.0"
-source = { editable = "packages/identity/identity-api-client" }
-dependencies = [
-    { name = "httpx" },
-    { name = "identity-core" },
-    { name = "shared-kernel" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "identity-core", editable = "packages/identity/identity-core" },
     { name = "shared-kernel", editable = "packages/shared-kernel" },
 ]
 
@@ -1966,23 +1929,6 @@ dependencies = [
 requires-dist = [
     { name = "blacksheep", specifier = ">=2.6.2" },
     { name = "pydantic", specifier = ">=2.13.4" },
-    { name = "shared-kernel", editable = "packages/shared-kernel" },
-    { name = "submissions-core", editable = "packages/submissions/submissions-core" },
-]
-
-[[package]]
-name = "submissions-api-client"
-version = "1.0.0"
-source = { editable = "packages/submissions/submissions-api-client" }
-dependencies = [
-    { name = "httpx" },
-    { name = "shared-kernel" },
-    { name = "submissions-core" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "httpx", specifier = ">=0.28.1" },
     { name = "shared-kernel", editable = "packages/shared-kernel" },
     { name = "submissions-core", editable = "packages/submissions/submissions-core" },
 ]

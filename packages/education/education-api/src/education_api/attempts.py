@@ -1,7 +1,8 @@
+from typing import override
 from uuid import UUID
 from datetime import datetime
 
-from blacksheep import Request, FromJSON
+from blacksheep import Request, FromJSON, FromQuery
 from blacksheep.server.controllers import Controller, get, post
 from blacksheep.server.responses import (
     ok,
@@ -54,6 +55,11 @@ class AttemptResponse(BaseModel):
 
 
 class Attempts(Controller):
+    @classmethod
+    @override
+    def route(cls) -> str | None:
+        return "/attempts"
+
     def __init__(
         self,
         get_project_attempts_port: GetProjectAttemptsPort,
@@ -87,9 +93,12 @@ class Attempts(Controller):
             return not_found(str(e))
 
     @auth()
-    @get("/projects/{project_id}/attempts")
-    async def get_attempts(self, project_id: UUID):
-        attempts = await self.get_project_attempts_port(project_id)
+    @get("")
+    async def get_attempts(self, project_id: FromQuery[UUID]):
+        if project_id.value is None:
+            return status_code(400, "Missing project_id query parameter")
+
+        attempts = await self.get_project_attempts_port(project_id.value)
         return ok(
             [
                 AttemptListItemResponse(
@@ -104,14 +113,14 @@ class Attempts(Controller):
         )
 
     @auth()
-    @get("attempts/{submission_id}/download-url")
-    async def get_download_url(self, request: Request, submission_id: UUID):
+    @get("/{attempt_id}/download-url")
+    async def get_download_url(self, request: Request, attempt_id: UUID):
         user_id = request.user.claims.get("sub")
         if not user_id:
             return status_code(401, "User ID not found in token")
 
         try:
-            url = await self.view_submission_port(user_id, submission_id)
+            url = await self.view_submission_port(user_id, attempt_id)
             return ok({"download_url": url})
         except AttemptNotFoundError as e:
             return not_found(str(e))
@@ -121,7 +130,7 @@ class Attempts(Controller):
             return forbidden(str(e))
 
     @auth()
-    @post("attempts/{attempt_id}/grade")
+    @post("/{attempt_id}/grade")
     async def grade_attempt(
         self,
         request: Request,

@@ -2,7 +2,6 @@ from uuid import UUID
 from pathlib import Path
 from ..ports.incoming.upload_submission import UploadSubmissionPort
 from ..ports.outgoing.submissions import SubmissionsPort
-import httpx
 
 
 class UploadSubmissionUseCase(UploadSubmissionPort):
@@ -22,10 +21,7 @@ class UploadSubmissionUseCase(UploadSubmissionPort):
         )
 
         # 2. Upload file directly to storage
-        async with httpx.AsyncClient() as client:
-            with open(file_path, "rb") as f:
-                response = await client.put(upload_url, content=f)
-                response.raise_for_status()
+        await self.submissions_port.upload_file(upload_url, file_path)
 
         # 3. Commit submission
         await self.submissions_port.commit_submission(submission_id)

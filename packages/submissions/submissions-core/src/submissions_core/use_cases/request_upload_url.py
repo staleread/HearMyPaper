@@ -35,11 +35,11 @@ class RequestUploadUrlUseCase(RequestUploadUrlPort):
 
         submission_id = uuid4()
         extension = cmd.file_extension.lstrip(".")
-        path = (
-            f"submissions/{cmd.project_id}/{cmd.student_id}/{submission_id}.{extension}"
-        )
+        path = f"{cmd.project_id}/{cmd.student_id}/{submission_id}.{extension}"
 
-        upload_url = await self._storage.generate_upload_url(path)
+        upload_url = await self._storage.generate_upload_url(
+            path, content_type="application/octet-stream"
+        )
 
         submission = LabSubmission(
             submission_id=submission_id,

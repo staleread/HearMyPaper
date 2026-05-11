@@ -62,7 +62,9 @@ class EducationPortAdapter(EducationPort):
         response.raise_for_status()
 
     async def get_project_attempts(self, project_id: UUID) -> list[LabAttempt]:
-        response = await self.client.get(f"/attempts/projects/{project_id}/attempts")
+        response = await self.client.get(
+            "/attempts", params={"project_id": str(project_id)}
+        )
         if response.status_code == 404:
             return []
         response.raise_for_status()
@@ -94,6 +96,11 @@ class EducationPortAdapter(EducationPort):
             feedback=a.get("instructor_feedback"),
         )
 
+    async def get_attempt_download_url(self, attempt_id: UUID) -> str:
+        response = await self.client.get(f"/attempts/{attempt_id}/download-url")
+        response.raise_for_status()
+        return response.json()["download_url"]
+
     async def grade_attempt(
         self, attempt_id: UUID, grade: int, feedback: str | None
     ) -> None:
@@ -116,7 +123,7 @@ class EducationPortAdapter(EducationPort):
             "instructor_id": instructor_id,
             "deadline": deadline.isoformat(),
         }
-        response = await self.client.post("/projects/", json=payload)
+        response = await self.client.post("/projects", json=payload)
         response.raise_for_status()
         p = response.json()
         return Project(

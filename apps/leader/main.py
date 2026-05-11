@@ -170,6 +170,7 @@ storage_client = ObjectStorageClient(
 (
     cast(Container, app.services)
     .add_instance(RabbitMQClient(settings.rabbitmq.url), RabbitMQClient)
+    .add_instance(storage_client, ObjectStorageClient)
     # Outgoing identity adapters
     .add_instance(jwt_provider, TokenProviderPort)
     .add_singleton(IdentityProviderPort, PseudonymIdentityProviderAdapter)
@@ -227,6 +228,14 @@ async def initialize(app: Application):
     services = cast(Container, app.services)
     postgres_client = services.provider.get(PostgresClient)
     rabbitmq_client = services.provider.get(RabbitMQClient)
+    storage_manager = services.provider.get(ObjectStorageClient)
+
+    # Ensure buckets exist
+    async for s3_client in storage_manager.get_client():
+        try:
+            await s3_client.head_bucket(Bucket="submissions")
+        except Exception:
+            await s3_client.create_bucket(Bucket="submissions")
 
     # Start RabbitMQ Consumer
     consumer = RabbitMQEventConsumer(rabbitmq_client, services, postgres_client)

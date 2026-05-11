@@ -17,12 +17,10 @@ class ViewSubmissionUseCase(ViewSubmissionPort):
         self._projects = projects
         self._download_url_provider = download_url_provider
 
-    async def __call__(self, instructor_id: str, submission_id: UUID) -> str:
-        attempt = await self._attempts.get_by_submission_id(submission_id)
+    async def __call__(self, instructor_id: str, attempt_id: UUID) -> str:
+        attempt = await self._attempts.get_by_id(attempt_id)
         if not attempt:
-            raise AttemptNotFoundError(
-                f"Attempt for submission {submission_id} not found"
-            )
+            raise AttemptNotFoundError(f"Attempt {attempt_id} not found")
 
         project = await self._projects.get_by_id(attempt.project_id)
         if not project:
@@ -30,8 +28,8 @@ class ViewSubmissionUseCase(ViewSubmissionPort):
 
         if project.instructor_id != instructor_id:
             raise AccessDeniedError(
-                f"Instructor {instructor_id} is not authorized to view submission {submission_id} "
+                f"Instructor {instructor_id} is not authorized to view submission for attempt {attempt_id} "
                 f"for project {project.id}"
             )
 
-        return await self._download_url_provider.get_download_url(submission_id)
+        return await self._download_url_provider.get_download_url(attempt.submission_id)
