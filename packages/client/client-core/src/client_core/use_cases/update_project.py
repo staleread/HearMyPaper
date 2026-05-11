@@ -6,8 +6,8 @@ from ..models import Project
 
 
 class UpdateProjectUseCase(UpdateProjectPort):
-    def __init__(self, education_port: EducationPort):
-        self.education_port = education_port
+    def __init__(self, education: EducationPort):
+        self.education = education
 
     async def __call__(
         self,
@@ -17,6 +17,6 @@ class UpdateProjectUseCase(UpdateProjectPort):
         instructor_id: str,
         deadline: datetime,
     ) -> Project:
-        return await self.education_port.update_project(
+        return await self.education.update_project(
             project_id, title, description, instructor_id, deadline
         )

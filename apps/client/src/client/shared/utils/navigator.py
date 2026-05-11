@@ -24,6 +24,9 @@ from client_core.use_cases.grade_attempt import GradeAttemptUseCase
 from client_core.use_cases.get_my_projects import GetMyProjectsUseCase
 from client_core.use_cases.manage_students import ManageStudentsUseCase
 from client_core.use_cases.upload_submission import UploadSubmissionUseCase
+from client_core.use_cases.download_attempt import DownloadAttemptUseCase
+from client_file_manager import HttpFileManagerAdapter
+from client_crypto import CryptoAdapter
 
 
 class SessionProvider(SessionProviderPort):
@@ -53,6 +56,9 @@ class Navigator:
         self.api_base_url = config.get("api", {}).get(
             "base_url", "http://localhost:8000"
         )
+        self.download_path = config.get("storage", {}).get(
+            "download_path", "~/Downloads/HearMyPaper"
+        )
         self.async_client = httpx.AsyncClient(base_url=self.api_base_url)
 
         # Adapters
@@ -61,44 +67,48 @@ class Navigator:
         self.education_port = EducationPortAdapter(self.async_client)
         self.submissions_port = SubmissionsPortAdapter(self.async_client)
         self.credentials_port = FileCredentialsStorageAdapter()
+        self.file_manager_port = HttpFileManagerAdapter()
+        self.crypto_port = CryptoAdapter()
 
         # Use Cases
         self.login_use_case = LoginUseCase(
-            identity_port=self.identity_port,
-            credentials_port=self.credentials_port,
+            identity=self.identity_port,
+            credentials=self.credentials_port,
             session_provider=self.session_provider,
+            crypto=self.crypto_port,
         )
-        self.get_user_use_case = GetUserUseCase(identity_port=self.identity_port)
+        self.get_user_use_case = GetUserUseCase(identity=self.identity_port)
         self.create_user_use_case = CreateUserUseCase(
-            identity_port=self.identity_port, credentials_port=self.credentials_port
+            identity=self.identity_port,
+            credentials=self.credentials_port,
+            crypto=self.crypto_port,
         )
-        self.update_user_use_case = UpdateUserUseCase(identity_port=self.identity_port)
-        self.get_project_use_case = GetProjectUseCase(
-            education_port=self.education_port
-        )
+        self.update_user_use_case = UpdateUserUseCase(identity=self.identity_port)
+        self.get_project_use_case = GetProjectUseCase(education=self.education_port)
         self.create_project_use_case = CreateProjectUseCase(
-            education_port=self.education_port
+            education=self.education_port
         )
         self.update_project_use_case = UpdateProjectUseCase(
-            education_port=self.education_port
+            education=self.education_port
         )
         self.get_project_attempts_use_case = GetProjectAttemptsUseCase(
-            education_port=self.education_port
+            education=self.education_port
         )
-        self.get_attempt_use_case = GetAttemptUseCase(
-            education_port=self.education_port
-        )
-        self.grade_attempt_use_case = GradeAttemptUseCase(
-            education_port=self.education_port
-        )
+        self.get_attempt_use_case = GetAttemptUseCase(education=self.education_port)
+        self.grade_attempt_use_case = GradeAttemptUseCase(education=self.education_port)
         self.get_my_projects_use_case = GetMyProjectsUseCase(
-            education_port=self.education_port
+            education=self.education_port
         )
         self.manage_students_use_case = ManageStudentsUseCase(
-            education_port=self.education_port
+            education=self.education_port
         )
         self.upload_submission_use_case = UploadSubmissionUseCase(
-            submissions_port=self.submissions_port
+            submissions=self.submissions_port,
+            file_manager=self.file_manager_port,
+        )
+        self.download_attempt_use_case = DownloadAttemptUseCase(
+            education=self.education_port,
+            file_manager=self.file_manager_port,
         )
 
         self.credentials_path: str | None = None

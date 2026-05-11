@@ -14,9 +14,16 @@ def submission_info_screen(navigator, attempt_id):
     async def load_attempt():
         try:
             attempt = await navigator.get_attempt_use_case(attempt_id)
+            if not attempt:
+                await navigator.main_window.dialog(
+                    toga.ErrorDialog("Error", "Attempt not found")
+                )
+                navigator.navigate("resource_catalog")
+                return
 
             attempt_data = {
                 "id": str(attempt.id),
+                "project_id": str(attempt.project_id),
                 "student_id": attempt.student_id,
                 "submitted_at": attempt.submitted_at.isoformat(),
                 "on_time": "Yes" if attempt.is_on_time else "No",
@@ -32,7 +39,21 @@ def submission_info_screen(navigator, attempt_id):
             def on_pdf_to_audio():
                 navigator.navigate("submission_convert_form", attempt_id=attempt_id)
 
+            async def on_download():
+                try:
+                    local_path = await navigator.download_attempt_use_case(
+                        attempt_id, navigator.download_path
+                    )
+                    await navigator.main_window.dialog(
+                        toga.InfoDialog("Success", f"File downloaded to: {local_path}")
+                    )
+                except Exception as e:
+                    await navigator.main_window.dialog(
+                        toga.ErrorDialog("Error", f"Download failed: {e}")
+                    )
+
             actions = [
+                ("Download", lambda w: asyncio.create_task(on_download())),
                 ("Grade", on_grade),
                 ("PDF to Audio", on_pdf_to_audio),
             ]
@@ -40,7 +61,9 @@ def submission_info_screen(navigator, attempt_id):
             info_screen = item_info_screen(
                 title="Attempt Details",
                 data=Ok(attempt_data),
-                on_back=lambda w: navigator.navigate("resource_catalog"),
+                on_back=lambda w: navigator.navigate(
+                    "submissions_catalog", attempt.project_id
+                ),
                 actions=actions,
             )
             navigator.main_window.content = info_screen

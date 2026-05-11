@@ -4,8 +4,8 @@ from ..models import User, AccessLevel
 
 
 class UpdateUserUseCase(UpdateUserPort):
-    def __init__(self, identity_port: IdentityPort):
-        self.identity_port = identity_port
+    def __init__(self, identity: IdentityPort):
+        self.identity = identity
 
     async def __call__(
         self,
@@ -16,7 +16,7 @@ class UpdateUserUseCase(UpdateUserPort):
         confidentiality_level: AccessLevel,
         integrity_levels: list[AccessLevel],
     ) -> User:
-        return await self.identity_port.update_user(
+        return await self.identity.update_user(
             user_id=user_id,
             name=name,
             surname=surname,

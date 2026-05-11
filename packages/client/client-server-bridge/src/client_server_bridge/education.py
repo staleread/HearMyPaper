@@ -72,6 +72,7 @@ class EducationPortAdapter(EducationPort):
         return [
             LabAttempt(
                 id=UUID(a["attempt_id"]),
+                project_id=project_id,
                 student_id=a["student_id"],
                 submitted_at=datetime.fromisoformat(a["submitted_at"]),
                 is_on_time=a["is_on_time"],
@@ -89,6 +90,7 @@ class EducationPortAdapter(EducationPort):
         a = response.json()
         return LabAttempt(
             id=UUID(a["attempt_id"]),
+            project_id=UUID(a["project_id"]),
             student_id=a["student_id"],
             submitted_at=datetime.fromisoformat(a["submitted_at"]),
             is_on_time=a["is_on_time"],

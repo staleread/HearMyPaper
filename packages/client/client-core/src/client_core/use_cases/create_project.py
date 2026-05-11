@@ -5,12 +5,12 @@ from ..models import Project
 
 
 class CreateProjectUseCase(CreateProjectPort):
-    def __init__(self, education_port: EducationPort):
-        self.education_port = education_port
+    def __init__(self, education: EducationPort):
+        self.education = education
 
     async def __call__(
         self, title: str, description: str, instructor_id: str, deadline: datetime
     ) -> Project:
-        return await self.education_port.create_project(
+        return await self.education.create_project(
             title, description, instructor_id, deadline
         )

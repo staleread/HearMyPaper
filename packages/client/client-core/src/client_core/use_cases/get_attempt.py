@@ -5,8 +5,8 @@ from ..models import LabAttempt
 
 
 class GetAttemptUseCase(GetAttemptPort):
-    def __init__(self, education_port: EducationPort):
-        self.education_port = education_port
+    def __init__(self, education: EducationPort):
+        self.education = education
 
     async def __call__(self, attempt_id: UUID) -> LabAttempt | None:
-        return await self.education_port.get_attempt(attempt_id)
+        return await self.education.get_attempt(attempt_id)

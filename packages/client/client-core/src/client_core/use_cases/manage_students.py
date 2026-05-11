@@ -4,14 +4,14 @@ from ..ports.outgoing.education import EducationPort
 
 
 class ManageStudentsUseCase(ManageStudentsPort):
-    def __init__(self, education_port: EducationPort):
-        self.education_port = education_port
+    def __init__(self, education: EducationPort):
+        self.education = education
 
     async def get_students(self, project_id: UUID) -> list[str]:
-        return await self.education_port.get_project_students(project_id)
+        return await self.education.get_project_students(project_id)
 
     async def assign_student(self, project_id: UUID, student_id: str) -> None:
-        return await self.education_port.assign_student(project_id, student_id)
+        return await self.education.assign_student(project_id, student_id)
 
     async def remove_student(self, project_id: UUID, student_id: str) -> None:
-        return await self.education_port.remove_student(project_id, student_id)
+        return await self.education.remove_student(project_id, student_id)

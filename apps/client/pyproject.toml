@@ -21,6 +21,7 @@ dependencies = [
     "client-core",
     "client-server-bridge",
     "client-credentials",
+    "client-file-manager",
 ]
 
 
@@ -46,6 +47,7 @@ sources = [
     "../../packages/client/client-core/src/client_core",
     "../../packages/client/client-server-bridge/src/client_server_bridge",
     "../../packages/client/client-credentials/src/client_credentials",
+    "../../packages/client/client-file-manager/src/client_file_manager",
     "../../packages/identity/identity-core/src/identity_core",
     "../../packages/education/education-core/src/education_core",
     "../../packages/submissions/submissions-core/src/submissions_core",
@@ -79,3 +81,4 @@ client-credentials = { workspace = true }
 identity-core = { workspace = true }
 education-core = { workspace = true }
 submissions-core = { workspace = true }
+client-file-manager = { workspace = true }

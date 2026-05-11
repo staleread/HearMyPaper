@@ -11,6 +11,8 @@ members = [
     "client",
     "client-core",
     "client-credentials",
+    "client-crypto",
+    "client-file-manager",
     "client-server-bridge",
     "education-api",
     "education-core",
@@ -511,6 +513,7 @@ dependencies = [
     { name = "briefcase" },
     { name = "client-core" },
     { name = "client-credentials" },
+    { name = "client-file-manager" },
     { name = "client-server-bridge" },
     { name = "httpx" },
     { name = "ipinfo" },
@@ -532,6 +535,7 @@ requires-dist = [
     { name = "briefcase", specifier = ">=0.3.25" },
     { name = "client-core", editable = "packages/client/client-core" },
     { name = "client-credentials", editable = "packages/client/client-credentials" },
+    { name = "client-file-manager", editable = "packages/client/client-file-manager" },
     { name = "client-server-bridge", editable = "packages/client/client-server-bridge" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "ipinfo", specifier = ">=5.2.1" },
@@ -550,18 +554,6 @@ dev = [{ name = "pytest", specifier = ">=9.0.3" }]
 name = "client-core"
 version = "1.0.0"
 source = { editable = "packages/client/client-core" }
-dependencies = [
-    { name = "pydantic" },
-    { name = "result" },
-    { name = "shared-kernel" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "pydantic", specifier = ">=2.11.9" },
-    { name = "result", specifier = ">=0.17.0" },
-    { name = "shared-kernel", editable = "packages/shared-kernel" },
-]
 
 [[package]]
 name = "client-credentials"
@@ -576,6 +568,36 @@ dependencies = [
 requires-dist = [
     { name = "client-core", editable = "packages/client/client-core" },
     { name = "shared-kernel", editable = "packages/shared-kernel" },
+]
+
+[[package]]
+name = "client-crypto"
+version = "1.0.0"
+source = { editable = "packages/client/client-crypto" }
+dependencies = [
+    { name = "client-core" },
+    { name = "shared-kernel" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "client-core", editable = "packages/client/client-core" },
+    { name = "shared-kernel", editable = "packages/shared-kernel" },
+]
+
+[[package]]
+name = "client-file-manager"
+version = "1.0.0"
+source = { editable = "packages/client/client-file-manager" }
+dependencies = [
+    { name = "client-core" },
+    { name = "httpx" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "client-core", editable = "packages/client/client-core" },
+    { name = "httpx", specifier = ">=0.28.1" },
 ]
 
 [[package]]

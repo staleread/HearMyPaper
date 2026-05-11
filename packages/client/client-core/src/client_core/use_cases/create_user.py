@@ -1,16 +1,20 @@
 from ..ports.incoming.create_user import CreateUserPort
 from ..ports.outgoing.identity import IdentityPort
 from ..ports.outgoing.credentials import CredentialsStoragePort
+from ..ports.outgoing.crypto import CryptoPort
 from ..models import User, AccessLevel
-from shared_kernel import crypto
 
 
 class CreateUserUseCase(CreateUserPort):
     def __init__(
-        self, identity_port: IdentityPort, credentials_port: CredentialsStoragePort
+        self,
+        identity: IdentityPort,
+        credentials: CredentialsStoragePort,
+        crypto: CryptoPort,
     ):
-        self.identity_port = identity_port
-        self.credentials_port = credentials_port
+        self.identity = identity
+        self.credentials = credentials
+        self.crypto = crypto
 
     async def __call__(
         self,
@@ -22,11 +26,9 @@ class CreateUserUseCase(CreateUserPort):
         credentials_path: str,
         credentials_password: str,
     ) -> User:
-        # Generate key pair
-        private_key, public_key = crypto.generate_keypair()
+        private_key, public_key = self.crypto.generate_keypair()
 
-        # Create user on server
-        user = await self.identity_port.create_user(
+        user = await self.identity.create_user(
             name=name,
             surname=surname,
             email=email,
@@ -35,8 +37,7 @@ class CreateUserUseCase(CreateUserPort):
             integrity_levels=integrity_levels,
         )
 
-        # Save credentials locally
-        self.credentials_port.save_credentials(
+        self.credentials.save_credentials(
             user_id=user.id,
             path=credentials_path,
             private_key=private_key,

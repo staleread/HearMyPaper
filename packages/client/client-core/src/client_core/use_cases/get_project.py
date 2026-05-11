@@ -5,8 +5,8 @@ from ..models import Project
 
 
 class GetProjectUseCase(GetProjectPort):
-    def __init__(self, education_port: EducationPort):
-        self.education_port = education_port
+    def __init__(self, education: EducationPort):
+        self.education = education
 
     async def __call__(self, project_id: UUID) -> Project | None:
-        return await self.education_port.get_project(project_id)
+        return await self.education.get_project(project_id)

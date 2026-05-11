@@ -12,6 +12,13 @@ class AccessLevel(StrEnum):
 
 
 @dataclass(frozen=True)
+class FileInfo:
+    path: str
+    name: str
+    extension: str
+
+
+@dataclass(frozen=True)
 class User:
     id: str
     name: str
@@ -34,6 +41,7 @@ class Project:
 @dataclass(frozen=True)
 class LabAttempt:
     id: UUID
+    project_id: UUID
     student_id: str
     submitted_at: datetime
     is_on_time: bool

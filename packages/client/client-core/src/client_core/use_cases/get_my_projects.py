@@ -4,8 +4,8 @@ from ..models import Project
 
 
 class GetMyProjectsUseCase(GetMyProjectsPort):
-    def __init__(self, education_port: EducationPort):
-        self.education_port = education_port
+    def __init__(self, education: EducationPort):
+        self.education = education
 
     async def __call__(self) -> list[Project]:
-        return await self.education_port.get_my_projects()
+        return await self.education.get_my_projects()

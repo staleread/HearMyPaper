@@ -8,6 +8,7 @@ from pathlib import Path
 
 from client_server_bridge import IdentityPortAdapter
 from client_credentials import FileCredentialsStorageAdapter
+from client_crypto import CryptoAdapter
 from client_core.use_cases.login import LoginUseCase
 from client_core.ports.outgoing.session import SessionProviderPort
 
@@ -30,14 +31,16 @@ async def gen_session(key_path: Path, port: int):
     base_url = f"http://localhost:{port}"
 
     async with httpx.AsyncClient(base_url=base_url) as client:
-        identity_port = IdentityPortAdapter(client)
-        credentials_port = FileCredentialsStorageAdapter()
+        identity = IdentityPortAdapter(client)
+        credentials = FileCredentialsStorageAdapter()
+        crypto = CryptoAdapter()
         session_provider = SimpleSessionProvider()
 
         login_use_case = LoginUseCase(
-            identity_port=identity_port,
-            credentials_port=credentials_port,
+            identity=identity,
+            credentials=credentials,
             session_provider=session_provider,
+            crypto=crypto,
         )
 
         password = getpass.getpass(f"Password for {key_path.name}: ")

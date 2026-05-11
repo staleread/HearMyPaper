@@ -1,27 +1,23 @@
 from uuid import UUID
-from pathlib import Path
 from ..ports.incoming.upload_submission import UploadSubmissionPort
 from ..ports.outgoing.submissions import SubmissionsPort
+from ..ports.outgoing.file_manager import FileManagerPort
 
 
 class UploadSubmissionUseCase(UploadSubmissionPort):
-    def __init__(self, submissions_port: SubmissionsPort):
-        self.submissions_port = submissions_port
+    def __init__(self, submissions: SubmissionsPort, file_manager: FileManagerPort):
+        self.submissions = submissions
+        self.file_manager = file_manager
 
     async def __call__(self, project_id: UUID, file_path: str) -> None:
-        p = Path(file_path)
-        if not p.exists():
+        file_info = self.file_manager.get_info(file_path)
+        if not self.file_manager.exists(file_info):
             raise FileNotFoundError(f"File not found: {file_path}")
 
-        file_extension = p.suffix.lstrip(".")
-
-        # 1. Request upload URL and submission ID
-        upload_url, submission_id = await self.submissions_port.request_upload_url(
-            project_id, file_extension
+        upload_url, submission_id = await self.submissions.request_upload_url(
+            project_id, file_info.extension
         )
 
-        # 2. Upload file directly to storage
-        await self.submissions_port.upload_file(upload_url, file_path)
+        await self.file_manager.upload(upload_url, file_info)
 
-        # 3. Commit submission
-        await self.submissions_port.commit_submission(submission_id)
+        await self.submissions.commit_submission(submission_id)
