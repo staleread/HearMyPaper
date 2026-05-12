@@ -11,10 +11,12 @@ dependencies = [
     "blacksheep>=2.6.2",
     "pydantic>=2.13.4",
     "processing-core",
+    "shared-kernel",
 ]
 
 [tool.uv.sources]
 processing-core = { workspace = true }
+shared-kernel = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.11.13,<0.12.0"]

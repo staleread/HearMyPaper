@@ -22,6 +22,7 @@ from processing_core.ports.incoming.commit_conversion import (
     CommitConversionPort,
     CommitConversionCommand,
 )
+from shared_kernel.marshal import to_b64
 
 
 class RequestConversionRequest(BaseModel):
@@ -31,7 +32,7 @@ class RequestConversionRequest(BaseModel):
 
 class RequestConversionResponse(BaseModel):
     conversion_id: UUID
-    worker_public_key: bytes
+    worker_public_key_b64: str
     upload_url: str
 
 
@@ -70,7 +71,7 @@ class Conversions(Controller):
             return ok(
                 RequestConversionResponse(
                     conversion_id=resp.conversion_id,
-                    worker_public_key=resp.worker_public_key,
+                    worker_public_key_b64=to_b64(resp.worker_public_key),
                     upload_url=resp.upload_url,
                 )
             )

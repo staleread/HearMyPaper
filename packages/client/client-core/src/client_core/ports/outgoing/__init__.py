@@ -6,6 +6,7 @@ from .session import SessionProviderPort
 from .submissions import SubmissionsPort, SubmissionUploadInfo
 from .cloud_storage import CloudStoragePort
 from .local_storage import LocalStoragePort
+from .processing import ProcessingPort, ConversionRequestInfo
 
 __all__ = [
     "CredentialsStoragePort",
@@ -18,4 +19,6 @@ __all__ = [
     "SubmissionUploadInfo",
     "CloudStoragePort",
     "LocalStoragePort",
+    "ProcessingPort",
+    "ConversionRequestInfo",
 ]

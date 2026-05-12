@@ -11,6 +11,10 @@ class AccessLevel(StrEnum):
     CONFIDENTIAL = "CONFIDENTIAL"
 
 
+class ProcessingTaskType(StrEnum):
+    PDF_TO_AUDIO = "pdf_to_audio"
+
+
 @dataclass(frozen=True)
 class FileInfo:
     path: str

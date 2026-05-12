@@ -1544,6 +1544,7 @@ dependencies = [
     { name = "blacksheep" },
     { name = "processing-core" },
     { name = "pydantic" },
+    { name = "shared-kernel" },
 ]
 
 [package.metadata]
@@ -1551,6 +1552,7 @@ requires-dist = [
     { name = "blacksheep", specifier = ">=2.6.2" },
     { name = "processing-core", editable = "packages/processing/processing-core" },
     { name = "pydantic", specifier = ">=2.13.4" },
+    { name = "shared-kernel", editable = "packages/shared-kernel" },
 ]
 
 [[package]]
