@@ -17,7 +17,7 @@ class WorkerSettings(BaseSettings):
     leader_url: str = "http://localhost:8000"
     rabbitmq_url: str = "amqp://guest:guest@localhost:5672/"
     heartbeat_interval: int = 20
-    capabilities: list[str] = ["pdf-to-audio"]
+    capabilities: list[str] = ["pdf_to_audio"]
 
     model_config = SettingsConfigDict(env_prefix="WORKER_")
 
