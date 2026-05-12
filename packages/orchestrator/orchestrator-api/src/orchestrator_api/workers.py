@@ -7,13 +7,21 @@ from orchestrator_core.ports.incoming.register_worker import (
     RegisterWorkerPort,
     RegisterWorkerCommand,
 )
+from orchestrator_core.ports.incoming.heartbeat import (
+    HeartbeatPort,
+    HeartbeatCommand,
+)
 from shared_kernel.marshal import from_b64
+
+
+class RegisterRequest(BaseModel):
+    worker_id: UUID
+    public_key_b64: str
+    capabilities: list[str]
 
 
 class HeartbeatRequest(BaseModel):
     worker_id: UUID
-    public_key_b64: str
-    capabilities: list[str]
 
 
 class Workers(Controller):
@@ -21,13 +29,16 @@ class Workers(Controller):
     def route(cls) -> str | None:
         return "/orchestrator/workers"
 
-    def __init__(self, register_worker_port: RegisterWorkerPort) -> None:
+    def __init__(
+        self, register_worker_port: RegisterWorkerPort, heartbeat_port: HeartbeatPort
+    ) -> None:
         self.register_worker_port = register_worker_port
+        self.heartbeat_port = heartbeat_port
 
-    @post("/heartbeat")
-    async def heartbeat(self, data: FromJSON[HeartbeatRequest]):
+    @post("/register")
+    async def register(self, data: FromJSON[RegisterRequest]):
         """
-        Register or update a worker's heartbeat and capabilities.
+        Initial worker registration with public key and capabilities.
         """
         req = data.value
         cmd = RegisterWorkerCommand(
@@ -36,4 +47,14 @@ class Workers(Controller):
             capabilities=req.capabilities,
         )
         await self.register_worker_port(cmd)
+        return ok()
+
+    @post("/heartbeat")
+    async def heartbeat(self, data: FromJSON[HeartbeatRequest]):
+        """
+        Lightweight heartbeat to update worker liveness.
+        """
+        req = data.value
+        cmd = HeartbeatCommand(worker_id=req.worker_id)
+        await self.heartbeat_port(cmd)
         return ok()

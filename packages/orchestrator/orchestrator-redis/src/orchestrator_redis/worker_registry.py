@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 from uuid import UUID
 from typing import override
 import redis.asyncio as aioredis
@@ -19,61 +18,58 @@ class RedisWorkerRegistryAdapter(WorkerRegistryPort):
         worker_key = f"worker:{worker_id}"
         heartbeat_key = f"worker_heartbeat:{worker_id}"
 
-        # Get existing load if it exists, otherwise use the one from model (likely 0)
+        # Get existing load if it exists
         existing_load = await self._client.hget(worker_key, "load_score")
         load_score = int(existing_load) if existing_load else worker.load_score
 
-        # Save worker data in Hash
+        # Save worker metadata
         await self._client.hset(
             worker_key,
             mapping={
                 "worker_id": worker_id,
                 "public_key": worker.public_key,
-                "last_heartbeat": worker.last_heartbeat.isoformat(),
                 "load_score": str(load_score),
                 "capabilities": json.dumps(worker.capabilities),
             },
         )
 
-        # Set heartbeat with TTL
+        # Set liveness key
         await self._client.setex(heartbeat_key, self.HEARTBEAT_TTL, "alive")
 
-        # Add/update in load score ZSET
+        # Update ZSET for load balancing
         await self._client.zadd("worker_load", {worker_id: load_score})
 
-        # Add to capability sets
+        # Update capability sets
         for capability in worker.capabilities:
             await self._client.sadd(f"capability:{capability}", worker_id)
 
     @override
+    async def heartbeat(self, worker_id: UUID) -> None:
+        heartbeat_key = f"worker_heartbeat:{str(worker_id)}"
+        await self._client.expire(heartbeat_key, self.HEARTBEAT_TTL)
+
+    @override
     async def get_active_workers(self, required_capability: str) -> list[WorkerNode]:
         capability_key = f"capability:{required_capability}"
-
         worker_ids_bytes = await self._client.smembers(capability_key)
-        worker_ids = [
-            wid.decode() if isinstance(wid, bytes) else wid for wid in worker_ids_bytes
-        ]
 
         active_workers = []
-        for worker_id in worker_ids:
-            if not await self._client.exists(f"worker_heartbeat:{worker_id}"):
+        for wid_bytes in worker_ids_bytes:
+            wid = wid_bytes.decode()
+            if not await self._client.exists(f"worker_heartbeat:{wid}"):
                 continue
 
-            data = await self._client.hgetall(f"worker:{worker_id}")
+            data = await self._client.hgetall(f"worker:{wid}")
             if not data:
                 continue
 
-            # Helper to handle byte keys from Redis
             def get_val(key: str) -> bytes:
                 return data.get(key.encode(), b"")
 
             active_workers.append(
                 WorkerNode(
-                    worker_id=UUID(get_val("worker_id").decode()),
+                    worker_id=UUID(wid),
                     public_key=get_val("public_key"),
-                    last_heartbeat=datetime.fromisoformat(
-                        get_val("last_heartbeat").decode()
-                    ),
                     load_score=int(get_val("load_score").decode()),
                     capabilities=json.loads(get_val("capabilities").decode()),
                 )

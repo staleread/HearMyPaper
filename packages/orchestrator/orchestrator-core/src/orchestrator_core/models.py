@@ -14,8 +14,7 @@ class TaskStatus(StrEnum):
 @dataclass(frozen=True, slots=True)
 class WorkerNode:
     worker_id: UUID
-    public_key: bytes  # The transient RSA/ECC key
-    last_heartbeat: datetime
+    public_key: bytes
     load_score: int  # Current active tasks
     capabilities: list[str] = field(default_factory=list)
 

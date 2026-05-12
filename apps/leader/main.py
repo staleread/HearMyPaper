@@ -152,10 +152,12 @@ from orchestrator_core.ports.incoming.acquire_worker import (
     DispatchTaskPort,
 )
 from orchestrator_core.ports.incoming.register_worker import RegisterWorkerPort
+from orchestrator_core.ports.incoming.heartbeat import HeartbeatPort
 from orchestrator_core.ports.incoming.update_task_status import UpdateTaskStatusPort
 from orchestrator_core.use_cases import (
     AcquireWorkerUseCase,
     RegisterWorkerUseCase,
+    HeartbeatUseCase,
     DispatchTaskUseCase,
     UpdateTaskStatusUseCase,
 )
@@ -271,6 +273,7 @@ storage_client = ObjectStorageClient(
     )
     .add_scoped(AcquireWorkerPort, AcquireWorkerUseCase)
     .add_scoped(RegisterWorkerPort, RegisterWorkerUseCase)
+    .add_scoped(HeartbeatPort, HeartbeatUseCase)
     .add_scoped(DispatchTaskPort, DispatchTaskUseCase)
     .add_scoped(UpdateTaskStatusPort, UpdateTaskStatusUseCase)
     # Processing
