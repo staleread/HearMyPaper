@@ -30,17 +30,14 @@ class RequestConversionUseCase(RequestConversionPort):
         self._paths = paths
 
     async def __call__(self, query: RequestConversionQuery) -> ConversionResponseDTO:
-        # 1. Acquire task from orchestrator
         assignment = await self._broker.acquire_task(query.task_type.value)
 
         conversion_id = uuid4()
 
-        # 2. Authorize storage (Blind Handshake)
         # Note the .bin extension as it will be an encrypted file
         file_path = self._paths.get_source_path(conversion_id)
         upload_url = await self._storage.generate_upload_url(file_path)
 
-        # 3. Persist conversion
         now = datetime.now(UTC)
         conversion = Conversion(
             conversion_id=conversion_id,

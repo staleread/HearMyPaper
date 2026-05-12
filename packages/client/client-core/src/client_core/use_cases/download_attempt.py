@@ -28,14 +28,12 @@ class DownloadAttemptUseCase(DownloadAttemptPort):
     async def __call__(self, attempt_id: UUID, password: str) -> str:
         info = await self.education.get_attempt_download_url(attempt_id)
 
-        # Load private key using password
         _, private_key = self.credentials.load_credentials(
             self.credentials_path, password
         )
 
         sealed_data = await self.cloud_storage.download(info.url)
 
-        # Unseal with private key
         raw_data = self.crypto.unseal(sealed_data, private_key)
 
         file_info = self.local_storage.write(

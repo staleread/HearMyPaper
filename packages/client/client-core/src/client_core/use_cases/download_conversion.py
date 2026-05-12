@@ -25,21 +25,16 @@ class DownloadConversionUseCase(DownloadConversionPort):
         self.credentials_path = credentials_path
 
     async def __call__(self, conversion_id: UUID, password: str) -> str:
-        # 1. Get download URL from processing
         download_url = await self.processing.get_conversion_download_url(conversion_id)
 
-        # 2. Download sealed data
         sealed_data = await self.cloud_storage.download(download_url)
 
-        # 3. Load private key
         user_id, private_key = self.credentials.load_credentials(
             self.credentials_path, password
         )
 
-        # 4. Unseal data
         raw_data = self.crypto.unseal(sealed_data, private_key)
 
-        # 5. Save locally
         filename = f"conversion_{conversion_id}.mp3"
         file_info = self.local_storage.get_info(filename)
         self.local_storage.write(file_info, raw_data)

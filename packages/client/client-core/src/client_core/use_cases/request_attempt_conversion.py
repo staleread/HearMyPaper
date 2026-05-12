@@ -25,19 +25,14 @@ class RequestAttemptConversionUseCase(RequestAttemptConversionPort):
         if not self.local_storage.exists(file_info):
             raise FileNotFoundError(f"File not found: {file_path}")
 
-        # 1. Request conversion
         info = await self.processing.request_conversion(
             source_id, ProcessingTaskType.PDF_TO_AUDIO
         )
 
-        # 2. Read local attempt file
         raw_data = self.local_storage.read(file_info)
 
-        # 3. Seal with worker's public key (sealing_key)
         sealed_data = self.crypto.seal(raw_data, info.sealing_key)
 
-        # 4. Upload to cloud storage
         await self.cloud_storage.upload(info.upload_url, sealed_data)
 
-        # 5. Commit conversion
         await self.processing.commit_conversion(info.conversion_id)

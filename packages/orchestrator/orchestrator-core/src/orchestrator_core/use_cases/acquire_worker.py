@@ -22,14 +22,10 @@ class AcquireWorkerUseCase(AcquireWorkerPort):
         active_workers = await self._registry.get_active_workers(query.task_type)
 
         if not active_workers:
-            print(f"[DEBUG] No workers found with capability: {query.task_type}")
             raise NoWorkerAvailableError(
                 f"No active workers with capability '{query.task_type}'"
             )
 
-        print(
-            f"[DEBUG] Found {len(active_workers)} active workers for {query.task_type}"
-        )
         # Sort by load_score (lowest first)
         active_workers.sort(key=lambda w: w.load_score)
 
@@ -38,7 +34,6 @@ class AcquireWorkerUseCase(AcquireWorkerPort):
         if best_worker.load_score >= self.DDOS_THRESHOLD:
             raise NoWorkerAvailableError("All workers are over capacity")
 
-        # Create and save task
         now = datetime.now(UTC)
         task_id = uuid4()
         task = ConversionTask(
