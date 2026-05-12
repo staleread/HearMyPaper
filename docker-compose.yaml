@@ -31,6 +31,26 @@ services:
       minio:
         condition: service_started
 
+  worker:
+    container_name: hmp-worker
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+      target: dev
+    profiles:
+      - app
+    environment:
+      WORKER_LEADER_URL: http://leader:8000
+      WORKER_RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    volumes:
+      - .:/app
+      - /app/.venv
+    depends_on:
+      leader:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+
   postgres:
     container_name: hmp-postgres
     image: postgres:18-alpine
