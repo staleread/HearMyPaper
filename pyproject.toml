@@ -47,6 +47,8 @@ members = [
     "packages/processing/processing-orchestrator-bridge",
     "packages/orchestrator/orchestrator-core",
     "packages/orchestrator/orchestrator-redis",
+    "packages/orchestrator/orchestrator-api",
+    "packages/orchestrator/orchestrator-rabbitmq",
 ]
 
 [dependency-groups]
