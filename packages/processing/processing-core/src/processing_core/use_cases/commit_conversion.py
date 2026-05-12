@@ -11,6 +11,7 @@ from processing_core.ports.outgoing.conversion_repository import (
     ConversionRepositoryPort,
 )
 from processing_core.ports.outgoing.file_storage import FileStoragePort
+from processing_core.ports.outgoing.resource_broker import ResourceBrokerPort
 
 
 class CommitConversionUseCase(CommitConversionPort):
@@ -18,9 +19,11 @@ class CommitConversionUseCase(CommitConversionPort):
         self,
         repository: ConversionRepositoryPort,
         storage: FileStoragePort,
+        broker: ResourceBrokerPort,
     ):
         self._repository = repository
         self._storage = storage
+        self._broker = broker
 
     async def __call__(self, command: CommitConversionCommand) -> None:
         conversion = await self._repository.get_conversion(command.conversion_id)
@@ -30,16 +33,30 @@ class CommitConversionUseCase(CommitConversionPort):
             )
 
         if conversion.status != ConversionStatus.PENDING:
-            return  # Idempotent
+            return
 
-        # Verify file exists in storage (Two-Step Commitment)
-        file_path = f"conversions/{command.conversion_id}/source.pdf"
-        if not await self._storage.file_exists(file_path):
+        # Verify source file exists (.bin extension)
+        source_path = f"conversions/{conversion.conversion_id}/source.pdf.bin"
+        if not await self._storage.file_exists(source_path):
             raise FileNotUploadedError(
-                f"File for conversion {command.conversion_id} not uploaded yet"
+                f"Source file for conversion {conversion.conversion_id} not found"
             )
 
-        # Mark as committed (Ready for pickup)
+        # Generate URLs for the worker
+        source_url = await self._storage.generate_download_url(source_path)
+
+        # Result will also be encrypted .bin
+        result_path = f"conversions/{conversion.conversion_id}/result.mp3.bin"
+        result_url = await self._storage.generate_upload_url(result_path)
+
+        # Start the task in the orchestrator
+        await self._broker.start_task(
+            task_id=conversion.task_id,
+            source_download_url=source_url,
+            result_upload_url=result_url,
+        )
+
+        # Mark as committed
         await self._repository.update_status(
             command.conversion_id, ConversionStatus.COMMITTED
         )

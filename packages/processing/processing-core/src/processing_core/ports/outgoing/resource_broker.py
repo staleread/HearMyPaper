@@ -1,8 +1,20 @@
 from typing import Protocol
-from processing_core.models import WorkerAssignment, ProcessingTaskType
+from uuid import UUID
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True, slots=True)
+class TaskAssignment:
+    task_id: UUID
+    worker_public_key: bytes
 
 
 class ResourceBrokerPort(Protocol):
-    async def assign_compute_resource(
-        self, task_type: ProcessingTaskType
-    ) -> WorkerAssignment: ...
+    async def acquire_task(self, task_type: str) -> TaskAssignment: ...
+
+    async def start_task(
+        self,
+        task_id: UUID,
+        source_download_url: str,
+        result_upload_url: str,
+    ) -> None: ...

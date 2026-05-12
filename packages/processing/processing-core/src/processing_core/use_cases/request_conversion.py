@@ -1,8 +1,10 @@
 from datetime import datetime, UTC
-from processing_core.models import AssignmentDTO, Conversion, ConversionStatus
+from uuid import uuid4
+from processing_core.models import Conversion, ConversionStatus
 from processing_core.ports.incoming.request_conversion import (
     RequestConversionPort,
     RequestConversionQuery,
+    ConversionResponseDTO,
 )
 from processing_core.ports.outgoing.resource_broker import ResourceBrokerPort
 from processing_core.ports.outgoing.conversion_repository import (
@@ -22,32 +24,32 @@ class RequestConversionUseCase(RequestConversionPort):
         self._repository = repository
         self._storage = storage
 
-    async def __call__(self, query: RequestConversionQuery) -> AssignmentDTO:
-        # 1. Acquire compute resource
-        assignment = await self._broker.assign_compute_resource(query.task_type)
+    async def __call__(self, query: RequestConversionQuery) -> ConversionResponseDTO:
+        # 1. Acquire task from orchestrator
+        assignment = await self._broker.acquire_task(query.task_type.value)
+
+        conversion_id = uuid4()
 
         # 2. Authorize storage (Blind Handshake)
-        # Path format: conversions/{assignment_id}/source.pdf
-        file_path = f"conversions/{assignment.assignment_id}/source.pdf"
+        # Note the .bin extension as it will be an encrypted file
+        file_path = f"conversions/{conversion_id}/source.pdf.bin"
         upload_url = await self._storage.generate_upload_url(file_path)
 
-        # 3. Persist intent
+        # 3. Persist conversion
         now = datetime.now(UTC)
         conversion = Conversion(
-            conversion_id=assignment.assignment_id,
+            conversion_id=conversion_id,
             lab_attempt_id=query.lab_attempt_id,
             instructor_id=query.instructor_id,
-            worker_id=assignment.worker_id,
+            task_id=assignment.task_id,
             status=ConversionStatus.PENDING,
             created_at=now,
             updated_at=now,
         )
         await self._repository.save_conversion(conversion)
 
-        return AssignmentDTO(
-            assignment_id=assignment.assignment_id,
-            worker_id=assignment.worker_id,
+        return ConversionResponseDTO(
+            conversion_id=conversion_id,
             worker_public_key=assignment.worker_public_key,
             upload_url=upload_url,
-            expires_at=assignment.expires_at,
         )

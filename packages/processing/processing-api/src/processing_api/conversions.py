@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import override
 from uuid import UUID
 
@@ -31,11 +30,9 @@ class RequestConversionRequest(BaseModel):
 
 
 class RequestConversionResponse(BaseModel):
-    assignment_id: UUID
-    worker_id: UUID
+    conversion_id: UUID
     worker_public_key: bytes
     upload_url: str
-    expires_at: datetime
 
 
 class Conversions(Controller):
@@ -72,11 +69,9 @@ class Conversions(Controller):
             resp = await self.request_conversion(query)
             return ok(
                 RequestConversionResponse(
-                    assignment_id=resp.assignment_id,
-                    worker_id=resp.worker_id,
+                    conversion_id=resp.conversion_id,
                     worker_public_key=resp.worker_public_key,
                     upload_url=resp.upload_url,
-                    expires_at=resp.expires_at,
                 )
             )
         except NoWorkerAvailableError as e:
