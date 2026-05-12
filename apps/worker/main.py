@@ -3,9 +3,13 @@ import json
 import uuid
 import httpx
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 from shared_kernel.events import RabbitMQClient, TaskStatusUpdatedEvent
-from shared_kernel.crypto import generate_keypair
+from shared_kernel.crypto import generate_keypair, unseal
 from shared_kernel.marshal import to_b64
+
+from processing_parser import PyMuPDFParserAdapter
+from processing_tts import ESpeakTTSAdapter
 
 
 class WorkerSettings(BaseSettings):
@@ -54,7 +58,7 @@ async def send_heartbeat():
     async with httpx.AsyncClient() as client:
         while True:
             try:
-                resp = await client.post(url, json=payload)
+                resp = await client.post(url, json=payload, timeout=5.0)
                 if resp.status_code == 200:
                     print("[INFO] Heartbeat sent")
                 else:
@@ -66,9 +70,17 @@ async def send_heartbeat():
 
 
 class WorkerCoordinator:
-    def __init__(self, rabbit_client: RabbitMQClient, private_key: bytes):
+    def __init__(
+        self,
+        rabbit_client: RabbitMQClient,
+        private_key: bytes,
+        parser: PyMuPDFParserAdapter,
+        tts: ESpeakTTSAdapter,
+    ):
         self._rabbit_client = rabbit_client
         self._private_key = private_key
+        self._parser = parser
+        self._tts = tts
 
     async def start_listening(self):
         """Listen for tasks assigned specifically to this worker."""
@@ -88,16 +100,53 @@ class WorkerCoordinator:
                 async with message.process():
                     payload = json.loads(message.body.decode())
                     task_id = uuid.UUID(payload["task_id"])
+                    source_url = payload["source_download_url"]
+                    result_url = payload["result_upload_url"]
 
                     print(f"[INFO] Received task {task_id}")
 
-                    await self._report_status(task_id, "processing")
+                    try:
+                        # 1. Notify: Processing
+                        await self._report_status(task_id, "processing")
 
-                    # Execute (Milestone 3 placeholder)
-                    await asyncio.sleep(5)  # Simulate work
+                        # 2. Download source
+                        print(f"[INFO] Downloading source for task {task_id}")
+                        async with httpx.AsyncClient() as http:
+                            resp = await http.get(source_url)
+                            resp.raise_for_status()
+                            sealed_pdf = resp.content
 
-                    await self._report_status(task_id, "completed")
-                    print(f"[INFO] Task {task_id} completed")
+                        # 3. Unseal
+                        print(f"[INFO] Unsealing PDF for task {task_id}")
+                        pdf_bytes = unseal(
+                            sealed_pdf, private_key_bytes=self._private_key
+                        )
+
+                        # 4. Extract Text
+                        print(f"[INFO] Extracting text for task {task_id}")
+                        text = await self._parser.extract_text(pdf_bytes)
+                        if not text.strip():
+                            raise ValueError("PDF contains no text")
+
+                        # 5. TTS
+                        print(f"[INFO] Converting to speech for task {task_id}")
+                        audio_bytes = await self._tts.text_to_speech(text)
+
+                        # 6. Upload result
+                        # Note: For now uploading raw audio.
+                        # If result must be encrypted, we'd need a public key to seal for.
+                        print(f"[INFO] Uploading result for task {task_id}")
+                        async with httpx.AsyncClient() as http:
+                            resp = await http.put(result_url, content=audio_bytes)
+                            resp.raise_for_status()
+
+                        # 7. Notify: Completed
+                        await self._report_status(task_id, "completed")
+                        print(f"[INFO] Task {task_id} completed successfully")
+
+                    except Exception as e:
+                        print(f"[ERROR] Task {task_id} failed: {e}")
+                        await self._report_status(task_id, "failed")
 
     async def _report_status(self, task_id: uuid.UUID, status: str):
         event = TaskStatusUpdatedEvent(task_id=task_id, status=status)
@@ -114,7 +163,12 @@ async def main():
         return
 
     rabbit_client = RabbitMQClient(settings.rabbitmq_url)
-    coordinator = WorkerCoordinator(rabbit_client, private_key)
+
+    # Initialize Adapters
+    parser = PyMuPDFParserAdapter()
+    tts = ESpeakTTSAdapter()
+
+    coordinator = WorkerCoordinator(rabbit_client, private_key, parser, tts)
 
     # 2. Run listener and heartbeat concurrently
     try:

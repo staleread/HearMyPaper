@@ -45,6 +45,8 @@ members = [
     "packages/processing/processing-storage",
     "packages/processing/processing-rabbitmq",
     "packages/processing/processing-orchestrator-bridge",
+    "packages/processing/processing-tts",
+    "packages/processing/processing-parser",
     "packages/orchestrator/orchestrator-core",
     "packages/orchestrator/orchestrator-redis",
     "packages/orchestrator/orchestrator-api",

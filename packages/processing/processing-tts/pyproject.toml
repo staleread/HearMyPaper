@@ -1,20 +1,20 @@
 [project]
-name = "processing-postgres"
+name = "processing-tts"
 version = "1.0.0"
-description = "PostgreSQL adapter for processing module"
+description = "Text-to-Speech adapter for HMP processing module"
 readme = "README.md"
 authors = [
     { name = "K1ngston1", email = "kingstn29@gmail.com" }
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "sqlalchemy>=2.0.38",
+    "langdetect>=1.0.9",
     "processing-core",
 ]
 
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
 [tool.uv.sources]
 processing-core = { workspace = true }
-
-[build-system]
-requires = ["uv_build>=0.11.13,<0.12.0"]
-build-backend = "uv_build"

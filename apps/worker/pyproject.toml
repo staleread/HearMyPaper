@@ -9,7 +9,11 @@ dependencies = [
     "pydantic>=2.13.4",
     "pydantic-settings>=2.14.1",
     "shared-kernel",
+    "processing-parser",
+    "processing-tts",
 ]
 
 [tool.uv.sources]
 shared-kernel = { workspace = true }
+processing-parser = { workspace = true }
+processing-tts = { workspace = true }
