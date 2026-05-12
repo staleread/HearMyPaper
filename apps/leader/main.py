@@ -128,12 +128,22 @@ from submissions_education_bridge import (
 )
 from submissions_rabbitmq import RabbitMQEventPublisherAdapter
 
+import processing_api  # noqa: F401
 from processing_core.ports.incoming.request_conversion import RequestConversionPort
-from processing_core.use_cases import RequestConversionUseCase
+from processing_core.ports.incoming.commit_conversion import CommitConversionPort
+from processing_core.use_cases import RequestConversionUseCase, CommitConversionUseCase
 from processing_core.ports.outgoing.resource_broker import ResourceBrokerPort
+from processing_core.ports.outgoing.conversion_repository import (
+    ConversionRepositoryPort,
+)
+from processing_core.ports.outgoing.file_storage import FileStoragePort
 from processing_orchestrator_bridge.resource_broker import (
     OrchestratorResourceBrokerAdapter,
 )
+from processing_postgres.conversion_repository import (
+    PostgresConversionRepositoryAdapter,
+)
+from processing_storage.s3_adapter import S3StorageAdapter as ProcessingS3StorageAdapter
 
 from orchestrator_core.ports.incoming.acquire_worker import AcquireWorkerPort
 from orchestrator_core.use_cases import AcquireWorkerUseCase
@@ -236,8 +246,14 @@ storage_client = ObjectStorageClient(
     .add_scoped(WorkerRegistryPort, RedisWorkerRegistryAdapter)
     .add_scoped(AcquireWorkerPort, AcquireWorkerUseCase)
     # Processing
+    .add_scoped(ConversionRepositoryPort, PostgresConversionRepositoryAdapter)
+    .add_instance(
+        ProcessingS3StorageAdapter(storage_client, bucket="conversions"),
+        FileStoragePort,
+    )
     .add_scoped(ResourceBrokerPort, OrchestratorResourceBrokerAdapter)
     .add_scoped(RequestConversionPort, RequestConversionUseCase)
+    .add_scoped(CommitConversionPort, CommitConversionUseCase)
 )
 
 
@@ -254,6 +270,11 @@ async def initialize(app: Application):
             await s3_client.head_bucket(Bucket="submissions")
         except Exception:
             await s3_client.create_bucket(Bucket="submissions")
+
+        try:
+            await s3_client.head_bucket(Bucket="conversions")
+        except Exception:
+            await s3_client.create_bucket(Bucket="conversions")
 
     # Start RabbitMQ Consumer
     consumer = RabbitMQEventConsumer(rabbitmq_client, services, postgres_client)

@@ -1,7 +1,7 @@
 from uuid import uuid4
 from datetime import datetime, timedelta, UTC
 from typing import override
-from processing_core.models import AssignmentDTO, ProcessingTaskType
+from processing_core.models import WorkerAssignment, ProcessingTaskType
 from processing_core.ports.outgoing.resource_broker import ResourceBrokerPort
 from orchestrator_core.ports.incoming.acquire_worker import (
     AcquireWorkerPort,
@@ -24,7 +24,7 @@ class OrchestratorResourceBrokerAdapter(ResourceBrokerPort):
     @override
     async def assign_compute_resource(
         self, task_type: ProcessingTaskType
-    ) -> AssignmentDTO:
+    ) -> WorkerAssignment:
         capability = self._TASK_CAPABILITY_MAP.get(task_type)
         if not capability:
             raise ValueError(
@@ -35,7 +35,7 @@ class OrchestratorResourceBrokerAdapter(ResourceBrokerPort):
             AcquireWorkerQuery(required_capability=capability)
         )
 
-        return AssignmentDTO(
+        return WorkerAssignment(
             assignment_id=uuid4(),
             worker_id=worker.worker_id,
             worker_public_key=worker.public_key,

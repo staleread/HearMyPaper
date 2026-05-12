@@ -1,0 +1,9 @@
+from typing import Protocol
+from uuid import UUID
+from processing_core.models import Conversion
+
+
+class ConversionRepositoryPort(Protocol):
+    async def save_conversion(self, conversion: Conversion) -> None: ...
+    async def get_conversion(self, conversion_id: UUID) -> Conversion | None: ...
+    async def update_status(self, conversion_id: UUID, status: str) -> None: ...

@@ -1,13 +1,19 @@
 [project]
-name = "orchestrator-core"
+name = "processing-postgres"
 version = "1.0.0"
-description = "Core domain for worker orchestration"
+description = "PostgreSQL adapter for processing module"
 readme = "README.md"
 authors = [
     { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "sqlalchemy>=2.0.38",
+    "processing-core",
+]
+
+[tool.uv.sources]
+processing-core = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.11.13,<0.12.0"]

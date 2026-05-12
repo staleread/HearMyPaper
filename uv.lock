@@ -1261,8 +1261,11 @@ dependencies = [
     { name = "identity-signture" },
     { name = "orchestrator-core" },
     { name = "orchestrator-redis" },
+    { name = "processing-api" },
     { name = "processing-core" },
     { name = "processing-orchestrator-bridge" },
+    { name = "processing-postgres" },
+    { name = "processing-storage" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "rodi" },
@@ -1296,8 +1299,11 @@ requires-dist = [
     { name = "identity-signture", editable = "packages/identity/identity-signture" },
     { name = "orchestrator-core", editable = "packages/orchestrator/orchestrator-core" },
     { name = "orchestrator-redis", editable = "packages/orchestrator/orchestrator-redis" },
+    { name = "processing-api", editable = "packages/processing/processing-api" },
     { name = "processing-core", editable = "packages/processing/processing-core" },
     { name = "processing-orchestrator-bridge", editable = "packages/processing/processing-orchestrator-bridge" },
+    { name = "processing-postgres", editable = "packages/processing/processing-postgres" },
+    { name = "processing-storage", editable = "packages/processing/processing-storage" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "pydantic-settings", specifier = ">=2.14.1" },
     { name = "rodi", specifier = ">=2.0.8" },
@@ -1418,12 +1424,12 @@ wheels = [
 
 [[package]]
 name = "orchestrator-core"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/orchestrator/orchestrator-core" }
 
 [[package]]
 name = "orchestrator-redis"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/orchestrator/orchestrator-redis" }
 dependencies = [
     { name = "orchestrator-core" },
@@ -1483,17 +1489,29 @@ wheels = [
 
 [[package]]
 name = "processing-api"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/processing/processing-api" }
+dependencies = [
+    { name = "blacksheep" },
+    { name = "processing-core" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "blacksheep", specifier = ">=2.6.2" },
+    { name = "processing-core", editable = "packages/processing/processing-core" },
+    { name = "pydantic", specifier = ">=2.13.4" },
+]
 
 [[package]]
 name = "processing-core"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/processing/processing-core" }
 
 [[package]]
 name = "processing-orchestrator-bridge"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/processing/processing-orchestrator-bridge" }
 dependencies = [
     { name = "orchestrator-core" },
@@ -1508,17 +1526,27 @@ requires-dist = [
 
 [[package]]
 name = "processing-postgres"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/processing/processing-postgres" }
+dependencies = [
+    { name = "processing-core" },
+    { name = "sqlalchemy" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "processing-core", editable = "packages/processing/processing-core" },
+    { name = "sqlalchemy", specifier = ">=2.0.38" },
+]
 
 [[package]]
 name = "processing-rabbitmq"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/processing/processing-rabbitmq" }
 
 [[package]]
 name = "processing-storage"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/processing/processing-storage" }
 dependencies = [
     { name = "processing-core" },
@@ -2380,7 +2408,7 @@ wheels = [
 
 [[package]]
 name = "worker"
-version = "0.1.0"
+version = "1.0.0"
 source = { virtual = "apps/worker" }
 
 [[package]]

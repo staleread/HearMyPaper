@@ -1,6 +1,6 @@
 [project]
 name = "processing-orchestrator-bridge"
-version = "0.1.0"
+version = "1.0.0"
 description = "Bridge between processing and orchestrator modules"
 readme = "README.md"
 authors = [

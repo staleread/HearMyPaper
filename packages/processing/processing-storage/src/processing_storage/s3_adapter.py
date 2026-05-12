@@ -1,48 +1,43 @@
 from typing import override
-from botocore.exceptions import ClientError
 from shared_kernel.storage import ObjectStorageClient
-from processing_core.ports.outgoing.storage import StoragePort
+from processing_core.ports.outgoing.file_storage import FileStoragePort
 
 
-class S3StorageAdapter(StoragePort):
+class S3StorageAdapter(FileStoragePort):
     def __init__(self, storage_client: ObjectStorageClient, bucket: str):
         self._storage_client = storage_client
         self._bucket = bucket
 
     @override
-    async def generate_upload_url(
-        self, path: str, content_type: str | None = None, ttl_seconds: int = 900
-    ) -> str:
-        params = {"Bucket": self._bucket, "Key": path}
-        if content_type:
-            params["ContentType"] = content_type
-
+    async def generate_upload_url(self, file_path: str, ttl_seconds: int = 900) -> str:
         async for client in self._storage_client.get_client():
             return await client.generate_presigned_url(
                 ClientMethod="put_object",
-                Params=params,
+                Params={"Bucket": self._bucket, "Key": file_path},
                 ExpiresIn=ttl_seconds,
             )
         raise RuntimeError("Failed to acquire S3 client")
 
     @override
-    async def generate_download_url(self, path: str, ttl_seconds: int = 900) -> str:
+    async def generate_download_url(
+        self, file_path: str, ttl_seconds: int = 3600
+    ) -> str:
         async for client in self._storage_client.get_client():
             return await client.generate_presigned_url(
                 ClientMethod="get_object",
-                Params={"Bucket": self._bucket, "Key": path},
+                Params={"Bucket": self._bucket, "Key": file_path},
                 ExpiresIn=ttl_seconds,
             )
         raise RuntimeError("Failed to acquire S3 client")
 
     @override
-    async def file_exists(self, path: str) -> bool:
+    async def file_exists(self, file_path: str) -> bool:
         async for client in self._storage_client.get_client():
             try:
-                await client.head_object(Bucket=self._bucket, Key=path)
+                await client.head_object(Bucket=self._bucket, Key=file_path)
                 return True
-            except ClientError as e:
-                if e.response["Error"]["Code"] == "404":
+            except Exception as e:
+                if "404" in str(e):
                     return False
-                raise
+                raise RuntimeError(f"Failed to check file existence: {e}") from e
         raise RuntimeError("Failed to acquire S3 client")

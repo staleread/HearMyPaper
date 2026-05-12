@@ -1,6 +1,6 @@
 [project]
 name = "orchestrator-redis"
-version = "0.1.0"
+version = "1.0.0"
 description = "Redis implementation of worker registry"
 readme = "README.md"
 authors = [

@@ -1,13 +1,20 @@
 [project]
-name = "orchestrator-core"
+name = "processing-api"
 version = "1.0.0"
-description = "Core domain for worker orchestration"
+description = "API for processing module"
 readme = "README.md"
 authors = [
     { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "blacksheep>=2.6.2",
+    "pydantic>=2.13.4",
+    "processing-core",
+]
+
+[tool.uv.sources]
+processing-core = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.11.13,<0.12.0"]

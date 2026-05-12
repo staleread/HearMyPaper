@@ -33,6 +33,9 @@ dependencies = [
     "submissions-rabbitmq",
     "submissions-storage",
     "processing-core",
+    "processing-api",
+    "processing-postgres",
+    "processing-storage",
     "orchestrator-core",
     "orchestrator-redis",
     "processing-orchestrator-bridge",
@@ -40,6 +43,9 @@ dependencies = [
 
 [tool.uv.sources]
 processing-core = { workspace = true }
+processing-api = { workspace = true }
+processing-postgres = { workspace = true }
+processing-storage = { workspace = true }
 orchestrator-core = { workspace = true }
 orchestrator-redis = { workspace = true }
 processing-orchestrator-bridge = { workspace = true }
