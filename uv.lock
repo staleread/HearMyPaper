@@ -35,6 +35,7 @@ members = [
     "orchestrator-redis",
     "processing-api",
     "processing-core",
+    "processing-education-bridge",
     "processing-orchestrator-bridge",
     "processing-parser",
     "processing-postgres",
@@ -1559,6 +1560,11 @@ requires-dist = [
 name = "processing-core"
 version = "1.0.0"
 source = { editable = "packages/processing/processing-core" }
+
+[[package]]
+name = "processing-education-bridge"
+version = "0.1.0"
+source = { editable = "packages/processing/processing-education-bridge" }
 
 [[package]]
 name = "processing-orchestrator-bridge"
