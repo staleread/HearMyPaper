@@ -32,9 +32,17 @@ dependencies = [
     "submissions-postgres",
     "submissions-rabbitmq",
     "submissions-storage",
+    "processing-core",
+    "orchestrator-core",
+    "orchestrator-redis",
+    "processing-orchestrator-bridge",
 ]
 
 [tool.uv.sources]
+processing-core = { workspace = true }
+orchestrator-core = { workspace = true }
+orchestrator-redis = { workspace = true }
+processing-orchestrator-bridge = { workspace = true }
 shared-kernel = { workspace = true }
 identity-api = { workspace = true }
 identity-ch-gen = { workspace = true }

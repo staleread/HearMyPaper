@@ -29,6 +29,14 @@ members = [
     "identity-redis",
     "identity-signture",
     "leader",
+    "orchestrator-core",
+    "orchestrator-redis",
+    "processing-api",
+    "processing-core",
+    "processing-orchestrator-bridge",
+    "processing-postgres",
+    "processing-rabbitmq",
+    "processing-storage",
     "shared-kernel",
     "submissions-api",
     "submissions-core",
@@ -36,6 +44,7 @@ members = [
     "submissions-postgres",
     "submissions-rabbitmq",
     "submissions-storage",
+    "worker",
 ]
 
 [[package]]
@@ -1250,6 +1259,10 @@ dependencies = [
     { name = "identity-postgres" },
     { name = "identity-redis" },
     { name = "identity-signture" },
+    { name = "orchestrator-core" },
+    { name = "orchestrator-redis" },
+    { name = "processing-core" },
+    { name = "processing-orchestrator-bridge" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "rodi" },
@@ -1281,6 +1294,10 @@ requires-dist = [
     { name = "identity-postgres", editable = "packages/identity/identity-postgres" },
     { name = "identity-redis", editable = "packages/identity/identity-redis" },
     { name = "identity-signture", editable = "packages/identity/identity-signture" },
+    { name = "orchestrator-core", editable = "packages/orchestrator/orchestrator-core" },
+    { name = "orchestrator-redis", editable = "packages/orchestrator/orchestrator-redis" },
+    { name = "processing-core", editable = "packages/processing/processing-core" },
+    { name = "processing-orchestrator-bridge", editable = "packages/processing/processing-orchestrator-bridge" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "pydantic-settings", specifier = ">=2.14.1" },
     { name = "rodi", specifier = ">=2.0.8" },
@@ -1400,6 +1417,26 @@ wheels = [
 ]
 
 [[package]]
+name = "orchestrator-core"
+version = "0.1.0"
+source = { editable = "packages/orchestrator/orchestrator-core" }
+
+[[package]]
+name = "orchestrator-redis"
+version = "0.1.0"
+source = { editable = "packages/orchestrator/orchestrator-redis" }
+dependencies = [
+    { name = "orchestrator-core" },
+    { name = "redis" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "orchestrator-core", editable = "packages/orchestrator/orchestrator-core" },
+    { name = "redis", specifier = ">=7.4.0" },
+]
+
+[[package]]
 name = "packaging"
 version = "26.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1442,6 +1479,56 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3", size = 69412, upload-time = "2025-05-15T12:30:07.975Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538, upload-time = "2025-05-15T12:30:06.134Z" },
+]
+
+[[package]]
+name = "processing-api"
+version = "0.1.0"
+source = { editable = "packages/processing/processing-api" }
+
+[[package]]
+name = "processing-core"
+version = "0.1.0"
+source = { editable = "packages/processing/processing-core" }
+
+[[package]]
+name = "processing-orchestrator-bridge"
+version = "0.1.0"
+source = { editable = "packages/processing/processing-orchestrator-bridge" }
+dependencies = [
+    { name = "orchestrator-core" },
+    { name = "processing-core" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "orchestrator-core", editable = "packages/orchestrator/orchestrator-core" },
+    { name = "processing-core", editable = "packages/processing/processing-core" },
+]
+
+[[package]]
+name = "processing-postgres"
+version = "0.1.0"
+source = { editable = "packages/processing/processing-postgres" }
+
+[[package]]
+name = "processing-rabbitmq"
+version = "0.1.0"
+source = { editable = "packages/processing/processing-rabbitmq" }
+
+[[package]]
+name = "processing-storage"
+version = "0.1.0"
+source = { editable = "packages/processing/processing-storage" }
+dependencies = [
+    { name = "processing-core" },
+    { name = "shared-kernel" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "processing-core", editable = "packages/processing/processing-core" },
+    { name = "shared-kernel", editable = "packages/shared-kernel" },
 ]
 
 [[package]]
@@ -2290,6 +2377,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/39/62/75f18a0f03b4219c4
 wheels = [
     { url = "https://files.pythonhosted.org/packages/87/1b/9e33c09813d65e248f7f773119148a612516a4bea93e9c6f545f78455b7c/wheel-0.47.0-py3-none-any.whl", hash = "sha256:212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced", size = 32218, upload-time = "2026-04-22T15:51:26.296Z" },
 ]
+
+[[package]]
+name = "worker"
+version = "0.1.0"
+source = { virtual = "apps/worker" }
 
 [[package]]
 name = "wrapt"

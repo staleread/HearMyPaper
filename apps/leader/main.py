@@ -128,6 +128,18 @@ from submissions_education_bridge import (
 )
 from submissions_rabbitmq import RabbitMQEventPublisherAdapter
 
+from processing_core.ports.incoming.request_conversion import RequestConversionPort
+from processing_core.use_cases import RequestConversionUseCase
+from processing_core.ports.outgoing.resource_broker import ResourceBrokerPort
+from processing_orchestrator_bridge.resource_broker import (
+    OrchestratorResourceBrokerAdapter,
+)
+
+from orchestrator_core.ports.incoming.acquire_worker import AcquireWorkerPort
+from orchestrator_core.use_cases import AcquireWorkerUseCase
+from orchestrator_core.ports.outgoing.worker_registry import WorkerRegistryPort
+from orchestrator_redis import RedisWorkerRegistryAdapter
+
 from utils import use_postgres, use_redis
 
 
@@ -220,6 +232,12 @@ storage_client = ObjectStorageClient(
     .add_scoped(CommitSubmissionPort, CommitSubmissionUseCase)
     .add_scoped(GetSubmissionPort, GetSubmissionUseCase)
     .add_scoped(ListProjectSubmissionsPort, ListProjectSubmissionsUseCase)
+    # Orchestrator
+    .add_scoped(WorkerRegistryPort, RedisWorkerRegistryAdapter)
+    .add_scoped(AcquireWorkerPort, AcquireWorkerUseCase)
+    # Processing
+    .add_scoped(ResourceBrokerPort, OrchestratorResourceBrokerAdapter)
+    .add_scoped(RequestConversionPort, RequestConversionUseCase)
 )
 
 
