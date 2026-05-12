@@ -118,7 +118,7 @@ from submissions_core.ports.outgoing import (
     SubmissionRepositoryPort,
     StoragePort,
     SubmissionEligibilityPort,
-    EventPublisherPort,
+    EventPublisherPort as SubmissionsEventPublisherPort,
 )
 from submissions_postgres import PostgresSubmissionRepositoryAdapter
 from submissions_storage import S3StorageAdapter
@@ -126,7 +126,9 @@ from submissions_education_bridge import (
     EducationServiceAdapter,
     DownloadUrlProviderAdapter,
 )
-from submissions_rabbitmq import RabbitMQEventPublisherAdapter
+from submissions_rabbitmq import (
+    RabbitMQEventPublisherAdapter as SubmissionsRabbitMQEventPublisherAdapter,
+)
 
 import processing_api  # noqa: F401
 from processing_core.ports.incoming.request_conversion import RequestConversionPort
@@ -145,10 +147,29 @@ from processing_postgres.conversion_repository import (
 )
 from processing_storage.s3_adapter import S3StorageAdapter as ProcessingS3StorageAdapter
 
-from orchestrator_core.ports.incoming.acquire_worker import AcquireWorkerPort
-from orchestrator_core.use_cases import AcquireWorkerUseCase
+from orchestrator_core.ports.incoming.acquire_worker import (
+    AcquireWorkerPort,
+    DispatchTaskPort,
+)
+from orchestrator_core.ports.incoming.register_worker import RegisterWorkerPort
+from orchestrator_core.ports.incoming.update_task_status import UpdateTaskStatusPort
+from orchestrator_core.use_cases import (
+    AcquireWorkerUseCase,
+    RegisterWorkerUseCase,
+    DispatchTaskUseCase,
+    UpdateTaskStatusUseCase,
+)
 from orchestrator_core.ports.outgoing.worker_registry import WorkerRegistryPort
-from orchestrator_redis import RedisWorkerRegistryAdapter
+from orchestrator_core.ports.outgoing.task_repository import TaskRepositoryPort
+from orchestrator_core.ports.outgoing.event_publisher import (
+    EventPublisherPort as OrchestratorEventPublisherPort,
+)
+from orchestrator_redis import RedisWorkerRegistryAdapter, RedisTaskRepositoryAdapter
+from orchestrator_rabbitmq import (
+    RabbitMQEventPublisherAdapter as OrchestratorRabbitMQEventPublisherAdapter,
+    TaskStatusConsumer,
+)
+import orchestrator_api  # noqa: F401
 
 from utils import use_postgres, use_redis
 
@@ -236,7 +257,7 @@ storage_client = ObjectStorageClient(
     )
     .add_scoped(SubmissionRepositoryPort, PostgresSubmissionRepositoryAdapter)
     .add_scoped(SubmissionEligibilityPort, EducationServiceAdapter)
-    .add_scoped(EventPublisherPort, RabbitMQEventPublisherAdapter)
+    .add_scoped(SubmissionsEventPublisherPort, SubmissionsRabbitMQEventPublisherAdapter)
     # Submissions use cases
     .add_scoped(RequestUploadUrlPort, RequestUploadUrlUseCase)
     .add_scoped(CommitSubmissionPort, CommitSubmissionUseCase)
@@ -244,7 +265,14 @@ storage_client = ObjectStorageClient(
     .add_scoped(ListProjectSubmissionsPort, ListProjectSubmissionsUseCase)
     # Orchestrator
     .add_scoped(WorkerRegistryPort, RedisWorkerRegistryAdapter)
+    .add_scoped(TaskRepositoryPort, RedisTaskRepositoryAdapter)
+    .add_scoped(
+        OrchestratorEventPublisherPort, OrchestratorRabbitMQEventPublisherAdapter
+    )
     .add_scoped(AcquireWorkerPort, AcquireWorkerUseCase)
+    .add_scoped(RegisterWorkerPort, RegisterWorkerUseCase)
+    .add_scoped(DispatchTaskPort, DispatchTaskUseCase)
+    .add_scoped(UpdateTaskStatusPort, UpdateTaskStatusUseCase)
     # Processing
     .add_scoped(ConversionRepositoryPort, PostgresConversionRepositoryAdapter)
     .add_instance(
@@ -276,9 +304,12 @@ async def initialize(app: Application):
         except Exception:
             await s3_client.create_bucket(Bucket="conversions")
 
-    # Start RabbitMQ Consumer
+    # Start RabbitMQ Consumers
     consumer = RabbitMQEventConsumer(rabbitmq_client, services, postgres_client)
     consumer_task = asyncio.create_task(consumer.start_consuming())
+
+    status_consumer = TaskStatusConsumer(rabbitmq_client, services)
+    status_consumer_task = asyncio.create_task(status_consumer.start_consuming())
 
     with services.provider.create_scope() as scope:
         async with postgres_client.transactional_session() as session:
@@ -308,8 +339,11 @@ async def initialize(app: Application):
 
     # Cleanup
     consumer_task.cancel()
+    status_consumer_task.cancel()
     try:
-        await consumer_task
+        await asyncio.gather(
+            consumer_task, status_consumer_task, return_exceptions=True
+        )
     except asyncio.CancelledError:
         pass
     await rabbitmq_client.close()

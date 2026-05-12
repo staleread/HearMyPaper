@@ -1,0 +1,23 @@
+[project]
+name = "orchestrator-api"
+version = "1.0.0"
+description = "API interface for HMP orchestrator module"
+readme = "README.md"
+authors = [
+    { name = "Mykola Ratushniak", email = "nicolas.ratushniak@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "blacksheep>=2.6.2",
+    "orchestrator-core",
+    "pydantic>=2.13.4",
+    "shared_kernel",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+orchestrator-core = { workspace = true }
+shared-kernel = { workspace = true }

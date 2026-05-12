@@ -38,6 +38,7 @@ dependencies = [
     "processing-storage",
     "orchestrator-core",
     "orchestrator-redis",
+    "orchestrator-api",
     "processing-orchestrator-bridge",
 ]
 
@@ -48,6 +49,7 @@ processing-postgres = { workspace = true }
 processing-storage = { workspace = true }
 orchestrator-core = { workspace = true }
 orchestrator-redis = { workspace = true }
+orchestrator-api = { workspace = true }
 processing-orchestrator-bridge = { workspace = true }
 shared-kernel = { workspace = true }
 identity-api = { workspace = true }
