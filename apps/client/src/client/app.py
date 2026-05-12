@@ -20,6 +20,8 @@ from .submission.ui.unseal_form import submission_unseal_form_screen
 from .submission.ui.open_form import submission_open_form_screen
 from .submission.ui.convert_form import submission_convert_form_screen
 from .submission.ui.grade_form import submission_grade_form_screen
+from .conversion.ui.catalog import conversions_catalog_screen
+from .conversion.ui.download_form import conversion_download_form_screen
 
 
 class HearMyPaper(toga.App):
@@ -51,6 +53,12 @@ class HearMyPaper(toga.App):
         )
         self.navigator.register_screen(
             "submission_grade_form", submission_grade_form_screen
+        )
+        self.navigator.register_screen(
+            "conversions_catalog", conversions_catalog_screen
+        )
+        self.navigator.register_screen(
+            "conversion_download_form", conversion_download_form_screen
         )
 
         self.navigator.register_screen(

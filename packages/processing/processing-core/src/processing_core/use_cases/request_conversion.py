@@ -13,16 +13,21 @@ from processing_core.ports.outgoing.conversion_repository import (
 from processing_core.ports.outgoing.file_storage import FileStoragePort
 
 
+from processing_core.ports.outgoing.path_resolver import FilePathResolverPort
+
+
 class RequestConversionUseCase(RequestConversionPort):
     def __init__(
         self,
         broker: ResourceBrokerPort,
         repository: ConversionRepositoryPort,
         storage: FileStoragePort,
+        paths: FilePathResolverPort,
     ):
         self._broker = broker
         self._repository = repository
         self._storage = storage
+        self._paths = paths
 
     async def __call__(self, query: RequestConversionQuery) -> ConversionResponseDTO:
         # 1. Acquire task from orchestrator
@@ -32,7 +37,7 @@ class RequestConversionUseCase(RequestConversionPort):
 
         # 2. Authorize storage (Blind Handshake)
         # Note the .bin extension as it will be an encrypted file
-        file_path = f"conversions/{conversion_id}/source.pdf.bin"
+        file_path = self._paths.get_source_path(conversion_id)
         upload_url = await self._storage.generate_upload_url(file_path)
 
         # 3. Persist conversion

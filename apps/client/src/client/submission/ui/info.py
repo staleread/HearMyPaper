@@ -36,8 +36,26 @@ def submission_info_screen(navigator, attempt_id):
             def on_grade(w):
                 navigator.navigate("submission_grade_form", attempt_data)
 
-            def on_pdf_to_audio(w):
-                navigator.navigate("submission_convert_form", attempt_id=attempt_id)
+            async def on_pdf_to_audio(w):
+                try:
+                    file_path = await navigator.main_window.open_file_dialog(
+                        title="Select PDF to Convert",
+                        file_types=["pdf"],
+                    )
+                    if not file_path:
+                        return
+
+                    await navigator.request_attempt_conversion_use_case(
+                        attempt_id, str(file_path)
+                    )
+                    await navigator.main_window.dialog(
+                        toga.InfoDialog("Success", "Conversion requested successfully")
+                    )
+                    navigator.navigate("conversions_catalog")
+                except Exception as e:
+                    await navigator.main_window.dialog(
+                        toga.ErrorDialog("Error", f"Failed to request conversion: {e}")
+                    )
 
             async def on_download():
                 navigator.navigate("submission_unseal_form", attempt_id=attempt_id)
@@ -45,7 +63,7 @@ def submission_info_screen(navigator, attempt_id):
             actions = [
                 ("Download", lambda w: asyncio.create_task(on_download())),
                 ("Grade", on_grade),
-                ("PDF to Audio", on_pdf_to_audio),
+                ("PDF to Audio", lambda w: asyncio.create_task(on_pdf_to_audio(w))),
             ]
 
             info_screen = item_info_screen(

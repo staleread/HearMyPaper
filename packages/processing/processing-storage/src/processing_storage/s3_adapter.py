@@ -10,10 +10,14 @@ class S3StorageAdapter(FileStoragePort):
 
     @override
     async def generate_upload_url(self, file_path: str, ttl_seconds: int = 900) -> str:
-        async for client in self._storage_client.get_client():
+        params = {"Bucket": self._bucket, "Key": file_path}
+        if file_path.endswith(".bin"):
+            params["ContentType"] = "application/octet-stream"
+
+        async for client in self._storage_client.get_signing_client():
             return await client.generate_presigned_url(
                 ClientMethod="put_object",
-                Params={"Bucket": self._bucket, "Key": file_path},
+                Params=params,
                 ExpiresIn=ttl_seconds,
             )
         raise RuntimeError("Failed to acquire S3 client")
@@ -22,7 +26,7 @@ class S3StorageAdapter(FileStoragePort):
     async def generate_download_url(
         self, file_path: str, ttl_seconds: int = 3600
     ) -> str:
-        async for client in self._storage_client.get_client():
+        async for client in self._storage_client.get_signing_client():
             return await client.generate_presigned_url(
                 ClientMethod="get_object",
                 Params={"Bucket": self._bucket, "Key": file_path},

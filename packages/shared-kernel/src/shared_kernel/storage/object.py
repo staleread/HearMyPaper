@@ -15,9 +15,11 @@ class ObjectStorageClient:
         access_key: str,
         secret_key: str,
         region_name: str = "us-east-1",
+        public_url: str | None = None,
     ):
         self.session = aioboto3.Session()
         self.endpoint_url = endpoint_url
+        self.public_url = public_url or endpoint_url
         self.access_key = access_key
         self.secret_key = secret_key
         self.region_name = region_name
@@ -26,6 +28,16 @@ class ObjectStorageClient:
         async with self.session.client(
             "s3",
             endpoint_url=self.endpoint_url,
+            aws_access_key_id=self.access_key,
+            aws_secret_access_key=self.secret_key,
+            region_name=self.region_name,
+        ) as client:
+            yield client
+
+    async def get_signing_client(self) -> AsyncGenerator[Any, None]:
+        async with self.session.client(
+            "s3",
+            endpoint_url=self.public_url,
             aws_access_key_id=self.access_key,
             aws_secret_access_key=self.secret_key,
             region_name=self.region_name,

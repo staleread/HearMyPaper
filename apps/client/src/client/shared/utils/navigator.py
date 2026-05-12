@@ -9,6 +9,7 @@ from client_server_bridge import (
     IdentityPortAdapter,
     EducationPortAdapter,
     SubmissionsPortAdapter,
+    ProcessingPortAdapter,
 )
 from client_credentials import FileCredentialsStorageAdapter
 from client_core.use_cases.login import LoginUseCase
@@ -25,6 +26,11 @@ from client_core.use_cases.get_my_projects import GetMyProjectsUseCase
 from client_core.use_cases.manage_students import ManageStudentsUseCase
 from client_core.use_cases.upload_submission import UploadSubmissionUseCase
 from client_core.use_cases.download_attempt import DownloadAttemptUseCase
+from client_core.use_cases.get_my_conversions import GetMyConversionsUseCase
+from client_core.use_cases.request_attempt_conversion import (
+    RequestAttemptConversionUseCase,
+)
+from client_core.use_cases.download_conversion import DownloadConversionUseCase
 from client_file_manager import LocalStorageAdapter, CloudStorageAdapter
 from client_crypto import CryptoAdapter
 
@@ -67,6 +73,7 @@ class Navigator:
         self.identity_port = IdentityPortAdapter(self.async_client)
         self.education_port = EducationPortAdapter(self.async_client)
         self.submissions_port = SubmissionsPortAdapter(self.async_client)
+        self.processing_port = ProcessingPortAdapter(self.async_client)
         self.credentials_port = FileCredentialsStorageAdapter()
         self.local_storage_port = LocalStorageAdapter(self.download_path)
         self.cloud_storage_port = CloudStorageAdapter()
@@ -121,6 +128,23 @@ class Navigator:
             credentials_path=self.credentials_path
             or "",  # Will be set after login/creation
         )
+        self.get_my_conversions_use_case = GetMyConversionsUseCase(
+            processing=self.processing_port
+        )
+        self.request_attempt_conversion_use_case = RequestAttemptConversionUseCase(
+            processing=self.processing_port,
+            crypto=self.crypto_port,
+            local_storage=self.local_storage_port,
+            cloud_storage=self.cloud_storage_port,
+        )
+        self.download_conversion_use_case = DownloadConversionUseCase(
+            processing=self.processing_port,
+            local_storage=self.local_storage_port,
+            cloud_storage=self.cloud_storage_port,
+            credentials=self.credentials_port,
+            crypto=self.crypto_port,
+            credentials_path=self.credentials_path or "",
+        )
 
     @property
     def credentials_path(self) -> str | None:
@@ -131,6 +155,8 @@ class Navigator:
         self._credentials_path = value
         if hasattr(self, "download_attempt_use_case"):
             self.download_attempt_use_case.credentials_path = value or ""
+        if hasattr(self, "download_conversion_use_case"):
+            self.download_conversion_use_case.credentials_path = value or ""
 
     def register_screen(self, name, screen_factory):
         self.screens[name] = screen_factory

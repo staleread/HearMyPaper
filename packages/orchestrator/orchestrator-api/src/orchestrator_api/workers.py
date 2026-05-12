@@ -41,6 +41,9 @@ class Workers(Controller):
         Initial worker registration with public key and capabilities.
         """
         req = data.value
+        print(
+            f"[DEBUG] Received worker registration request: ID={req.worker_id}, Capabilities={req.capabilities}"
+        )
         cmd = RegisterWorkerCommand(
             worker_id=req.worker_id,
             public_key=from_b64(req.public_key_b64),

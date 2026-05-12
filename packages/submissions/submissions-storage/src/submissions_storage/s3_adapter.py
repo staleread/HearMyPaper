@@ -9,14 +9,12 @@ class S3StorageAdapter(StoragePort):
         self._bucket = bucket
 
     @override
-    async def generate_upload_url(
-        self, path: str, content_type: str | None = None, ttl_seconds: int = 3600
-    ) -> str:
+    async def generate_upload_url(self, path: str, ttl_seconds: int = 3600) -> str:
         params = {"Bucket": self._bucket, "Key": path}
-        if content_type:
-            params["ContentType"] = content_type
+        if path.endswith(".bin"):
+            params["ContentType"] = "application/octet-stream"
 
-        async for client in self._storage_client.get_client():
+        async for client in self._storage_client.get_signing_client():
             return await client.generate_presigned_url(
                 ClientMethod="put_object",
                 Params=params,
@@ -26,7 +24,7 @@ class S3StorageAdapter(StoragePort):
 
     @override
     async def generate_download_url(self, path: str, ttl_seconds: int = 3600) -> str:
-        async for client in self._storage_client.get_client():
+        async for client in self._storage_client.get_signing_client():
             return await client.generate_presigned_url(
                 ClientMethod="get_object",
                 Params={"Bucket": self._bucket, "Key": path},

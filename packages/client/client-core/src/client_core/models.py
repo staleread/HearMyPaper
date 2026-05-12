@@ -15,6 +15,22 @@ class ProcessingTaskType(StrEnum):
     PDF_TO_AUDIO = "pdf_to_audio"
 
 
+class ConversionStatus(StrEnum):
+    PENDING = "pending"
+    COMMITTED = "committed"
+    PROCESSING = "processing"
+    FAILED = "failed"
+    COMPLETED = "completed"
+
+
+@dataclass(frozen=True)
+class Conversion:
+    id: UUID
+    source_id: UUID
+    status: ConversionStatus
+    created_at: datetime
+
+
 @dataclass(frozen=True)
 class FileInfo:
     path: str

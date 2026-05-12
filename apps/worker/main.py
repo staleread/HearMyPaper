@@ -142,7 +142,11 @@ class WorkerCoordinator:
                         # 7. Upload result
                         print(f"[INFO] Uploading result for task {task_id}")
                         async with httpx.AsyncClient() as http:
-                            resp = await http.put(result_url, content=sealed_audio)
+                            resp = await http.put(
+                                result_url,
+                                content=sealed_audio,
+                                headers={"Content-Type": "application/octet-stream"},
+                            )
                             resp.raise_for_status()
 
                         # 8. Notify: Completed

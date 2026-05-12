@@ -36,6 +36,9 @@ class OrchestratorResourceBrokerAdapter(ResourceBrokerPort):
         result_upload_url: str,
         sealing_key: bytes,
     ) -> None:
+        print(
+            f"[DEBUG] OrchestratorResourceBrokerAdapter.start_task: task_id={task_id}"
+        )
         await self._dispatcher(
             DispatchTaskCommand(
                 task_id=task_id,

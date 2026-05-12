@@ -23,6 +23,9 @@ from processing_core.ports.incoming.commit_conversion import (
     CommitConversionCommand,
 )
 from processing_core.ports.incoming.get_my_conversions import GetMyConversionsPort
+from processing_core.ports.incoming.get_conversion_download_url import (
+    GetConversionDownloadUrlPort,
+)
 from shared_kernel.marshal import to_b64
 
 
@@ -48,10 +51,12 @@ class Conversions(Controller):
         request_conversion: RequestConversionPort,
         commit_conversion: CommitConversionPort,
         get_my_conversions: GetMyConversionsPort,
+        get_conversion_download_url: GetConversionDownloadUrlPort,
     ):
         self.request_conversion = request_conversion
         self.commit_conversion = commit_conversion
         self.get_my_conversions = get_my_conversions
+        self.get_conversion_download_url = get_conversion_download_url
 
     @auth()
     @get("/")
@@ -73,6 +78,9 @@ class Conversions(Controller):
             return status_code(401, "User ID not found in token")
 
         req = data.value
+        print(
+            f"[DEBUG] Processing request_conversion for source_id={req.source_id}, task_type={req.task_type}"
+        )
         query = RequestConversionQuery(
             source_id=req.source_id,
             subject_id=user_id,
@@ -81,6 +89,7 @@ class Conversions(Controller):
 
         try:
             resp = await self.request_conversion(query)
+            print(f"[INFO] Conversion requested successfully: {resp.conversion_id}")
             return ok(
                 RequestConversionResponse(
                     conversion_id=resp.conversion_id,
@@ -89,8 +98,13 @@ class Conversions(Controller):
                 )
             )
         except NoWorkerAvailableError as e:
+            print(f"[WARN] No worker available for task {req.task_type}: {e}")
             return status_code(503, str(e))
         except Exception as e:
+            print(f"[ERROR] request_conversion_endpoint failed: {e}")
+            import traceback
+
+            traceback.print_exc()
             return status_code(500, str(e))
 
     @auth()
@@ -106,5 +120,20 @@ class Conversions(Controller):
             return status_code(400, str(e))
         except InvalidConversionStatusError as e:
             return status_code(409, str(e))
+        except Exception as e:
+            return status_code(500, str(e))
+
+    @auth()
+    @get("/{conversion_id}/download-url")
+    async def get_conversion_download_url_endpoint(self, conversion_id: UUID):
+        try:
+            url = await self.get_conversion_download_url(conversion_id)
+            return ok({"download_url": url})
+        except ConversionNotFoundError as e:
+            return not_found(str(e))
+        except InvalidConversionStatusError as e:
+            return status_code(409, str(e))
+        except FileNotUploadedError as e:
+            return status_code(404, str(e))
         except Exception as e:
             return status_code(500, str(e))

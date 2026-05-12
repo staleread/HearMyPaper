@@ -11,6 +11,9 @@ class RegisterWorkerUseCase(RegisterWorkerPort):
         self._registry = registry
 
     async def __call__(self, cmd: RegisterWorkerCommand) -> None:
+        print(
+            f"[DEBUG] Executing RegisterWorkerUseCase for worker {cmd.worker_id} with capabilities {cmd.capabilities}"
+        )
         worker = WorkerNode(
             worker_id=cmd.worker_id,
             public_key=cmd.public_key,

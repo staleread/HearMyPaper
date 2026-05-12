@@ -14,16 +14,21 @@ from ..ports.outgoing.storage import StoragePort
 from ..ports.outgoing.submission_eligibility import SubmissionEligibilityPort
 
 
+from submissions_core.ports.outgoing.path_resolver import FilePathResolverPort
+
+
 class RequestUploadUrlUseCase(RequestUploadUrlPort):
     def __init__(
         self,
         submissions: SubmissionRepositoryPort,
         storage: StoragePort,
         eligibility: SubmissionEligibilityPort,
+        paths: FilePathResolverPort,
     ):
         self._submissions = submissions
         self._storage = storage
         self._eligibility = eligibility
+        self._paths = paths
 
     async def __call__(self, cmd: RequestSubmissionUploadCommand) -> UploadUrlResponse:
         if not await self._eligibility.can_student_submit(
@@ -36,11 +41,11 @@ class RequestUploadUrlUseCase(RequestUploadUrlPort):
         submission_id = uuid4()
         extension = cmd.extension.lstrip(".")
         # Files on cloud storage always have .bin extension
-        path = f"{cmd.project_id}/{cmd.student_id}/{submission_id}.bin"
-
-        upload_url = await self._storage.generate_upload_url(
-            path, content_type="application/octet-stream"
+        path = self._paths.get_submission_path(
+            cmd.project_id, cmd.student_id, submission_id
         )
+
+        upload_url = await self._storage.generate_upload_url(path)
 
         submission = LabSubmission(
             submission_id=submission_id,

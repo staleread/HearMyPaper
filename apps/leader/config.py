@@ -44,6 +44,7 @@ class JWTSettings(BaseSettings):
 
 class MinioSettings(BaseSettings):
     url: str = "http://minio:9000"
+    public_url: str | None = None
     access_key: str = "minioadmin"
     secret_key: str = "minioadmin"
 

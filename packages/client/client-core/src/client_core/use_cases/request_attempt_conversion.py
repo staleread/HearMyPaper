@@ -1,5 +1,5 @@
 from uuid import UUID
-from ..ports.incoming.convert_attempt_to_audio import RequestAttemptConversionPort
+from ..ports.incoming.request_attempt_conversion import RequestAttemptConversionPort
 from ..ports.outgoing.processing import ProcessingPort
 from ..ports.outgoing.local_storage import LocalStoragePort
 from ..ports.outgoing.cloud_storage import CloudStoragePort

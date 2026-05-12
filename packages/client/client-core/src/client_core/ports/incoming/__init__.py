@@ -13,6 +13,8 @@ from .update_project import UpdateProjectPort
 from .update_user import UpdateUserPort
 from .upload_submission import UploadSubmissionPort
 from .request_attempt_conversion import RequestAttemptConversionPort
+from .get_my_conversions import GetMyConversionsPort
+from .download_conversion import DownloadConversionPort
 
 __all__ = [
     "CreateProjectPort",
@@ -30,4 +32,6 @@ __all__ = [
     "UpdateUserPort",
     "UploadSubmissionPort",
     "RequestAttemptConversionPort",
+    "GetMyConversionsPort",
+    "DownloadConversionPort",
 ]

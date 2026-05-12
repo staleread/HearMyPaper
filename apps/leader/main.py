@@ -120,8 +120,12 @@ from submissions_core.ports.outgoing import (
     SubmissionEligibilityPort,
     EventPublisherPort as SubmissionsEventPublisherPort,
 )
+from submissions_core.ports.outgoing.path_resolver import (
+    FilePathResolverPort as SubmissionsFilePathResolverPort,
+)
 from submissions_postgres import PostgresSubmissionRepositoryAdapter
 from submissions_storage import S3StorageAdapter
+from submissions_storage.path_resolver import SubmissionsFilePathResolver
 from submissions_education_bridge import (
     EducationServiceAdapter,
     DownloadUrlProviderAdapter,
@@ -137,11 +141,15 @@ from processing_core.ports.incoming.update_conversion_status import (
     UpdateConversionStatusPort,
 )
 from processing_core.ports.incoming.get_my_conversions import GetMyConversionsPort
+from processing_core.ports.incoming.get_conversion_download_url import (
+    GetConversionDownloadUrlPort,
+)
 from processing_core.use_cases import (
     RequestConversionUseCase,
     CommitConversionUseCase,
     UpdateConversionStatusUseCase,
     GetMyConversionsUseCase,
+    GetConversionDownloadUrlUseCase,
 )
 from processing_core.ports.outgoing.resource_broker import ResourceBrokerPort
 from processing_core.ports.outgoing.conversion_repository import (
@@ -151,6 +159,9 @@ from processing_core.ports.outgoing.file_storage import FileStoragePort
 from processing_core.ports.outgoing.identity import (
     IdentityPort as ProcessingIdentityPort,
 )
+from processing_core.ports.outgoing.path_resolver import (
+    FilePathResolverPort as ProcessingFilePathResolverPort,
+)
 from processing_orchestrator_bridge.resource_broker import (
     OrchestratorResourceBrokerAdapter,
 )
@@ -158,6 +169,7 @@ from processing_postgres.conversion_repository import (
     PostgresConversionRepositoryAdapter,
 )
 from processing_storage.s3_adapter import S3StorageAdapter as ProcessingS3StorageAdapter
+from processing_storage.path_resolver import ProcessingFilePathResolver
 from processing_identity_bridge import IdentityAdapter as ProcessingIdentityAdapter
 from processing_rabbitmq import ProcessingStatusConsumer
 
@@ -220,6 +232,7 @@ jwt_provider = JwtTokenProviderAdapter(
 
 storage_client = ObjectStorageClient(
     endpoint_url=settings.minio.url,
+    public_url=settings.minio.public_url,
     access_key=settings.minio.access_key,
     secret_key=settings.minio.secret_key,
 )
@@ -270,6 +283,7 @@ storage_client = ObjectStorageClient(
         StoragePort,
     )
     .add_scoped(SubmissionRepositoryPort, PostgresSubmissionRepositoryAdapter)
+    .add_singleton(SubmissionsFilePathResolverPort, SubmissionsFilePathResolver)
     .add_scoped(SubmissionEligibilityPort, EducationServiceAdapter)
     .add_scoped(SubmissionsEventPublisherPort, SubmissionsRabbitMQEventPublisherAdapter)
     # Submissions use cases
@@ -290,6 +304,7 @@ storage_client = ObjectStorageClient(
     .add_scoped(UpdateTaskStatusPort, UpdateTaskStatusUseCase)
     # Processing
     .add_scoped(ConversionRepositoryPort, PostgresConversionRepositoryAdapter)
+    .add_singleton(ProcessingFilePathResolverPort, ProcessingFilePathResolver)
     .add_instance(
         ProcessingS3StorageAdapter(storage_client, bucket="conversions"),
         FileStoragePort,
@@ -300,6 +315,7 @@ storage_client = ObjectStorageClient(
     .add_scoped(CommitConversionPort, CommitConversionUseCase)
     .add_scoped(UpdateConversionStatusPort, UpdateConversionStatusUseCase)
     .add_scoped(GetMyConversionsPort, GetMyConversionsUseCase)
+    .add_scoped(GetConversionDownloadUrlPort, GetConversionDownloadUrlUseCase)
 )
 
 

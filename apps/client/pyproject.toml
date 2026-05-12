@@ -17,11 +17,12 @@ dependencies = [
     "toga-gtk~=0.5.0",
     "httpx>=0.28.1",
     # Comment the following entries when running with briefcase
-    "shared-kernel",
-    "client-core",
-    "client-server-bridge",
-    "client-credentials",
-    "client-file-manager",
+    # "shared-kernel",
+    # "client-core",
+    # "client-server-bridge",
+    # "client-credentials",
+    # "client-file-manager",
+    # "processing-core",
 ]
 
 
@@ -52,6 +53,7 @@ sources = [
     "../../packages/identity/identity-core/src/identity_core",
     "../../packages/education/education-core/src/education_core",
     "../../packages/submissions/submissions-core/src/submissions_core",
+    "../../packages/processing/processing-core/src/processing_core",
 ]
 test_sources = [
     "tests",
@@ -82,4 +84,5 @@ client-credentials = { workspace = true }
 identity-core = { workspace = true }
 education-core = { workspace = true }
 submissions-core = { workspace = true }
+processing-core = { workspace = true }
 client-file-manager = { workspace = true }
