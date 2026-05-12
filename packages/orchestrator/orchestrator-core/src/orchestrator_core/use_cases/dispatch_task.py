@@ -23,4 +23,5 @@ class DispatchTaskUseCase(DispatchTaskPort):
             task_type=task.task_type,
             source_download_url=cmd.source_download_url,
             result_upload_url=cmd.result_upload_url,
+            sealing_key=cmd.sealing_key,
         )

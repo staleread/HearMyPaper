@@ -22,7 +22,7 @@ class OrchestratorResourceBrokerAdapter(ResourceBrokerPort):
         assignment = await self._orchestrator(AcquireWorkerQuery(task_type=task_type))
         return ProcessingTaskAssignment(
             task_id=assignment.task_id,
-            worker_public_key=assignment.worker_public_key,
+            sealing_key=assignment.sealing_key,
         )
 
     @override
@@ -31,11 +31,13 @@ class OrchestratorResourceBrokerAdapter(ResourceBrokerPort):
         task_id: UUID,
         source_download_url: str,
         result_upload_url: str,
+        sealing_key: bytes,
     ) -> None:
         await self._dispatcher(
             DispatchTaskCommand(
                 task_id=task_id,
                 source_download_url=source_download_url,
                 result_upload_url=result_upload_url,
+                sealing_key=sealing_key,
             )
         )

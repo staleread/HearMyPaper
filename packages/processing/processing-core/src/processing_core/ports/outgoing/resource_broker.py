@@ -6,7 +6,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True, slots=True)
 class TaskAssignment:
     task_id: UUID
-    worker_public_key: bytes
+    sealing_key: bytes
 
 
 class ResourceBrokerPort(Protocol):
@@ -17,4 +17,5 @@ class ResourceBrokerPort(Protocol):
         task_id: UUID,
         source_download_url: str,
         result_upload_url: str,
+        sealing_key: bytes,
     ) -> None: ...

@@ -26,13 +26,13 @@ from shared_kernel.marshal import to_b64
 
 
 class RequestConversionRequest(BaseModel):
-    lab_attempt_id: UUID
+    source_id: UUID
     task_type: ProcessingTaskType
 
 
 class RequestConversionResponse(BaseModel):
     conversion_id: UUID
-    worker_public_key_b64: str
+    sealing_key_b64: str
     upload_url: str
 
 
@@ -61,8 +61,8 @@ class Conversions(Controller):
 
         req = data.value
         query = RequestConversionQuery(
-            lab_attempt_id=req.lab_attempt_id,
-            instructor_id=user_id,
+            source_id=req.source_id,
+            subject_id=user_id,
             task_type=req.task_type,
         )
 
@@ -71,7 +71,7 @@ class Conversions(Controller):
             return ok(
                 RequestConversionResponse(
                     conversion_id=resp.conversion_id,
-                    worker_public_key_b64=to_b64(resp.worker_public_key),
+                    sealing_key_b64=to_b64(resp.sealing_key),
                     upload_url=resp.upload_url,
                 )
             )

@@ -10,4 +10,5 @@ class EventPublisherPort(Protocol):
         task_type: str,
         source_download_url: str,
         result_upload_url: str,
+        sealing_key: bytes,
     ) -> None: ...

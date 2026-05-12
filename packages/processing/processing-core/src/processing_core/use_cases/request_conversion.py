@@ -39,8 +39,8 @@ class RequestConversionUseCase(RequestConversionPort):
         now = datetime.now(UTC)
         conversion = Conversion(
             conversion_id=conversion_id,
-            lab_attempt_id=query.lab_attempt_id,
-            instructor_id=query.instructor_id,
+            source_id=query.source_id,
+            subject_id=query.subject_id,
             task_id=assignment.task_id,
             status=ConversionStatus.PENDING,
             created_at=now,
@@ -50,6 +50,6 @@ class RequestConversionUseCase(RequestConversionPort):
 
         return ConversionResponseDTO(
             conversion_id=conversion_id,
-            worker_public_key=assignment.worker_public_key,
+            sealing_key=assignment.sealing_key,
             upload_url=upload_url,
         )

@@ -18,16 +18,16 @@ class PostgresConversionRepositoryAdapter(ConversionRepositoryPort):
             text(
                 """
                 INSERT INTO processing.conversions (
-                    conversion_id, lab_attempt_id, instructor_id, task_id, status, created_at, updated_at
+                    conversion_id, source_id, subject_id, task_id, status, created_at, updated_at
                 ) VALUES (
-                    :conversion_id, :lab_attempt_id, :instructor_id, :task_id, :status, :created_at, :updated_at
+                    :conversion_id, :source_id, :subject_id, :task_id, :status, :created_at, :updated_at
                 )
                 """
             ),
             {
                 "conversion_id": conversion.conversion_id,
-                "lab_attempt_id": conversion.lab_attempt_id,
-                "instructor_id": conversion.instructor_id,
+                "source_id": conversion.source_id,
+                "subject_id": conversion.subject_id,
                 "task_id": conversion.task_id,
                 "status": conversion.status.value,
                 "created_at": conversion.created_at,
@@ -40,7 +40,7 @@ class PostgresConversionRepositoryAdapter(ConversionRepositoryPort):
         result = await self._session.execute(
             text(
                 """
-                SELECT conversion_id, lab_attempt_id, instructor_id, task_id, status, created_at, updated_at
+                SELECT conversion_id, source_id, subject_id, task_id, status, created_at, updated_at
                 FROM processing.conversions
                 WHERE conversion_id = :id
                 """
@@ -52,8 +52,8 @@ class PostgresConversionRepositoryAdapter(ConversionRepositoryPort):
             return None
         return Conversion(
             conversion_id=row["conversion_id"],
-            lab_attempt_id=row["lab_attempt_id"],
-            instructor_id=row["instructor_id"],
+            source_id=row["source_id"],
+            subject_id=row["subject_id"],
             task_id=row["task_id"],
             status=ConversionStatus(row["status"]),
             created_at=row["created_at"],

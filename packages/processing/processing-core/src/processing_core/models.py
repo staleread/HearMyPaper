@@ -16,8 +16,8 @@ class ProcessingTaskType(StrEnum):
 @dataclass(frozen=True, slots=True)
 class Conversion:
     conversion_id: UUID
-    lab_attempt_id: UUID
-    instructor_id: str
+    source_id: UUID
+    subject_id: str
     task_id: UUID
     status: ConversionStatus
     created_at: datetime

@@ -52,5 +52,5 @@ class AcquireWorkerUseCase(AcquireWorkerPort):
 
         return TaskAssignment(
             task_id=task_id,
-            worker_public_key=best_worker.public_key,
+            sealing_key=best_worker.public_key,
         )
