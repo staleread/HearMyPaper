@@ -27,6 +27,11 @@ description = "Start leader app in development mode"
 dir = "apps/leader"
 run = "uv run uvicorn main:app --reload"
 
+[tasks."worker:dev"]
+description = "Start single worker app in development mode"
+dir = "apps/worker"
+run = "uv run main.py"
+
 [tasks."client:dev"]
 description = "Start client app in development mode"
 dir = "apps/client"

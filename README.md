@@ -12,7 +12,11 @@ This project uses a modern Python stack with `uv` for dependency management, `mi
 
 - [uv](https://docs.astral.sh/uv/) - Python package manager
 - [mise](https://mise.jdx.dev/) - Universal task runner and tool manager
-- [Docker & Docker Compose](https://docs.docker.com/get-docker/)
+- [Docker & Docker Compose](https://docs.docker.com/get-driver/)
+- **System Packages** (for Worker):
+  - `espeak-ng` - Required for Text-to-Speech conversion.
+    - Arch: `sudo pacman -S espeak-ng`
+    - Ubuntu/Debian: `sudo apt-get install espeak-ng`
 
 ### 2. Infrastructure
 
@@ -23,14 +27,14 @@ You can spin up the required infrastructure (Postgres, Redis, MinIO, RabbitMQ) u
 docker compose --profile infra up -d
 ```
 
-**Start the full stack (Infra + Leader API):**
+**Start the full stack (Infra + Leader API + Worker):**
 ```bash
 docker compose --profile infra --profile app up -d
 ```
 
 ### 3. Local Development (outside Docker)
 
-If you prefer running the applications locally while using Docker only for the database and services:
+If you prefer running the applications locally while using Docker only for the infrastructure:
 
 1. **Setup environment:**
    ```bash
@@ -45,7 +49,11 @@ If you prefer running the applications locally while using Docker only for the d
 3. **Launch applications:**
    We use `mise` to simplify common development tasks. You can run:
    - `mise run leader:dev`: Starts the Leader API (BlackSheep) with hot-reload.
+   - `mise run worker:dev`: Starts the Worker node for PDF to Audio processing.
    - `mise run client:dev`: Launches the BeeWare Toga desktop client in development mode.
+
+> [!TIP]
+> **Networking with MinIO**: If running Leader/Worker locally against Docker infra, ensure `MINIO__PUBLIC_URL` in `apps/leader/.env.development` is set to `http://localhost:9000` so pre-signed URLs are reachable from your host.
 
 > [!IMPORTANT]
 > **Briefcase & uv Integration**: Briefcase does not currently support `uv` workspace dependencies. Before running any `briefcase` command (including `mise run client:dev`), you must manually comment out the workspace-based dependencies in `apps/client/pyproject.toml` (e.g., `shared-kernel`, `client-core`, etc.). The project is configured to include these sources directly via Briefcase's `sources` configuration.
