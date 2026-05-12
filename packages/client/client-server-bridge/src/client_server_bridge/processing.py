@@ -11,10 +11,10 @@ class ProcessingPortAdapter(ProcessingPort):
         self.client = client
 
     async def request_conversion(
-        self, lab_attempt_id: UUID, task_type: ProcessingTaskType
+        self, source_id: UUID, task_type: ProcessingTaskType
     ) -> ConversionRequestInfo:
         payload = {
-            "lab_attempt_id": str(lab_attempt_id),
+            "source_id": str(source_id),
             "task_type": task_type,
         }
         response = await self.client.post("/conversions", json=payload)
@@ -23,7 +23,7 @@ class ProcessingPortAdapter(ProcessingPort):
 
         return ConversionRequestInfo(
             conversion_id=UUID(data["conversion_id"]),
-            worker_public_key=from_b64(data["worker_public_key_b64"]),
+            sealing_key=from_b64(data["sealing_key_b64"]),
             upload_url=data["upload_url"],
         )
 

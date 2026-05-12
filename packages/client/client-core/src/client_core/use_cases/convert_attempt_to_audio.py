@@ -20,21 +20,21 @@ class ConvertAttemptToAudioUseCase(ConvertAttemptToAudioPort):
         self.local_storage = local_storage
         self.cloud_storage = cloud_storage
 
-    async def __call__(self, attempt_id: UUID, file_path: str) -> None:
+    async def __call__(self, source_id: UUID, file_path: str) -> None:
         file_info = self.local_storage.get_info(file_path)
         if not self.local_storage.exists(file_info):
             raise FileNotFoundError(f"File not found: {file_path}")
 
         # 1. Request conversion
         info = await self.processing.request_conversion(
-            attempt_id, ProcessingTaskType.PDF_TO_AUDIO
+            source_id, ProcessingTaskType.PDF_TO_AUDIO
         )
 
         # 2. Read local attempt file
         raw_data = self.local_storage.read(file_info)
 
-        # 3. Seal with worker's public key
-        sealed_data = self.crypto.seal(raw_data, info.worker_public_key)
+        # 3. Seal with worker's public key (sealing_key)
+        sealed_data = self.crypto.seal(raw_data, info.sealing_key)
 
         # 4. Upload to cloud storage
         await self.cloud_storage.upload(info.upload_url, sealed_data)
