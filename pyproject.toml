@@ -44,14 +44,14 @@ members = [
     "packages/processing/processing-postgres",
     "packages/processing/processing-storage",
     "packages/processing/processing-rabbitmq",
-    "packages/processing/processing-orchestrator-bridge",
     "packages/processing/processing-tts",
     "packages/processing/processing-parser",
+    "packages/processing/processing-orchestrator-bridge",
+    "packages/processing/processing-identity-bridge",
     "packages/orchestrator/orchestrator-core",
     "packages/orchestrator/orchestrator-redis",
     "packages/orchestrator/orchestrator-api",
     "packages/orchestrator/orchestrator-rabbitmq",
-    "packages/processing/processing-education-bridge",
 ]
 
 [dependency-groups]

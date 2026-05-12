@@ -4,9 +4,12 @@ from processing_core.ports.outgoing.resource_broker import (
     ResourceBrokerPort,
     TaskAssignment as ProcessingTaskAssignment,
 )
+
 from orchestrator_core.ports.incoming.acquire_worker import (
     AcquireWorkerPort,
     AcquireWorkerQuery,
+)
+from orchestrator_core.ports.incoming.dispatch_task import (
     DispatchTaskPort,
     DispatchTaskCommand,
 )

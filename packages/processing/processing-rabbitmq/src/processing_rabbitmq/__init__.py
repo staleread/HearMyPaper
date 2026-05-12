@@ -1,2 +1,3 @@
-def hello() -> str:
-    return "Hello from processing-rabbitmq!"
+from .consumer import ProcessingStatusConsumer
+
+__all__ = ["ProcessingStatusConsumer"]

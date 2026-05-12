@@ -40,6 +40,8 @@ dependencies = [
     "orchestrator-redis",
     "orchestrator-api",
     "processing-orchestrator-bridge",
+    "processing-identity-bridge",
+    "processing-rabbitmq",
 ]
 
 [tool.uv.sources]
@@ -51,6 +53,8 @@ orchestrator-core = { workspace = true }
 orchestrator-redis = { workspace = true }
 orchestrator-api = { workspace = true }
 processing-orchestrator-bridge = { workspace = true }
+processing-identity-bridge = { workspace = true }
+processing-rabbitmq = { workspace = true }
 shared-kernel = { workspace = true }
 identity-api = { workspace = true }
 identity-ch-gen = { workspace = true }

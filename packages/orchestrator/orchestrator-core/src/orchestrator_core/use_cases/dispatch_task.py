@@ -1,4 +1,4 @@
-from orchestrator_core.ports.incoming.acquire_worker import (
+from orchestrator_core.ports.incoming.dispatch_task import (
     DispatchTaskPort,
     DispatchTaskCommand,
 )

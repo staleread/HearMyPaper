@@ -50,6 +50,41 @@ class PostgresConversionRepositoryAdapter(ConversionRepositoryPort):
         row = result.mappings().first()
         if not row:
             return None
+        return self._map_row(row)
+
+    @override
+    async def get_by_task_id(self, task_id: UUID) -> Conversion | None:
+        result = await self._session.execute(
+            text(
+                """
+                SELECT conversion_id, source_id, subject_id, task_id, status, created_at, updated_at
+                FROM processing.conversions
+                WHERE task_id = :task_id
+                """
+            ),
+            {"task_id": task_id},
+        )
+        row = result.mappings().first()
+        if not row:
+            return None
+        return self._map_row(row)
+
+    @override
+    async def get_by_subject(self, subject_id: str) -> list[Conversion]:
+        result = await self._session.execute(
+            text(
+                """
+                SELECT conversion_id, source_id, subject_id, task_id, status, created_at, updated_at
+                FROM processing.conversions
+                WHERE subject_id = :subject_id
+                ORDER BY created_at DESC
+                """
+            ),
+            {"subject_id": subject_id},
+        )
+        return [self._map_row(row) for row in result.mappings()]
+
+    def _map_row(self, row) -> Conversion:
         return Conversion(
             conversion_id=row["conversion_id"],
             source_id=row["source_id"],

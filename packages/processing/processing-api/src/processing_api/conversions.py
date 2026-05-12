@@ -2,7 +2,7 @@ from typing import override
 from uuid import UUID
 
 from blacksheep import FromJSON, Request
-from blacksheep.server.controllers import Controller, post
+from blacksheep.server.controllers import Controller, post, get
 from blacksheep.server.responses import ok, status_code, not_found
 from blacksheep.server.authorization import auth
 from pydantic import BaseModel
@@ -22,6 +22,7 @@ from processing_core.ports.incoming.commit_conversion import (
     CommitConversionPort,
     CommitConversionCommand,
 )
+from processing_core.ports.incoming.get_my_conversions import GetMyConversionsPort
 from shared_kernel.marshal import to_b64
 
 
@@ -46,9 +47,21 @@ class Conversions(Controller):
         self,
         request_conversion: RequestConversionPort,
         commit_conversion: CommitConversionPort,
+        get_my_conversions: GetMyConversionsPort,
     ):
         self.request_conversion = request_conversion
         self.commit_conversion = commit_conversion
+        self.get_my_conversions = get_my_conversions
+
+    @auth()
+    @get("/")
+    async def get_my_conversions_endpoint(self, request: Request):
+        user_id = request.user.claims.get("sub")
+        if not user_id:
+            return status_code(401, "User ID not found in token")
+
+        conversions = await self.get_my_conversions(user_id)
+        return ok(conversions)
 
     @auth()
     @post("/")

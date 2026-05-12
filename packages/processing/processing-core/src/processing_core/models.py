@@ -7,6 +7,9 @@ from datetime import datetime
 class ConversionStatus(StrEnum):
     PENDING = "pending"
     COMMITTED = "committed"
+    PROCESSING = "processing"
+    FAILED = "failed"
+    COMPLETED = "completed"
 
 
 class ProcessingTaskType(StrEnum):

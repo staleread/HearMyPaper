@@ -35,7 +35,7 @@ members = [
     "orchestrator-redis",
     "processing-api",
     "processing-core",
-    "processing-education-bridge",
+    "processing-identity-bridge",
     "processing-orchestrator-bridge",
     "processing-parser",
     "processing-postgres",
@@ -1278,8 +1278,10 @@ dependencies = [
     { name = "orchestrator-redis" },
     { name = "processing-api" },
     { name = "processing-core" },
+    { name = "processing-identity-bridge" },
     { name = "processing-orchestrator-bridge" },
     { name = "processing-postgres" },
+    { name = "processing-rabbitmq" },
     { name = "processing-storage" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -1317,8 +1319,10 @@ requires-dist = [
     { name = "orchestrator-redis", editable = "packages/orchestrator/orchestrator-redis" },
     { name = "processing-api", editable = "packages/processing/processing-api" },
     { name = "processing-core", editable = "packages/processing/processing-core" },
+    { name = "processing-identity-bridge", editable = "packages/processing/processing-identity-bridge" },
     { name = "processing-orchestrator-bridge", editable = "packages/processing/processing-orchestrator-bridge" },
     { name = "processing-postgres", editable = "packages/processing/processing-postgres" },
+    { name = "processing-rabbitmq", editable = "packages/processing/processing-rabbitmq" },
     { name = "processing-storage", editable = "packages/processing/processing-storage" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "pydantic-settings", specifier = ">=2.14.1" },
@@ -1562,9 +1566,19 @@ version = "1.0.0"
 source = { editable = "packages/processing/processing-core" }
 
 [[package]]
-name = "processing-education-bridge"
-version = "0.1.0"
-source = { editable = "packages/processing/processing-education-bridge" }
+name = "processing-identity-bridge"
+version = "1.0.0"
+source = { editable = "packages/processing/processing-identity-bridge" }
+dependencies = [
+    { name = "identity-core" },
+    { name = "processing-core" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "identity-core", editable = "packages/identity/identity-core" },
+    { name = "processing-core", editable = "packages/processing/processing-core" },
+]
 
 [[package]]
 name = "processing-orchestrator-bridge"
@@ -1615,6 +1629,16 @@ requires-dist = [
 name = "processing-rabbitmq"
 version = "1.0.0"
 source = { editable = "packages/processing/processing-rabbitmq" }
+dependencies = [
+    { name = "processing-core" },
+    { name = "shared-kernel" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "processing-core", editable = "packages/processing/processing-core" },
+    { name = "shared-kernel", editable = "packages/shared-kernel" },
+]
 
 [[package]]
 name = "processing-storage"

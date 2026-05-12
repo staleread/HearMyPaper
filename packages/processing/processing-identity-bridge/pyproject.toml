@@ -1,20 +1,21 @@
 [project]
-name = "processing-rabbitmq"
+name = "processing-identity-bridge"
 version = "1.0.0"
-description = "Add your description here"
+description = "Bridge between processing and identity modules"
 readme = "README.md"
 authors = [
     { name = "K1ngston1", email = "kingstn29@gmail.com" }
 ]
+
 requires-python = ">=3.14"
 dependencies = [
-    "shared-kernel",
     "processing-core",
+    "identity-core",
 ]
 
 [tool.uv.sources]
-shared-kernel = { workspace = true }
 processing-core = { workspace = true }
+identity-core = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.11.13,<0.12.0"]

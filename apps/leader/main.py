@@ -133,12 +133,24 @@ from submissions_rabbitmq import (
 import processing_api  # noqa: F401
 from processing_core.ports.incoming.request_conversion import RequestConversionPort
 from processing_core.ports.incoming.commit_conversion import CommitConversionPort
-from processing_core.use_cases import RequestConversionUseCase, CommitConversionUseCase
+from processing_core.ports.incoming.update_conversion_status import (
+    UpdateConversionStatusPort,
+)
+from processing_core.ports.incoming.get_my_conversions import GetMyConversionsPort
+from processing_core.use_cases import (
+    RequestConversionUseCase,
+    CommitConversionUseCase,
+    UpdateConversionStatusUseCase,
+    GetMyConversionsUseCase,
+)
 from processing_core.ports.outgoing.resource_broker import ResourceBrokerPort
 from processing_core.ports.outgoing.conversion_repository import (
     ConversionRepositoryPort,
 )
 from processing_core.ports.outgoing.file_storage import FileStoragePort
+from processing_core.ports.outgoing.identity import (
+    IdentityPort as ProcessingIdentityPort,
+)
 from processing_orchestrator_bridge.resource_broker import (
     OrchestratorResourceBrokerAdapter,
 )
@@ -146,11 +158,11 @@ from processing_postgres.conversion_repository import (
     PostgresConversionRepositoryAdapter,
 )
 from processing_storage.s3_adapter import S3StorageAdapter as ProcessingS3StorageAdapter
+from processing_identity_bridge import IdentityAdapter as ProcessingIdentityAdapter
+from processing_rabbitmq import ProcessingStatusConsumer
 
-from orchestrator_core.ports.incoming.acquire_worker import (
-    AcquireWorkerPort,
-    DispatchTaskPort,
-)
+from orchestrator_core.ports.incoming.acquire_worker import AcquireWorkerPort
+from orchestrator_core.ports.incoming.dispatch_task import DispatchTaskPort
 from orchestrator_core.ports.incoming.register_worker import RegisterWorkerPort
 from orchestrator_core.ports.incoming.heartbeat import HeartbeatPort
 from orchestrator_core.ports.incoming.update_task_status import UpdateTaskStatusPort
@@ -283,8 +295,11 @@ storage_client = ObjectStorageClient(
         FileStoragePort,
     )
     .add_scoped(ResourceBrokerPort, OrchestratorResourceBrokerAdapter)
+    .add_scoped(ProcessingIdentityPort, ProcessingIdentityAdapter)
     .add_scoped(RequestConversionPort, RequestConversionUseCase)
     .add_scoped(CommitConversionPort, CommitConversionUseCase)
+    .add_scoped(UpdateConversionStatusPort, UpdateConversionStatusUseCase)
+    .add_scoped(GetMyConversionsPort, GetMyConversionsUseCase)
 )
 
 
@@ -313,6 +328,13 @@ async def initialize(app: Application):
 
     status_consumer = TaskStatusConsumer(rabbitmq_client, services)
     status_consumer_task = asyncio.create_task(status_consumer.start_consuming())
+
+    processing_status_consumer = ProcessingStatusConsumer(
+        rabbitmq_client, services, postgres_client
+    )
+    processing_status_consumer_task = asyncio.create_task(
+        processing_status_consumer.start_listening()
+    )
 
     with services.provider.create_scope() as scope:
         async with postgres_client.transactional_session() as session:
@@ -343,9 +365,13 @@ async def initialize(app: Application):
     # Cleanup
     consumer_task.cancel()
     status_consumer_task.cancel()
+    processing_status_consumer_task.cancel()
     try:
         await asyncio.gather(
-            consumer_task, status_consumer_task, return_exceptions=True
+            consumer_task,
+            status_consumer_task,
+            processing_status_consumer_task,
+            return_exceptions=True,
         )
     except asyncio.CancelledError:
         pass
