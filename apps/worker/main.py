@@ -5,8 +5,8 @@ import httpx
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shared_kernel.events import RabbitMQClient, TaskStatusUpdatedEvent
-from shared_kernel.crypto import generate_keypair, unseal
-from shared_kernel.marshal import to_b64
+from shared_kernel.crypto import generate_keypair, unseal, seal
+from shared_kernel.marshal import to_b64, from_b64
 
 from processing_parser import PyMuPDFParserAdapter
 from processing_tts import ESpeakTTSAdapter
@@ -102,6 +102,7 @@ class WorkerCoordinator:
                     task_id = uuid.UUID(payload["task_id"])
                     source_url = payload["source_download_url"]
                     result_url = payload["result_upload_url"]
+                    sealing_key_b64 = payload["sealing_key_b64"]
 
                     print(f"[INFO] Received task {task_id}")
 
@@ -132,15 +133,19 @@ class WorkerCoordinator:
                         print(f"[INFO] Converting to speech for task {task_id}")
                         audio_bytes = await self._tts.text_to_speech(text)
 
-                        # 6. Upload result
-                        # Note: For now uploading raw audio.
-                        # If result must be encrypted, we'd need a public key to seal for.
+                        # 6. Seal Audio
+                        print(f"[INFO] Sealing audio for task {task_id}")
+                        sealed_audio = seal(
+                            audio_bytes, public_key_bytes=from_b64(sealing_key_b64)
+                        )
+
+                        # 7. Upload result
                         print(f"[INFO] Uploading result for task {task_id}")
                         async with httpx.AsyncClient() as http:
-                            resp = await http.put(result_url, content=audio_bytes)
+                            resp = await http.put(result_url, content=sealed_audio)
                             resp.raise_for_status()
 
-                        # 7. Notify: Completed
+                        # 8. Notify: Completed
                         await self._report_status(task_id, "completed")
                         print(f"[INFO] Task {task_id} completed successfully")
 
