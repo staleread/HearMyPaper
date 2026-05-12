@@ -1,0 +1,15 @@
+[project]
+name = "worker"
+version = "1.0.0"
+description = "HMP background processing worker"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.1",
+    "shared-kernel",
+]
+
+[tool.uv.sources]
+shared-kernel = { workspace = true }
