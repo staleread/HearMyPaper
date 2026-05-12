@@ -12,6 +12,7 @@ from .manage_students import ManageStudentsPort
 from .update_project import UpdateProjectPort
 from .update_user import UpdateUserPort
 from .upload_submission import UploadSubmissionPort
+from .convert_attempt_to_audio import ConvertAttemptToAudioPort
 
 __all__ = [
     "CreateProjectPort",
@@ -28,4 +29,5 @@ __all__ = [
     "UpdateProjectPort",
     "UpdateUserPort",
     "UploadSubmissionPort",
+    "ConvertAttemptToAudioPort",
 ]
