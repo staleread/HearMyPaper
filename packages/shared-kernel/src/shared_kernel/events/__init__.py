@@ -1,4 +1,13 @@
-from .models import SubmissionCommittedEvent
+from .models import (
+    SubmissionCommittedEvent,
+    TaskDispatchedEvent,
+    TaskStatusUpdatedEvent,
+)
 from .client import RabbitMQClient
 
-__all__ = ["SubmissionCommittedEvent", "RabbitMQClient"]
+__all__ = [
+    "SubmissionCommittedEvent",
+    "TaskDispatchedEvent",
+    "TaskStatusUpdatedEvent",
+    "RabbitMQClient",
+]

@@ -1,12 +1,29 @@
 from dataclasses import dataclass
 from typing import Protocol
-from orchestrator_core.models import WorkerNode
+from uuid import UUID
+
+
+@dataclass(frozen=True, slots=True)
+class TaskAssignment:
+    task_id: UUID
+    worker_public_key: bytes
 
 
 @dataclass(frozen=True, slots=True)
 class AcquireWorkerQuery:
-    required_capability: str
+    task_type: str
 
 
 class AcquireWorkerPort(Protocol):
-    async def __call__(self, query: AcquireWorkerQuery) -> WorkerNode: ...
+    async def __call__(self, query: AcquireWorkerQuery) -> TaskAssignment: ...
+
+
+@dataclass(frozen=True, slots=True)
+class DispatchTaskCommand:
+    task_id: UUID
+    source_download_url: str
+    result_upload_url: str
+
+
+class DispatchTaskPort(Protocol):
+    async def __call__(self, cmd: DispatchTaskCommand) -> None: ...

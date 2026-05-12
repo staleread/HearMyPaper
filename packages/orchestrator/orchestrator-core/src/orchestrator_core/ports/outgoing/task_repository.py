@@ -1,0 +1,9 @@
+from typing import Protocol
+from uuid import UUID
+from orchestrator_core.models import ConversionTask
+
+
+class TaskRepositoryPort(Protocol):
+    async def save_task(self, task: ConversionTask) -> None: ...
+    async def get_task(self, task_id: UUID) -> ConversionTask | None: ...
+    async def update_task_status(self, task_id: UUID, status: str) -> None: ...
