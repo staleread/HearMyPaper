@@ -5,7 +5,7 @@ set -e
 # Note: mise can also provide this via [env] or env_file
 URL="${DATABASE_URL:-postgres://user:password@localhost:5432/hmp-postgres?sslmode=disable}"
 
-MODULES=("identity" "education" "submissions")
+MODULES=("identity" "education" "submissions" "processing")
 
 for module in "${MODULES[@]}"; do
   echo "--- Migrating Module: $module ---"
