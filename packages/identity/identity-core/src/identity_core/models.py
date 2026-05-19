@@ -9,7 +9,6 @@ class AuthUser:
     id: str
     confidentiality_level: AccessLevel
     integrity_levels: list[AccessLevel]
-    public_key: bytes
 
 
 @dataclass(frozen=True)

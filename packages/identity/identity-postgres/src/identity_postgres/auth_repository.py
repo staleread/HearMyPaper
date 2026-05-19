@@ -16,7 +16,7 @@ class PostgresAuthRepositoryAdapter(AuthRepositoryPort):
         result = await self._session.execute(
             text(
                 """
-                SELECT id, public_key, confidentiality_level, integrity_levels
+                SELECT id, confidentiality_level, integrity_levels
                 FROM identity.users
                 WHERE id = :id
                 """
@@ -30,7 +30,6 @@ class PostgresAuthRepositoryAdapter(AuthRepositoryPort):
 
         return AuthUser(
             id=row["id"],
-            public_key=row["public_key"],
             confidentiality_level=AccessLevel(row["confidentiality_level"]),
             integrity_levels=[AccessLevel(lvl) for lvl in row["integrity_levels"]],
         )

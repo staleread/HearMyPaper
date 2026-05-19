@@ -58,7 +58,7 @@ class Conversions(Controller):
         self.get_my_conversions = get_my_conversions
         self.get_conversion_download_url = get_conversion_download_url
 
-    @auth()
+    @auth("RESTRICTED")
     @get("/")
     async def get_my_conversions_endpoint(self, request: Request):
         user_id = request.user.claims.get("sub")
@@ -68,7 +68,7 @@ class Conversions(Controller):
         conversions = await self.get_my_conversions(user_id)
         return ok(conversions)
 
-    @auth()
+    @auth("RESTRICTED")
     @post("/")
     async def request_conversion_endpoint(
         self, request: Request, data: FromJSON[RequestConversionRequest]
@@ -107,7 +107,7 @@ class Conversions(Controller):
             traceback.print_exc()
             return status_code(500, str(e))
 
-    @auth()
+    @auth("RESTRICTED")
     @post("/{conversion_id}/commit")
     async def commit_conversion_endpoint(self, conversion_id: UUID):
         command = CommitConversionCommand(conversion_id=conversion_id)
@@ -123,7 +123,7 @@ class Conversions(Controller):
         except Exception as e:
             return status_code(500, str(e))
 
-    @auth()
+    @auth("RESTRICTED")
     @get("/{conversion_id}/download-url")
     async def get_conversion_download_url_endpoint(self, conversion_id: UUID):
         try:

@@ -24,3 +24,7 @@ class IdentityCollisionError(IdentityError):
 
 class InvalidPublicKeyError(IdentityError):
     pass
+
+
+class AuthorizationError(IdentityError):
+    pass

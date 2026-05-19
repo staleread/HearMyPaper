@@ -54,7 +54,7 @@ class Students(Controller):
         self.assign_student_to_project = assign_student_to_project
         self.remove_student_from_project = remove_student_from_project
 
-    @auth()
+    @auth("CONTROLLED")
     @get("/{project_id}/students")
     async def get_project_students(self, project_id: UUID):
         try:
@@ -63,7 +63,7 @@ class Students(Controller):
         except ProjectNotFoundError as e:
             return not_found(str(e))
 
-    @auth()
+    @auth("CONTROLLED")
     @post("/{project_id}/students")
     async def add_student_to_project(
         self, project_id: UUID, data: FromJSON[StudentAssignmentRequest]
@@ -82,7 +82,7 @@ class Students(Controller):
         except StudentAlreadyAssignedError as e:
             return status_code(409, str(e))
 
-    @auth()
+    @auth("CONTROLLED")
     @delete("/{project_id}/students/{student_id}")
     async def remove_student_from_project(self, project_id: UUID, student_id: str):
         cmd = RemoveStudentFromProjectCommand(

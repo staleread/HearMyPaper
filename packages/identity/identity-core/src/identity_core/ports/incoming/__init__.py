@@ -1,3 +1,4 @@
+from .authorize_subject import AuthorizeSubjectPort
 from .create_initial_user import CreateInitialUserPort, InitialUserCreateCommand
 from .create_user import CreateUserPort, UserCreateCommand
 from .finalize_login import FinalizeLoginPort, LoginCommand, AuthToken
@@ -8,6 +9,7 @@ from .update_user import UpdateUserPort, UserUpdateCommand
 
 __all__ = [
     "AuthToken",
+    "AuthorizeSubjectPort",
     "CreateInitialUserPort",
     "InitialUserCreateCommand",
     "CreateUserPort",

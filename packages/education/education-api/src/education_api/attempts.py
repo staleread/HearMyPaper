@@ -72,7 +72,7 @@ class Attempts(Controller):
         self.grade_lab_attempt_port = grade_lab_attempt_port
         self.get_lab_attempt_port = get_lab_attempt_port
 
-    @auth()
+    @auth("RESTRICTED")
     @get("/{attempt_id}")
     async def get_attempt(self, attempt_id: UUID):
         try:
@@ -92,7 +92,7 @@ class Attempts(Controller):
         except AttemptNotFoundError as e:
             return not_found(str(e))
 
-    @auth()
+    @auth("RESTRICTED")
     @get("")
     async def get_attempts(self, project_id: FromQuery[UUID]):
         if project_id.value is None:
@@ -112,7 +112,7 @@ class Attempts(Controller):
             ]
         )
 
-    @auth()
+    @auth("RESTRICTED")
     @get("/{attempt_id}/download-url")
     async def get_download_url(self, request: Request, attempt_id: UUID):
         user_id = request.user.claims.get("sub")
@@ -135,7 +135,7 @@ class Attempts(Controller):
         except AccessDeniedError as e:
             return forbidden(str(e))
 
-    @auth()
+    @auth("RESTRICTED")
     @post("/{attempt_id}/grade")
     async def grade_attempt(
         self,

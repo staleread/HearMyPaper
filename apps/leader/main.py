@@ -3,6 +3,7 @@ from typing import cast
 from openapidocs.v3 import Info
 from rodi import Container
 from blacksheep import Application
+from blacksheep.server.authorization import Policy
 from blacksheep.server.openapi.v3 import OpenAPIHandler
 from blacksheep.server.authentication.jwt import JWTBearerAuthentication
 from blacksheep_prometheus import use_prometheus_metrics
@@ -14,6 +15,12 @@ from shared_kernel.storage.object import ObjectStorageClient
 from shared_kernel.marshal import from_b64
 from shared_kernel.events import RabbitMQClient
 from config import get_settings
+from auth import (
+    UnclassifiedRequirement,
+    ControlledRequirement,
+    RestrictedRequirement,
+    ConfidentialRequirement,
+)
 
 
 import identity_api  # noqa: F401
@@ -24,6 +31,7 @@ from identity_core.ports.incoming import (
     UpdateUserPort,
     InitLoginPort,
     FinalizeLoginPort,
+    AuthorizeSubjectPort,
     CreateInitialUserPort,
     InitialUserCreateCommand,
 )
@@ -34,6 +42,7 @@ from identity_core.use_cases import (
     UpdateUserUseCase,
     InitLoginUseCase,
     FinalizeLoginUseCase,
+    AuthorizeSubjectUseCase,
     CreateInitialUserUseCase,
 )
 from identity_core.ports.outgoing.user_repository import UserRepositoryPort
@@ -219,7 +228,11 @@ app.use_authentication().add(
         valid_issuers=[settings.jwt.issuer],
     )
 )
-app.use_authorization()
+app.use_authorization().add(Policy("UNCLASSIFIED", UnclassifiedRequirement)).add(
+    Policy("CONTROLLED", ControlledRequirement)
+).add(Policy("RESTRICTED", RestrictedRequirement)).add(
+    Policy("CONFIDENTIAL", ConfidentialRequirement)
+)
 
 jwt_provider = JwtTokenProviderAdapter(
     secret=settings.jwt.secret,
@@ -256,7 +269,12 @@ storage_client = ObjectStorageClient(
     .add_scoped(UpdateUserPort, UpdateUserUseCase)
     .add_scoped(InitLoginPort, InitLoginUseCase)
     .add_scoped(FinalizeLoginPort, FinalizeLoginUseCase)
+    .add_scoped(AuthorizeSubjectPort, AuthorizeSubjectUseCase)
     .add_scoped(CreateInitialUserPort, CreateInitialUserUseCase)
+    .add_scoped(UnclassifiedRequirement)
+    .add_scoped(ControlledRequirement)
+    .add_scoped(RestrictedRequirement)
+    .add_scoped(ConfidentialRequirement)
     # Outgoing education adapters
     .add_scoped(ProjectRepositoryPort, PostgresProjectRepositoryAdapter)
     .add_scoped(ProjectStudentRepositoryPort, PostgresProjectStudentRepositoryAdapter)

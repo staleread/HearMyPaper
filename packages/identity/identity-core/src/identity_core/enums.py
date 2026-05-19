@@ -1,4 +1,4 @@
-from enum import StrEnum
+from enum import StrEnum, IntFlag
 
 
 class AccessLevel(StrEnum):
@@ -6,3 +6,8 @@ class AccessLevel(StrEnum):
     CONTROLLED = "CONTROLLED"
     RESTRICTED = "RESTRICTED"
     CONFIDENTIAL = "CONFIDENTIAL"
+
+
+class AccessType(IntFlag):
+    READ = 1
+    WRITE = 2

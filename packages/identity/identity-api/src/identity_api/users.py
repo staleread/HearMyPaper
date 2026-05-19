@@ -5,6 +5,7 @@ from datetime import datetime
 from blacksheep import FromJSON
 from blacksheep.server.responses import created, not_found, ok, status_code
 from blacksheep.server.controllers import Controller, get, post, put
+from blacksheep.server.authorization import auth
 from pydantic import BaseModel, EmailStr
 
 from identity_core.enums import AccessLevel
@@ -72,6 +73,7 @@ class Users(Controller):
         self.get_user_public_key_port = get_user_public_key_port
         self.update_user_port = update_user_port
 
+    @auth("CONFIDENTIAL")
     @post("/")
     async def create_user(self, data: FromJSON[UserCreateRequest]):
         req = data.value
@@ -100,6 +102,7 @@ class Users(Controller):
         except (UserAlreadyExistsError, IdentityCollisionError) as e:
             return status_code(409, str(e))
 
+    @auth("CONFIDENTIAL")
     @get("/{user_id}")
     async def get_user(self, user_id: str):
         """Retrieves a user by ID."""
@@ -119,6 +122,7 @@ class Users(Controller):
         except UserNotFoundError as e:
             return not_found(str(e))
 
+    @auth("UNCLASSIFIED")
     @get("/{user_id}/public-key")
     async def get_user_public_key(self, user_id: str):
         """Retrieves a user's public key by ID."""
@@ -128,6 +132,7 @@ class Users(Controller):
         except UserNotFoundError as e:
             return not_found(str(e))
 
+    @auth("CONFIDENTIAL")
     @put("/{user_id}")
     async def update_user(self, user_id: str, data: FromJSON[UserUpdateRequest]):
         req = data.value

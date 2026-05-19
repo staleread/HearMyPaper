@@ -71,7 +71,7 @@ class Projects(Controller):
         self.create_project_port = create_project_port
         self.update_project_port = update_project_port
 
-    @auth()
+    @auth("CONTROLLED")
     @get("/")
     async def get_projects(self, request: Request):
         user_id = request.user.claims.get("sub")
@@ -91,7 +91,7 @@ class Projects(Controller):
             ]
         )
 
-    @auth()
+    @auth("CONTROLLED")
     @get("/{project_id}")
     async def get_project(self, project_id: UUID):
         try:
@@ -109,7 +109,7 @@ class Projects(Controller):
         except ProjectNotFoundError as e:
             return not_found(str(e))
 
-    @auth()
+    @auth("CONTROLLED")
     @post("/")
     async def create_project(
         self, request: Request, data: FromJSON[ProjectCreateRequest]
@@ -143,7 +143,7 @@ class Projects(Controller):
         except InstructorNotFoundError as e:
             return not_found(str(e))
 
-    @auth()
+    @auth("CONTROLLED")
     @put("/{project_id}")
     async def update_project(
         self, project_id: UUID, data: FromJSON[ProjectUpdateRequest]
