@@ -8,8 +8,9 @@ from identity_core.ports.incoming import AuthorizeSubjectPort
 class BellLaPadulaRequirement(Requirement):
     level: AccessLevel
 
-    def __init__(self, request: Request):
+    def __init__(self, request: Request, authorize_subject_port: AuthorizeSubjectPort):
         self.request = request
+        self.authorize_subject_port = authorize_subject_port
 
     def _get_access_type(self, method: str) -> AccessType:
         if method in {"GET", "HEAD", "OPTIONS"}:
@@ -35,10 +36,9 @@ class BellLaPadulaRequirement(Requirement):
                 ],
             )
 
-            authorize_subject_port = self.request.services.get(AuthorizeSubjectPort)
             access_type = self._get_access_type(self.request.method)
 
-            authorize_subject_port(
+            self.authorize_subject_port(
                 subject,
                 access_type=access_type,
                 object_access_level=self.level,
